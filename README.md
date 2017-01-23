@@ -2,9 +2,9 @@
 
 Ideen Doc: https://docs.google.com/document/d/1I86jCiSxkUiOldzZ_XSB1ZsVTcj7TMt-E8Wmi-W6avo/edit
 
-Piston Links: https://www.reddit.com/r/rust_gamedev/ 
-              https://github.com/PistonDevelopers/Piston-Tutorials
-              https://github.com/pistondevelopers/piston-examples
+Piston Links: https://www.reddit.com/r/rust_gamedev/ <br />
+              https://github.com/PistonDevelopers/Piston-Tutorials <br />
+              https://github.com/pistondevelopers/piston-examples <br />
 
 
 Ihr habt den Umfang auch im Wesentlichen schon gut abgesteckt; also 
