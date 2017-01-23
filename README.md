@@ -33,5 +33,3 @@ extrahieren kann, indem man z.B. die entsprechenden HTML-Seiten in einem
 Rust-Programm herunterlädt und die gesuchten Dinge herausparst oder eben 
 direkt entsprechende Datenbanken anzapft. Dann müsst ihr euch auch nicht 
 mehr auf die ersten 151 beschränken. ;)
-
-test
