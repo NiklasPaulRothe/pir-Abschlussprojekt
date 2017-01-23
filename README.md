@@ -1,19 +1,21 @@
-# pir-Abschlussprojekt
+# Notizen
 
-Commits: 
-  * -auf Master nur kompilierende Sachen commiten
-  * -englische Commits
-  * -beschreibung nur wenn nötig
+## Commits: 
+  * auf Master nur kompilierende Sachen commiten
+  * englische Commits
+  * beschreibung nur wenn nötig
 
 
-Ideen Doc: https://docs.google.com/document/d/1I86jCiSxkUiOldzZ_XSB1ZsVTcj7TMt-E8Wmi-W6avo/edit
+## Ideen Doc: 
+https://docs.google.com/document/d/1I86jCiSxkUiOldzZ_XSB1ZsVTcj7TMt-E8Wmi-W6avo/edit
 
-Piston Links:
+## Piston Links:
 * https://www.reddit.com/r/rust_gamedev/
 * https://github.com/PistonDevelopers/Piston-Tutorials
 * https://github.com/pistondevelopers/piston-examples
 
 
+## E-Mail:
 Ihr habt den Umfang auch im Wesentlichen schon gut abgesteckt; also 
 Kampfarena (vielleicht erstmal mit nur einem Modus und dann könnt ihr 
 weitersehen ;)) mit 2D-Graphik -- vielleicht so wie in den frühen 
