@@ -4,3 +4,7 @@ version = "0.1.0"
 authors = ["lukav"]
 
 [dependencies]
+csv = "0.14"
+enum_primitive = "0.1"
+num = "0.1"
+rand = "0.3"
