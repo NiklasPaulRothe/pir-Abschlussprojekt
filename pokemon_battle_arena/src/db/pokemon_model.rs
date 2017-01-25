@@ -7,6 +7,8 @@ use self::num::FromPrimitive;
 use self::regex::Regex;
 use std::collections::HashMap;
 
+///enum for the pokemon/attack types.
+///Can be assigned from i32 value.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone)]
     pub enum types {
@@ -32,6 +34,7 @@ enum_from_primitive! {
     }
 }
 
+///Basic values for Pokemon species. Equal for every instance of the given Pokemon.
 #[derive(Debug, Clone)]
 pub struct PokemonModel {
     pub pokedex_id: usize,
@@ -42,6 +45,7 @@ pub struct PokemonModel {
     pub mega_evolution: Box<Option<PokemonModel>>,
 }
 
+///contains the main stats for every Pokemon.
 #[derive(Debug, Clone)]
 pub struct stats {
     pub hp: u16,
@@ -55,9 +59,11 @@ pub struct stats {
 ///creates a pokedex with all known Pokemon
 pub fn create_pokedex() -> Vec<PokemonModel> {
     let mut pokemon = Vec::new();
-    let mut pokemon_db = csv::Reader::from_file("./src/db/tables/pokemon.csv").unwrap();
     let re = Regex::new(r"mega").unwrap();
     let mut mega = HashMap::new();
+
+    //creates the basic pokemon model with pokedex ID and name.
+    let mut pokemon_db = csv::Reader::from_file("./src/db/tables/pokemon.csv").unwrap();
     for record in pokemon_db.decode() {
         let(id, name, species, _, _, _, _, _): (usize, String, usize, usize, usize, usize, usize, usize)
             = record.unwrap();
@@ -79,6 +85,7 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
                 mega_evolution: Box::new(None),
             });
         }
+        //adds mega evolutions if available
         else if id > 10000 && re.is_match(&name) {
             pokemon[species - 1].mega_evolution = Box::new(Some(PokemonModel {
                 pokedex_id: id,
@@ -95,9 +102,12 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
                 },
                 mega_evolution: Box::new(None),
             }));
+            //saves where to find the mega evolutions by their ID
             mega.insert(id, species);
         }
     }
+
+    //adds types to the constructed pokemon models
     let mut type_db = csv::Reader::from_file("./src/db/tables/pokemon_types.csv").unwrap();
     for record in type_db.decode() {
         let(poke_id, type_id, slot): (usize, i32, u16) = record.unwrap();
@@ -128,6 +138,8 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
             }
         }
     }
+
+    //adds the base stats to every Pokemon Model
     let mut stat_db = csv::Reader::from_file("./src/db/tables/pokemon_stats.csv").unwrap();
     for record in stat_db.decode() {
         let(poke_id, stat_id, stat, _): (usize, u8, u16, u8) = record.unwrap();
@@ -193,6 +205,7 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
     pokemon
 }
 
+///returns a pokemon from it's pokedex number
 pub fn pokemon_by_id(id: usize) -> Option<PokemonModel> {
     let pokedex = create_pokedex();
     if id < 722 {
@@ -201,6 +214,7 @@ pub fn pokemon_by_id(id: usize) -> Option<PokemonModel> {
     None
 }
 
+///returns a pokemon from it's name
 pub fn pokemon_by_name(name: String, pokedex: Vec<PokemonModel>) -> Option<PokemonModel> {
     for entry in pokedex {
         if entry.name == name {

@@ -5,7 +5,8 @@ extern crate rustc_serialize;
 use super::pokemon_model;
 use self::num::FromPrimitive;
 
-#[derive(Debug, RustcDecodable)]
+///contains all important information of a move
+#[derive(Debug, RustcDecodable, Clone)]
 pub struct Technique {
     attack_id: u16,
     name: String,
@@ -17,9 +18,11 @@ pub struct Technique {
     target: Target,
     damage_class: DamageClass,
     effect_id: u16,
-    effect_chance: Option<u8>,
+    effect_chance: u8,
 }
 
+///temporary struct to read out of a csv file
+///Is needed, because reading into a tuple isn't possible because of the number of columns
 #[derive(Debug, RustcDecodable)]
 pub struct TechniqueTmp {
     attack_id: u16,
@@ -39,8 +42,10 @@ pub struct TechniqueTmp {
     contest_three: Option<usize>,
 }
 
+///enum for the Damage Class of a attack.
+///Can be assigned from a i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable)]
+    #[derive(Debug, RustcDecodable, Clone)]
     enum DamageClass {
         Physical = 1,
         Special = 2,
@@ -48,8 +53,10 @@ enum_from_primitive! {
     }
 }
 
+///Enum that contains the valid target(s) of a move.
+///Can be assigned from a i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable)]
+    #[derive(Debug, RustcDecodable, Clone)]
     enum Target {
         SpecificMove = 1,
         SelectedPokemonMeFirst = 2,
@@ -68,11 +75,16 @@ enum_from_primitive! {
     }
 }
 
+///creates similar to the pokedex a Vec that contains all known moves.
 pub fn create_movedex() -> Vec<Technique> {
     let mut moves = Vec::new();
     let mut move_db = csv::Reader::from_file("./src/db/tables/moves.csv").unwrap();
     for record in move_db.decode() {
         let tmp: TechniqueTmp = record.unwrap();
+        let chance = match tmp.effect_chance {
+            Some(n) => n,
+            None => 100,
+        };
         if tmp.attack_id < 622 {
             let attack = Technique {
                 attack_id: tmp.attack_id,
@@ -86,10 +98,18 @@ pub fn create_movedex() -> Vec<Technique> {
                 target: Target::from_i32(tmp.target).unwrap(),
                 damage_class: DamageClass::from_i32(tmp.damage_class).unwrap(),
                 effect_id: tmp.effect,
-                effect_chance: tmp.effect_chance
+                effect_chance: chance,
             };
             moves.push(attack);
         }
     }
     moves
+}
+
+pub fn move_by_id(id: usize) -> Option<Technique> {
+    let movedex = create_movedex();
+    if id < 622 {
+        return Some(movedex[id - 1].clone());
+    }
+    None
 }

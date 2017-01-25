@@ -12,6 +12,13 @@ pub struct PokemonToken {
     mega_evolution: Box<Option<pokemon_model::PokemonModel>>,
 }
 
+#[derive(Debug, Clone)]
+enum gender {
+    male,
+    female,
+    genderless,
+}
+
 impl PokemonToken {
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
         PokemonToken {
@@ -32,11 +39,4 @@ impl PokemonToken {
         }
         None
     }
-}
-
-#[derive(Debug, Clone)]
-enum gender {
-    male,
-    female,
-    genderless,
 }
