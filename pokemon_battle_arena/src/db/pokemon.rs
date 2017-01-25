@@ -1,11 +1,12 @@
 extern crate num;
 extern crate csv;
+extern crate rustc_serialize;
 
 use self::num::FromPrimitive;
 
 enum_from_primitive! {
-    #[derive(Debug)]
-    enum types {
+    #[derive(Debug, RustcDecodable, Clone)]
+    pub enum types {
         normal = 1,
         fighting = 2,
         flying = 3,
@@ -24,13 +25,13 @@ enum_from_primitive! {
         dragon = 16,
         dark = 17,
         fairy = 18,
-        empty = 19,
+        undefined = 19,
     }
 }
 
-#[derive(Debug)]
-pub struct pokemon_model {
-    pokedex_id: u16,
+#[derive(Debug, Clone)]
+pub struct pokemonModel {
+    pokedex_id: usize,
     name: String,
     type_one: types,
     type_two: types,
@@ -43,14 +44,14 @@ pub struct pokemon_model {
 }
 
 ///creates a pokedex with all known Pokemon
-pub fn create_pokedex() -> Vec<pokemon_model> {
+pub fn create_pokedex() -> Vec<pokemonModel> {
     let mut pokemon = Vec::new();
     let mut pokemon_db = csv::Reader::from_file("./src/db/tables/pokemon.csv").unwrap();
     for record in pokemon_db.decode() {
-        let(id, name, _, _, _, _, _, _): (u16, String, usize, usize, usize, usize, usize, usize)
+        let(id, name, _, _, _, _, _, _): (usize, String, usize, usize, usize, usize, usize, usize)
             = record.unwrap();
         if id < 722 {
-            pokemon.push(pokemon_model {pokedex_id: id, name: name,
+            pokemon.push(pokemonModel {pokedex_id: id, name: name,
                 type_one: types::from_i32(19).unwrap(), type_two: types::from_i32(19).unwrap(),
                 hp: 0, attack: 0, defense: 0, special_attack: 0, special_defense: 0, speed: 0});
         }
@@ -82,4 +83,18 @@ pub fn create_pokedex() -> Vec<pokemon_model> {
         }
     }
     pokemon
+}
+
+pub fn pokemon_by_id(id: usize) -> pokemonModel {
+    let pokedex = create_pokedex();
+    pokedex[id - 1].clone()
+}
+
+pub fn pokemon_by_name(name: String, pokedex: Vec<pokemonModel>) -> Option<pokemonModel> {
+    for entry in pokedex {
+        if entry.name == name {
+            return Some(entry)
+        }
+    }
+    None
 }
