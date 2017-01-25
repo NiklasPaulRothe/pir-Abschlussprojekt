@@ -34,17 +34,22 @@ enum_from_primitive! {
 
 #[derive(Debug, Clone)]
 pub struct PokemonModel {
-    pokedex_id: usize,
-    name: String,
-    type_one: types,
-    type_two: types,
-    hp: u16,
-    attack: u16,
-    defense: u16,
-    special_attack: u16,
-    special_defense: u16,
-    speed: u16,
+    pub pokedex_id: usize,
+    pub name: String,
+    pub type_one: types,
+    pub type_two: types,
+    pub base_stats: stats,
     pub mega_evolution: Box<Option<PokemonModel>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct stats {
+    pub hp: u16,
+    pub attack: u16,
+    pub defense: u16,
+    pub special_attack: u16,
+    pub special_defense: u16,
+    pub speed: u16,
 }
 
 ///creates a pokedex with all known Pokemon
@@ -63,12 +68,14 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
                 name: name,
                 type_one: types::from_i32(19).unwrap(),
                 type_two: types::from_i32(19).unwrap(),
-                hp: 0,
-                attack: 0,
-                defense: 0,
-                special_attack: 0,
-                special_defense: 0,
-                speed: 0,
+                base_stats: stats {
+                    hp: 0,
+                    attack: 0,
+                    defense: 0,
+                    special_attack: 0,
+                    special_defense: 0,
+                    speed: 0,
+                },
                 mega_evolution: Box::new(None),
             });
         }
@@ -78,12 +85,14 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
                 name: name,
                 type_one: types::from_i32(19).unwrap(),
                 type_two: types::from_i32(19).unwrap(),
-                hp: 0,
-                attack: 0,
-                defense: 0,
-                special_attack: 0,
-                special_defense: 0,
-                speed: 0,
+                base_stats: stats {
+                    hp: 0,
+                    attack: 0,
+                    defense: 0,
+                    special_attack: 0,
+                    special_defense: 0,
+                    speed: 0,
+                },
                 mega_evolution: Box::new(None),
             }));
             mega.insert(id, species);
@@ -124,12 +133,12 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
         let(poke_id, stat_id, stat, _): (usize, u8, u16, u8) = record.unwrap();
         if poke_id < 722 {
             match stat_id {
-                1 => pokemon[poke_id - 1].hp = stat,
-                2 => pokemon[poke_id - 1].attack = stat,
-                3 => pokemon[poke_id - 1].defense = stat,
-                4 => pokemon[poke_id - 1].special_attack = stat,
-                5 => pokemon[poke_id - 1].special_defense = stat,
-                6 => pokemon[poke_id - 1].speed = stat,
+                1 => pokemon[poke_id - 1].base_stats.hp = stat,
+                2 => pokemon[poke_id - 1].base_stats.attack = stat,
+                3 => pokemon[poke_id - 1].base_stats.defense = stat,
+                4 => pokemon[poke_id - 1].base_stats.special_attack = stat,
+                5 => pokemon[poke_id - 1].base_stats.special_defense = stat,
+                6 => pokemon[poke_id - 1].base_stats.speed = stat,
                 _ => unreachable!(),
             }
         }
@@ -138,42 +147,42 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
                 1 => {
                     let mut poke = pokemon[(mega.get(&poke_id)).unwrap() - 1].clone().
                     mega_evolution.unwrap();
-                    poke.hp = stat;
+                    poke.base_stats.hp = stat;
                     pokemon[(mega.get(&poke_id)).unwrap() - 1].mega_evolution =
                     Box::new(Some(poke));
                 },
                 2 => {
                     let mut poke = pokemon[(mega.get(&poke_id)).unwrap() - 1].clone().
                     mega_evolution.unwrap();
-                    poke.attack = stat;
+                    poke.base_stats.attack = stat;
                     pokemon[(mega.get(&poke_id)).unwrap() - 1].mega_evolution =
                     Box::new(Some(poke));
                 },
                 3 => {
                     let mut poke = pokemon[(mega.get(&poke_id)).unwrap() - 1].clone().
                     mega_evolution.unwrap();
-                    poke.defense = stat;
+                    poke.base_stats.defense = stat;
                     pokemon[(mega.get(&poke_id)).unwrap() - 1].mega_evolution =
                     Box::new(Some(poke));
                 },
                 4 => {
                     let mut poke = pokemon[(mega.get(&poke_id)).unwrap() - 1].clone().
                     mega_evolution.unwrap();
-                    poke.special_attack = stat;
+                    poke.base_stats.special_attack = stat;
                     pokemon[(mega.get(&poke_id)).unwrap() - 1].mega_evolution =
                     Box::new(Some(poke));
                 },
                 5 => {
                     let mut poke = pokemon[(mega.get(&poke_id)).unwrap() - 1].clone().
                     mega_evolution.unwrap();
-                    poke.special_defense = stat;
+                    poke.base_stats.special_defense = stat;
                     pokemon[(mega.get(&poke_id)).unwrap() - 1].mega_evolution =
                     Box::new(Some(poke));
                 },
                 6 => {
                     let mut poke = pokemon[(mega.get(&poke_id)).unwrap() - 1].clone().
                     mega_evolution.unwrap();
-                    poke.speed = stat;
+                    poke.base_stats.speed = stat;
                     pokemon[(mega.get(&poke_id)).unwrap() - 1].mega_evolution =
                     Box::new(Some(poke));
                 },

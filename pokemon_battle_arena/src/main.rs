@@ -10,5 +10,8 @@ mod graphic;
 mod player;
 
 fn main() {
-    println!("Hello World");
+    let pokedex = db::pokemon_model::create_pokedex();
+    let ivysaur = db::pokemon_token::PokemonToken::from_model(pokedex[2].clone());
+    println!("{:?}", ivysaur);
+    println!("{:?}", ivysaur.get_mega());
 }
