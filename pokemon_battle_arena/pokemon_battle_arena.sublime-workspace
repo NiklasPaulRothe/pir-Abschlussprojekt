@@ -1,0 +1,433 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"player",
+				"player_two"
+			],
+			[
+				"playe",
+				"player_one"
+			],
+			[
+				"Tt",
+				"TttItem"
+			],
+			[
+				"E",
+				"Empty"
+			],
+			[
+				"play",
+				"player_two"
+			],
+			[
+				"Playe",
+				"Player"
+			],
+			[
+				"from",
+				"from_str"
+			],
+			[
+				"token",
+				"token_in"
+			],
+			[
+				"is_",
+				"is_match"
+			],
+			[
+				"sun",
+				"subcommand"
+			],
+			[
+				"Lowe",
+				"LowerHex"
+			],
+			[
+				"fmt",
+				"fmt_trait"
+			],
+			[
+				"ve",
+				"vec3"
+			],
+			[
+				"v",
+				"vec2"
+			],
+			[
+				"Swagger",
+				"SwaggerExt"
+			],
+			[
+				"Veco",
+				"Vector2"
+			],
+			[
+				"assert",
+				"assert_eq\tassert_eq!(…, …)"
+			],
+			[
+				"poke",
+				"pokemon_1"
+			],
+			[
+				"Type",
+				"TypeEffectiveness"
+			],
+			[
+				"stats",
+				"Stats"
+			],
+			[
+				"Po",
+				"PokemonModel"
+			],
+			[
+				"find",
+				"find_pokemon_by_name"
+			],
+			[
+				"Di",
+				"Division"
+			],
+			[
+				"P",
+				"Product"
+			],
+			[
+				"Ausgabe",
+				"Ausgabe"
+			],
+			[
+				"to",
+				"to_string"
+			],
+			[
+				"Err",
+				"ErrorType"
+			],
+			[
+				"next_",
+				"next_step"
+			],
+			[
+				"ne",
+				"next_step"
+			],
+			[
+				"num_",
+				"num_two"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 150.0,
+		"last_filter": "Package Control: in",
+		"selected_items":
+		[
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 432.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"count 'W'",
+			"count W",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+	],
+	"file_history":
+	[
+		"/D/pir-Abschlussprojekt/pokemon_battle_arena/Cargo.toml",
+		"/C/Users/Matze/Desktop/Rust Workingdirectory Path.txt",
+		"/D/pir-Abschlussprojekt/.gitignore",
+		"/D/pir-Abschlussprojekt/.travis.yml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/.travis.yml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/.gitignore",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet11/task2/src/game/ki.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet11/task2/src/game/human.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet11/task2/src/game/field.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet11/task2/src/game/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet11/task2/src/control.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet11/task2/src/main.rs",
+		"/C/Users/Matze/Desktop/CSGO Nützliches.txt",
+		"/C/Users/Matze/Desktop/RoadToGlobal.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-Abschlussprojekt/pokemon_battle_arena/src/graphic/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-Abschlussprojekt/pokemon_battle_arena/src/main.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-Abschlussprojekt/pokemon_battle_arena/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-Abschlussprojekt/pokemon_battle_arena/src/player/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-Abschlussprojekt/pokemon_battle_arena/src/player/human/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-Abschlussprojekt/README.md",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet11/task2/src/game/player.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task1/magic.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/src/randomization.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/src/main.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/src/control.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/ci/test-all.sh",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/ci/run-all.sh",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task1/magic.s",
+		"/C/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg/PJumpmouse.cfg",
+		"/C/Users/Matze/OneDrive/Documents/Studium/coxileaks.txt",
+		"/C/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg/PlayConfig.cfg",
+		"/C/Users/Matze/Desktop/magic.s",
+		"/C/Users/Matze/AppData/Local/Temp/Rar$DIa0.639/ReadMe.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/src/randomization/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/src/randomization/choose.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/src/randomization/dice.rs",
+		"/C/Users/Matze/OneDrive/Documents/Steam/CSGO config/Jack Jasras autoexec.cfg",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/src/parse.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/task2/random_tool/src/randomization/New Text Document.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/random_tool/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/random_tool/src/main.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet10/random/Cargo.toml",
+		"/C/Users/Matze/Desktop/Pokemon Spiel.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet9/task3/hash-macro.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet9/task2/swagger.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet9/task1/try-opt.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet8/task2/sort.rs",
+		"/C/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg/PCrossHairTest.cfg",
+		"/C/Users/Matze/OneDrive/Documents/Steam/CSGO config/16.12.07/PlayConfig.cfg",
+		"/C/Users/Matze/OneDrive/Documents/Steam/CSGO config/16.12.07/PCrossHairTest.cfg",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet7/task2/functions.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet7/task4/src/main.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet7/task4/Peter.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet7/task4/orig.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet7/task4/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet7/task3/fold.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet7/task1/fibonacci_iterator.rs",
+		"/C/Users/Matze/OneDrive/Documents/Rust/maze/src/database/maze.rs",
+		"/C/Users/Matze/OneDrive/Documents/Rust/maze/src/functions/input.rs",
+		"/C/Users/Matze/OneDrive/Documents/Rust/maze/src/database/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Rust/maze/src/game/choose_level.rs",
+		"/C/Users/Matze/OneDrive/Documents/Rust/maze/src/main.rs",
+		"/C/Users/Matze/OneDrive/Documents/Rust/maze/src/game/mod.rs",
+		"/G/Win 10/Win10 Key + Anleitung.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet6/task3/swag.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet6/task2/src/tests.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet6/task2/src/lib.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet6/task1/src/tests.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet6/task1/src/lib.rs",
+		"/C/Users/Matze/OneDrive/Documents/Rust/maze/src/functions/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet6/task2/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Rust/maze/README.md",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet6/task1/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet6/task1/src/main.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/engine/canon.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/db/types.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/db/data.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/db/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/game/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/engine/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/Cargo.toml",
+		"/C/Users/Matze/AppData/Local/lxss/home/bash-matze-pc/.ssh/id_rsa.pub",
+		"/C/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg/PCrossHairTest.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/engine/types_function.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/db/types/types_function.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/db/types/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/main.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/src/lib.rs",
+		"/C/Users/Matze/Desktop/poki/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/game/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/engine/canon.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/engine/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/db/types/types_function.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/db/types/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/db/data.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/db/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/main.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/Cargo.toml",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/db/types_function.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/poki/src/db/types.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/main.rs",
+		"/C/Users/Matze/AppData/Local/Temp/Rar$DIa0.051/Instance.java",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/engine/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet5/task1/db/mod.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet4/task2/calculator.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet4/task1/bad.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet3/Task2/pokemon.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/test/errorhandling.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet3/task2/poki.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet3/task1/rule90.rs",
+		"/F/000 - SteamGames/steamapps/common/call of duty modern warfare 3/players2/config.cfg",
+		"/F/Call of Duty 4 - Modern Warfare  1.7™/Neu Textdokument.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet2/task1/prime.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet2/task2/sort.rs",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet2/task3/count.rs",
+		"/C/Users/Matze/Desktop/New Text Document.txt",
+		"/C/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg/autoexec.cfg",
+		"/C/Users/Matze/OneDrive/Documents/Steam/CSGO config/Andre Acc.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet2/task2/New Text Document.txt",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet1/task2/collatz.rs",
+		"/C/Users/Matze/AppData/Local/Temp/Rar$DIa0.967/Instance.java",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet1/task1/README.md",
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/README.md",
+		"/C/Users/Matze/AppData/Local/lxss/root/.ssh/id_rsa.pub",
+		"/C/Users/Matze/AppData/Local/lxss/root/.ssh/id_rsa",
+		"/C/Users/Matze/Desktop/TTT Serverdaten.txt"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"d",
+			"write",
+			"9",
+			"give_number",
+			"sens",
+			"step",
+			"keys"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "pokemon_battle_arena.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
