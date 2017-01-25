@@ -2,14 +2,14 @@ extern crate csv;
 extern crate num;
 extern crate rustc_serialize;
 
-use super::pokemon;
+use super::pokemon_model;
 use self::num::FromPrimitive;
 
 #[derive(Debug, RustcDecodable)]
 pub struct Technique {
     attack_id: u16,
     name: String,
-    attack_type: pokemon::types,
+    attack_type: pokemon_model::types,
     power: Option<u16>,
     power_points: Option<u8>,
     accuracy: Option<u16>,
@@ -77,8 +77,8 @@ pub fn create_movedex() -> Vec<Technique> {
             let attack = Technique {
                 attack_id: tmp.attack_id,
                 name: tmp.name,
-                attack_type: pokemon::types::from_i32(tmp.attack_type).
-                unwrap_or(pokemon::types::undefined),
+                attack_type: pokemon_model::types::from_i32(tmp.attack_type).
+                unwrap_or(pokemon_model::types::undefined),
                 power: tmp.power,
                 power_points: tmp.power_points,
                 accuracy: tmp.accuracy,
