@@ -10,7 +10,7 @@ use std::collections::HashMap;
 ///enum for the pokemon/attack types.
 ///Can be assigned from i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone)]
+    #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash)]
     pub enum types {
         normal = 1,
         fighting = 2,

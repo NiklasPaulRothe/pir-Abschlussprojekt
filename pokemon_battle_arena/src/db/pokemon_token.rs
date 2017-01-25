@@ -5,9 +5,9 @@ use super::natures;
 pub struct PokemonToken {
     pokedex_id: usize,
     name: String,
-    gender: gender,
-    type_one: pokemon_model::types,
-    type_two: pokemon_model::types,
+    gender: Gender,
+    pub type_one: pokemon_model::types,
+    pub type_two: pokemon_model::types,
     nature: natures::Nature,
     base_stats: pokemon_model::stats,
     current_stats: pokemon_model::stats,
@@ -15,10 +15,10 @@ pub struct PokemonToken {
 }
 
 #[derive(Debug, Clone)]
-enum gender {
-    male,
-    female,
-    genderless,
+enum Gender {
+    Male,
+    Female,
+    Genderless,
 }
 
 impl PokemonToken {
@@ -26,7 +26,7 @@ impl PokemonToken {
         PokemonToken {
             pokedex_id: model.pokedex_id,
             name: model.name,
-            gender: gender::male,
+            gender: Gender::Male,
             type_one: model.type_one,
             type_two: model.type_two,
             nature: natures::get_random_nature(),
