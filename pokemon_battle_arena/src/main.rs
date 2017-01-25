@@ -1,6 +1,8 @@
 #[macro_use] extern crate enum_primitive;
+#[macro_use] extern crate conrod;
 extern crate rustc_serialize;
 extern crate time;
+
 
 use time::get_time;
 
@@ -10,5 +12,5 @@ mod graphic;
 mod player;
 
 fn main() {
-    println!("Hello World");
+    graphic::windows::draw_startscreen();
 }
