@@ -1,38 +1,39 @@
 {
-	"build_systems":
-	[
-		{
-			"name": "List",
-			"shell_cmd": "ls -l"
-		},
-		{
-			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-			"name": "Anaconda Python Builder",
-			"selector": "source.python",
-			"shell_cmd": "\"python\" -u \"$file\""
-		}
-	],
-	"folders":
-	[
-		{
-			"folder_exclude_patterns":
-			[
-				"backup"
-			],
-			"follow_symlinks": true,
-			"path": "src"
-		},
-		{
-			"file_exclude_patterns":
-			[
-				"*.css"
-			],
-			"name": "Documentation",
-			"path": "docs"
-		}
-	],
-	"settings":
-	{
-		"tab_size": 8
-	}
+        "build_systems":
+        [
+                {
+                        "name": "List",
+                        "shell_cmd": "ls -l"
+                },
+                {
+                        "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+                        "name": "Anaconda Python Builder",
+                        "selector": "source.python",
+                        "shell_cmd": "\"python\" -u \"$file\""
+                }
+        ],
+        "folders":
+        [
+                {
+                        "folder_exclude_patterns":
+                        [
+                                "target",
+                        ],
+                        "follow_symlinks": true,
+                        "path": "../pokemon_battle_arena"
+                },
+
+                {
+                        "file_exclude_patterns":
+                        [
+                                "*.css"
+                        ],
+                        "name": "Documentation",
+                        "path": "docs"
+                }
+        ],
+        "settings":
+        {
+                "tab_size": 8
+        }
 }

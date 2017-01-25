@@ -171,9 +171,12 @@
 	},
 	"expanded_folders":
 	[
+		"/D/pir-Abschlussprojekt/pokemon_battle_arena",
+		"/D/pir-Abschlussprojekt/pokemon_battle_arena/src"
 	],
 	"file_history":
 	[
+		"/D/pir-Abschlussprojekt/pokemon_battle_arena/pokemon_battle_arena.sublime-project",
 		"/D/pir-Abschlussprojekt/pokemon_battle_arena/Cargo.toml",
 		"/C/Users/Matze/Desktop/Rust Workingdirectory Path.txt",
 		"/D/pir-Abschlussprojekt/.gitignore",
@@ -300,8 +303,7 @@
 		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet1/task1/README.md",
 		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/README.md",
 		"/C/Users/Matze/AppData/Local/lxss/root/.ssh/id_rsa.pub",
-		"/C/Users/Matze/AppData/Local/lxss/root/.ssh/id_rsa",
-		"/C/Users/Matze/Desktop/TTT Serverdaten.txt"
+		"/C/Users/Matze/AppData/Local/lxss/root/.ssh/id_rsa"
 	],
 	"find":
 	{
@@ -425,7 +427,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 150.0,
+	"side_bar_width": 278.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
