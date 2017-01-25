@@ -65,8 +65,8 @@ pub fn create_pokedex() -> Vec<PokemonModel> {
     //creates the basic pokemon model with pokedex ID and name.
     let mut pokemon_db = csv::Reader::from_file("./src/db/tables/pokemon.csv").unwrap();
     for record in pokemon_db.decode() {
-        let(id, name, species, _, _, _, _, _): (usize, String, usize, usize, usize, usize, usize, usize)
-            = record.unwrap();
+        let(id, name, species, _, _, _, _, _):
+        (usize, String, usize, usize, usize, usize, usize, usize) = record.unwrap();
         let re = Regex::new(r"mega").unwrap();
         if id < 722 {
             pokemon.push(PokemonModel {

@@ -10,5 +10,7 @@ mod graphic;
 mod player;
 
 fn main() {
-    println!("{:?}", db::moves::move_by_id(134));
+    for entry in db::natures::create_naturedex(){
+        println!("{:?}", entry);
+    }
 }
