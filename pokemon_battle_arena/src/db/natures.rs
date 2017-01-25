@@ -1,8 +1,10 @@
 extern crate csv;
+extern crate rand;
 
 use super::pokemon_model;
+use self::rand::{thread_rng, sample};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Nature {
     id: usize,
     name: String,
@@ -10,6 +12,7 @@ pub struct Nature {
     increase_stat: String,
 }
 
+///creates a Vec with all natures in it.
 pub fn create_naturedex() -> Vec<Nature> {
     let mut natures = Vec::new();
     let mut nature_db = csv::Reader::from_file("./src/db/tables/natures.csv").unwrap();
@@ -44,4 +47,11 @@ pub fn create_naturedex() -> Vec<Nature> {
         })
     }
     natures
+}
+
+pub fn get_random_nature() -> Nature {
+    let dex = create_naturedex();
+    let mut rng = thread_rng();
+    let nature = sample(&mut rng, dex.iter(), 1);
+    nature[0].clone()
 }

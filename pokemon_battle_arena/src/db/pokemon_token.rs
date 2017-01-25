@@ -1,4 +1,5 @@
 use super::pokemon_model;
+use super::natures;
 
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
@@ -7,6 +8,7 @@ pub struct PokemonToken {
     gender: gender,
     type_one: pokemon_model::types,
     type_two: pokemon_model::types,
+    nature: natures::Nature,
     base_stats: pokemon_model::stats,
     current_stats: pokemon_model::stats,
     mega_evolution: Box<Option<pokemon_model::PokemonModel>>,
@@ -27,6 +29,7 @@ impl PokemonToken {
             gender: gender::male,
             type_one: model.type_one,
             type_two: model.type_two,
+            nature: natures::get_random_nature(),
             base_stats: model.base_stats.clone(),
             current_stats: model.base_stats,
             mega_evolution: model.mega_evolution,

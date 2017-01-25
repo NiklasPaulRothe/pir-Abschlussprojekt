@@ -10,7 +10,5 @@ mod graphic;
 mod player;
 
 fn main() {
-    for entry in db::natures::create_naturedex(){
-        println!("{:?}", entry);
-    }
+    println!("Hello World");
 }
