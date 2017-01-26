@@ -19,7 +19,7 @@ pub fn draw_startscreen() {
             .samples(4)
             .exit_on_esc(true)
             .build()
-            .unwrap();
+            .unwrap_or_else(|e| { panic!("Failed to build window: {}", e) });
 
     // Create the event loop.
     let mut events = WindowEvents::new();
@@ -31,7 +31,6 @@ pub fn draw_startscreen() {
     widget_ids! {
          struct Ids {
             canvas,
-            list_select,
             button_play,
             button_options,
             button_exit,
@@ -40,9 +39,13 @@ pub fn draw_startscreen() {
     let ids = Ids::new(ui.widget_id_generator());
 
     // Add a font from file
-    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap();
+    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap_or_else(
+        |e| { panic!("Failed to find folder: {}", e) }
+    );
     let font_path = assets.join("fonts/arial/arial.ttf");
-    ui.fonts.insert_from_file(font_path).unwrap();
+    ui.fonts.insert_from_file(font_path).unwrap_or_else(
+        |e| { panic!("Failed to get font: {}", e) }
+    );
 
     // No text to draw -> create an empty text texture cache.
     let mut text_texture_cache = piston::window::GlyphCache::new(&mut window, WIDTH, HEIGHT);
