@@ -1,10 +1,11 @@
-use db::pokemon_model::*;
+use db::pokedex::*;
 use player::Player;
+use db::pokemon_token::*;
 
 /// The representation of a human player
 /// Stores e.g. the pokemon the player choose
 pub struct Human {
-    pokemon_list: Vec<PokemonModel>,
+    pokemon_list: Vec<PokemonToken>,
     pokemon_count: usize,
 }
 
@@ -13,8 +14,9 @@ impl Human {
     pub fn new_by_id(input: &[usize]) -> Self {
         let mut pokemon = Vec::new();
         let len = input.len();
+        let dex = Pokedex::new();
         for i in 0..input.len() {
-            pokemon.push(pokemon_by_id(input[i]).unwrap());
+            pokemon.push(PokemonToken::from_model(dex.pokemon_by_id(input[i]).unwrap()));
         }
 
         Human {
@@ -25,7 +27,7 @@ impl Human {
 }
 
 impl Player for Human {
-    fn get_pokemon_list(&self) -> &Vec<PokemonModel> {
+    fn get_pokemon_list(&self) -> &Vec<PokemonToken> {
         &self.pokemon_list
     }
 

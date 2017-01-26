@@ -1,32 +1,28 @@
 use super::pokemon_model;
 use super::natures;
+use super::enums;
+use super::stats;
 
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
     pokedex_id: usize,
-    name: String,
-    gender: Gender,
-    pub type_one: pokemon_model::types,
-    pub type_two: pokemon_model::types,
+    pub name: String,
+    gender: enums::Gender,
+    pub type_one: enums::types,
+    pub type_two: enums::types,
     nature: natures::Nature,
-    base_stats: pokemon_model::stats,
-    current_stats: pokemon_model::stats,
+    base_stats: stats::Stats,
+    current_stats: stats::Stats,
     mega_evolution: Box<Option<pokemon_model::PokemonModel>>,
 }
 
-#[derive(Debug, Clone)]
-enum Gender {
-    Male,
-    Female,
-    Genderless,
-}
 
 impl PokemonToken {
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
         PokemonToken {
             pokedex_id: model.pokedex_id,
             name: model.name,
-            gender: Gender::Male,
+            gender: enums::Gender::Male,
             type_one: model.type_one,
             type_two: model.type_two,
             nature: natures::get_random_nature(),
