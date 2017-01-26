@@ -36,6 +36,18 @@ pub enum Gender {
     Genderless,
 }
 
+enum_from_primitive! {
+    #[derive(Debug, Clone)]
+    pub enum Stats {
+        Hp = 1,
+        Attack = 2,
+        Defense = 3,
+        Special_Attack = 4,
+        Special_Defense = 5,
+        Speed = 6
+    }
+}
+
 ///enum for the Damage Class of a attack.
 ///Can be assigned from a i32 value.
 enum_from_primitive! {

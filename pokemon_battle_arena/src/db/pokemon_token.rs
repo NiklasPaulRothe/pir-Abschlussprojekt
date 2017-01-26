@@ -25,7 +25,7 @@ impl PokemonToken {
             gender: enums::Gender::Male,
             type_one: model.type_one,
             type_two: model.type_two,
-            nature: natures::get_random_nature(),
+            nature: natures::Nature::get_random_nature(),
             base_stats: model.base_stats.clone(),
             current_stats: model.base_stats,
             mega_evolution: model.mega_evolution,

@@ -20,12 +20,16 @@ impl movedex {
         None
     }
 
+    pub fn get_entries(&self) -> Vec<Technique> {
+        self.entries.clone()
+    }
+
     fn is_complete(&self) -> bool {
         self.complete
     }
 
     ///creates similar to the pokedex a Vec that contains all known moves.
-    pub fn create_movedex() -> Vec<Technique> {
+    pub fn new() -> Vec<Technique> {
         let mut effectivity = Vec::new();
         let mut effective_db = csv::Reader::from_file("./src/db/tables/type_efficacy.csv").unwrap();
         for record in effective_db.decode() {
@@ -61,7 +65,7 @@ impl movedex {
                     power: tmp.power,
                     power_points: tmp.power_points,
                     accuracy: tmp.accuracy,
-                    has_priority: { tmp.has_priority == Some(1) },
+                    priority: { tmp.has_priority == Some(1) },
                     target: enums::Target::from_i32(tmp.target).unwrap(),
                     typeeffectiveness: effective_hash,
                     damage_class: enums::DamageClass::from_i32(tmp.damage_class).unwrap(),

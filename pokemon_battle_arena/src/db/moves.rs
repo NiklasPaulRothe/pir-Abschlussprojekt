@@ -17,7 +17,7 @@ pub struct Technique {
     power: Option<u16>,
     power_points: Option<u8>,
     accuracy: Option<u16>,
-    has_priority: bool,
+    priority: bool,
     target: enums::Target,
     typeeffectiveness: HashMap<enums::types, i8>,
     damage_class: enums::DamageClass,
@@ -36,7 +36,7 @@ pub struct TechniqueTmp {
     power: Option<u16>,
     power_points: Option<u8>,
     accuracy: Option<u16>,
-    has_priority: Option<u8>,
+    priority: Option<u8>,
     target: i32,
     damage_class: i32,
     effect: u16,
@@ -67,5 +67,45 @@ impl Technique {
             2 => enums::TypeEffectiveness::SuperEffective,
             _ => enums::TypeEffectiveness::Ineffective,
         }
+    }
+
+    pub fn get_id(&self) -> u16 {
+        self.attack_id
+    }
+
+    pub fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn get_type(&self) -> enums::types {
+        self.attack_type.clone()
+    }
+
+    pub fn get_power(&self) -> Option<u16> {
+        self.power
+    }
+
+    pub fn get_power_points(&self) -> Option<u8> {
+        self.power_points
+    }
+
+    pub fn get_accuracy(&self) -> Option<u16> {
+        self.accuracy
+    }
+
+    pub fn has_priority(&self) -> bool {
+        self.priority
+    }
+
+    pub fn get_target(&self) -> enums::Target {
+        self.target.clone()
+    }
+
+    pub fn get_damage_class(&self) -> enums::DamageClass {
+        self.damage_class.clone()
+    }
+
+    pub fn get_effect_chance(&self) -> u8 {
+        self.effect_chance
     }
 }
