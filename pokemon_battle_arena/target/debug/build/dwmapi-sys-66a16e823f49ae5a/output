@@ -1,0 +1,2 @@
+cargo:rustc-link-lib=dylib=dwmapi
+cargo:rustc-link-search=native=C:\Users\Paul\.cargo\registry\src\github.com-1ecc6299db9ec823\dwmapi-sys-0.1.0/x86_64

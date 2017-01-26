@@ -1,4 +1,5 @@
 #[macro_use] extern crate enum_primitive;
+#[macro_use] extern crate conrod;
 extern crate rustc_serialize;
 extern crate time;
 extern crate piston_window;
@@ -12,6 +13,7 @@ use time::get_time;
 use player::Player;
 
 fn main() {
+    graphic::windows::draw_startscreen();
     println!("");
     println!("Hello and Welcome to the Pokemon Battle Arena");
     println!("");
