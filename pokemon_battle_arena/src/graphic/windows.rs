@@ -30,6 +30,9 @@ pub fn draw_startscreen() {
          struct Ids {
             canvas,
             list_select,
+            button_play,
+            button_options,
+            button_exit,
         }
     }
     let ids = Ids::new(ui.widget_id_generator());
@@ -45,16 +48,6 @@ pub fn draw_startscreen() {
     // The image map describing each of our widget->image mappings (in this case none)
     let image_map = conrod::image::Map::new();
 
-    // List of entries to display.
-    let list_items = [
-        "Play".to_string(),
-        "Options".to_string(),
-        "Exit".to_string(),
-    ];
-
-    // List of selections. Will be updated by the widget.
-    let list_selected: ::std::collections::HashSet<usize> = ::std::collections::HashSet::new();
-
     // Poll events from the window.
     while let Some(event) = window.next_event(&mut events) {
 
@@ -69,40 +62,54 @@ pub fn draw_startscreen() {
             // Instantiate the conrod widgets.
             let ui = &mut ui.set_widgets();
 
+            // Create new empty canvas
             widget::Canvas::new().color(conrod::color::WHITE).set(ids.canvas, ui);
 
-            // Instantiate the `ListSelect` widget.
-            let num_items = list_items.len();
-            let item_h = 32.0;
-            let (mut events, _) = widget::ListSelect::single(num_items, item_h)
-                .w_h(350.0, 100.0)
+            // Play button
+            if widget::Button::new()
+                .border(1.0)
+                .color(conrod::color::WHITE)
+                .label("Play")
+                .label_color(conrod::color::BLACK)
                 .middle_of(ids.canvas)
-                .set(ids.list_select, ui);
+                .w_h(100.0, 30.0)
+                .set(ids.button_play, ui)
+                .was_clicked()
+            {
+                // Right now only prints play
+                // Todo: draw new window with different play modi
+                println!("Play");
+            }
 
-            // Handle the `ListSelect`s events.
-            while let Some(event) = events.next(ui, |i| list_selected.contains(&i)) {
-                use conrod::widget::list_select::Event;
-                match event {
+            // Options button
+            if widget::Button::new()
+                .border(1.0)
+                .color(conrod::color::WHITE)
+                .label("Options")
+                .label_color(conrod::color::BLACK)
+                .down_from(ids.button_play, 0.0)
+                .w_h(100.0, 30.0)
+                .set(ids.button_options, ui)
+                .was_clicked()
+            {
+                // Right now only prints option
+                // Todo: draw new window with options menu
+                println!("Options");
+            }
 
-                    // For the `Item` events we instantiate the `List`'s items.
-                    Event::Item(item) => {
-                        let label = &list_items[item.i];
-                        let font_size = item_h as conrod::FontSize / 2;
-                        let (color, label_color) = match list_selected.contains(&item.i) {
-                            true => (conrod::color::LIGHT_GREY, conrod::color::BLACK),
-                            false => (conrod::color::WHITE, conrod::color::BLACK),
-                        };
-                        let button = widget::Button::new()
-                            .border(1.0)
-                            .color(color)
-                            .label(label)
-                            .label_font_size(font_size)
-                            .label_color(label_color);
-                        item.set(button, ui);
-                    },
-
-                    _ => {}
-                }
+            // Exit button
+            if widget::Button::new()
+                .border(1.0)
+                .color(conrod::color::WHITE)
+                .label("Exit")
+                .label_color(conrod::color::BLACK)
+                .down_from(ids.button_options, 0.0)
+                .w_h(100.0, 30.0)
+                .set(ids.button_exit, ui)
+                .was_clicked()
+            {
+                // exits the programm
+                ::std::process::exit(0);
             }
         });
 
