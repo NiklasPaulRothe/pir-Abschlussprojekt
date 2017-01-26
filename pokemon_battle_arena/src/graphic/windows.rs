@@ -8,6 +8,8 @@ pub fn draw_startscreen() {
 
     const WIDTH: u32 = 800;
     const HEIGHT: u32 = 600;
+    const BUTTON_W: f64 = 100.0;
+    const BUTTON_H: f64 = 30.0;
 
     // Construct the window.
     let mut window: Window =
@@ -72,7 +74,7 @@ pub fn draw_startscreen() {
                 .label("Play")
                 .label_color(conrod::color::BLACK)
                 .middle_of(ids.canvas)
-                .w_h(100.0, 30.0)
+                .w_h(BUTTON_W, BUTTON_H)
                 .set(ids.button_play, ui)
                 .was_clicked()
             {
@@ -88,7 +90,7 @@ pub fn draw_startscreen() {
                 .label("Options")
                 .label_color(conrod::color::BLACK)
                 .down_from(ids.button_play, 0.0)
-                .w_h(100.0, 30.0)
+                .w_h(BUTTON_W, BUTTON_H)
                 .set(ids.button_options, ui)
                 .was_clicked()
             {
@@ -104,7 +106,7 @@ pub fn draw_startscreen() {
                 .label("Exit")
                 .label_color(conrod::color::BLACK)
                 .down_from(ids.button_options, 0.0)
-                .w_h(100.0, 30.0)
+                .w_h(BUTTON_W, BUTTON_H)
                 .set(ids.button_exit, ui)
                 .was_clicked()
             {
