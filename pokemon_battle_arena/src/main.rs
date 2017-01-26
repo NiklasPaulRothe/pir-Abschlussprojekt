@@ -16,7 +16,6 @@ fn main() {
     println!("Hello and Welcome to the Pokemon Battle Arena");
     println!("");
     //test_players();
-
 }
 
 fn test_players() {
