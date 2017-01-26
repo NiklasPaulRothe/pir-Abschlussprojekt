@@ -3,6 +3,7 @@ pub mod moves;
 pub mod pokemon_token;
 pub mod natures;
 pub mod pokedex;
+pub mod movedex;
 
 mod enums;
 mod stats;

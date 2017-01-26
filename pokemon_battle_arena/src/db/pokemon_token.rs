@@ -1,3 +1,5 @@
+extern crate csv;
+
 use super::pokemon_model;
 use super::natures;
 use super::enums;
