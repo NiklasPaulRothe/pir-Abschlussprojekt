@@ -4,6 +4,7 @@ use super::pokemon_model;
 use super::natures;
 use super::enums;
 use super::stats;
+use super::determinant_values;
 
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
@@ -13,6 +14,7 @@ pub struct PokemonToken {
     pub type_one: enums::types,
     pub type_two: enums::types,
     nature: natures::Nature,
+    pub dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
     mega_evolution: Box<Option<pokemon_model::PokemonModel>>,
@@ -23,11 +25,12 @@ impl PokemonToken {
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
         PokemonToken {
             pokedex_id: model.pokedex_id,
-            name: model.name,
-            gender: enums::Gender::Male,
-            type_one: model.type_one,
-            type_two: model.type_two,
+            name: model.clone().name,
+            gender: enums::get_gender(),
+            type_one: model.clone().type_one,
+            type_two: model.clone().type_two,
             nature: natures::Nature::get_random_nature(),
+            dv: determinant_values::Dv::get_dv(model.clone()),
             base_stats: model.base_stats.clone(),
             current_stats: model.base_stats,
             mega_evolution: model.mega_evolution,

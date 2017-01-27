@@ -3,7 +3,7 @@ extern crate rand;
 
 use super::pokemon_model;
 use super::enums;
-use self::rand::{thread_rng, sample};
+use self::rand::{Rng, thread_rng};
 use enum_primitive::FromPrimitive;
 
 #[derive(Debug, Clone)]
@@ -35,8 +35,8 @@ impl Nature {
     pub fn get_random_nature() -> Nature {
         let dex = create_naturedb();
         let mut rng = thread_rng();
-        let nature = sample(&mut rng, dex.iter(), 1);
-        nature[0].clone()
+        let nature = rng.choose(&dex);
+        nature.unwrap().clone()
     }
 
     pub fn get_stats(&self) -> (enums::Stats, enums::Stats) {

@@ -1,4 +1,5 @@
 extern crate num;
+extern crate rand;
 
 use self::num::FromPrimitive;
 
@@ -89,4 +90,11 @@ enum_from_primitive! {
         UserAndAllies = 13,
         AllPokemon = 14,
     }
+}
+
+pub fn get_gender() -> Gender {
+    if rand::random() {
+        return Gender::Male
+    }
+    Gender::Female
 }
