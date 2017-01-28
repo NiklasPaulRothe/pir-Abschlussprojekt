@@ -30,6 +30,27 @@ enum_from_primitive! {
     }
 }
 
+enum_from_primitive! {
+    #[derive(Debug, Clone)]
+    pub enum Move_Category {
+        Damage = 0,
+        Ailment = 1,
+        Net_good_stats = 2,
+        Heal = 3,
+        Damage_and_ailment = 4,
+        Swagger = 5,
+        Damage_And_Lower = 6,
+        Damage_And_Raise = 7,
+        Damage_And_Heal = 8,
+        Ohko = 9,
+        Whole_Field_Effect = 10,
+        Field_Effect = 11,
+        Force_Switch = 12,
+        Unique = 13,
+
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum Gender {
     Male,
@@ -40,6 +61,7 @@ pub enum Gender {
 enum_from_primitive! {
     #[derive(Debug, Clone)]
     pub enum Stats {
+        Undefined = 0,
         Hp = 1,
         Attack = 2,
         Defense = 3,
