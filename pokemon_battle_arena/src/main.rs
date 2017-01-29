@@ -13,7 +13,7 @@ use time::get_time;
 use player::Player;
 
 fn main() {
-    graphic::windows::draw_startscreen();
+    graphic::windows::draw_window();
     println!("");
     println!("Hello and Welcome to the Pokemon Battle Arena");
     println!("");
