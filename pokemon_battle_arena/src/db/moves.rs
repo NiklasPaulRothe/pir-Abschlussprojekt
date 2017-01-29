@@ -10,81 +10,55 @@ use std::collections::HashMap;
 use std;
 
 ///contains all important information of a move
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, RustcDecodable)]
 pub struct Technique {
     attack_id: usize,
     name: String,
-    attack_type: enums::types,
+    attack_type: String,
     power: Option<u16>,
     power_points: Option<u8>,
     accuracy: Option<u16>,
-    priority: bool,
-    target: enums::Target,
-    typeeffectiveness: HashMap<enums::types, i8>,
-    damage_class: enums::DamageClass,
-    effect_id: u16,
-    effect_chance: u8,
+    priority: i8,
+    target: String,
+    damage_class: String,
+    effect_short: String,
+    effect_long: String,
+    effect_chance: Option<u8>,
+    category: String,
+    ailment: String,
+    min_hits: Option<u8>,
+    max_hits: Option<u8>,
+    min_turns: Option<u8>,
+    max_turns: Option<u8>,
+    drain_percentage: i8,
+    healing_percentage: i8,
+    crit_rate: u8,
+    ailment_chance: u8,
+    flinch_chance: u8,
+    stat_chance: u8,
     description: String,
+    stat: Option<i32>,
+    effectivity_map: Option<HashMap<enums::types, i8>>,
+    move_flags: Option<Vec<enums::MoveFlags>>,
+    stat_change_rate: Option<i8>,
 }
-
-///temporary struct to read out of a csv file
-///Is needed, because reading into a tuple isn't possible because of the number of columns
-#[derive(Debug, RustcDecodable, Clone)]
-pub struct TechniqueTmp {
-    pub attack_id: usize,
-    pub name: String,
-    generation: u8,
-    pub attack_type: i32,
-    pub power: Option<u16>,
-    pub power_points: Option<u8>,
-    pub accuracy: Option<u16>,
-    pub priority: Option<u8>,
-    pub target: i32,
-    pub damage_class: i32,
-    pub effect: u16,
-    pub effect_chance: Option<u8>,
-    contest_one: Option<usize>,
-    contest_two: Option<usize>,
-    contest_three: Option<usize>,
-}
-
-
-
 
 impl Technique {
-    pub fn from_tmp(tmp: TechniqueTmp, effective_hash: HashMap<enums::types, i8>,
-        description: String) -> Technique {
-        let chance = match tmp.effect_chance {
-                Some(n) => n,
-                None => 100,
-        };
-
-        Technique {
-            attack_id: tmp.attack_id,
-            name: tmp.name,
-            attack_type: enums::types::from_i32(tmp.attack_type).
-            unwrap_or(enums::types::undefined),
-            power: tmp.power,
-            power_points: tmp.power_points,
-            accuracy: tmp.accuracy,
-            priority: { tmp.priority == Some(1) },
-            target: enums::Target::from_i32(tmp.target).unwrap(),
-            typeeffectiveness: effective_hash,
-            damage_class: enums::DamageClass::from_i32(tmp.damage_class).unwrap(),
-            effect_id: tmp.effect,
-            effect_chance: chance,
-            description: description,
+    pub fn resolve_effect(&self, user: pokemon_model::PokemonModel,
+        target: pokemon_model::PokemonModel) {
+        match self.category {
+            _ => {},
         }
     }
 
     pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> enums::TypeEffectiveness {
         let mut eff_count = 0;
-        if self.typeeffectiveness.contains_key(&enemy.type_one) {
-            eff_count = eff_count + self.typeeffectiveness.get(&enemy.type_one).unwrap();
+        if self.clone().effectivity_map.unwrap().contains_key(&enemy.type_one) {
+            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.type_one).unwrap();
         }
         if enemy.type_two != enums::types::undefined
-        && self.typeeffectiveness.contains_key(&enemy.type_one) {
-            eff_count = eff_count + self.typeeffectiveness.get(&enemy.type_two).unwrap();
+        && self.clone().effectivity_map.unwrap().contains_key(&enemy.type_one) {
+            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.type_two).unwrap();
         }
         match eff_count {
             -2 => enums::TypeEffectiveness::NotEffective,
@@ -105,7 +79,28 @@ impl Technique {
     }
 
     pub fn get_type(&self) -> enums::types {
-        self.attack_type.clone()
+        let a_type: &str = &self.attack_type;
+        match a_type {
+            "normal" => enums::types::normal,
+            "fighting" => enums::types::fighting,
+            "flying" => enums::types::flying,
+            "poison" => enums::types::poison,
+            "ground" => enums::types::ground,
+            "rock" => enums::types::rock,
+            "bug" => enums::types::bug,
+            "ghost" => enums::types::ghost,
+            "steel" => enums::types::steel,
+            "fire" => enums::types::fire,
+            "water" => enums::types::water,
+            "grass" => enums::types::grass,
+            "electric" => enums::types::electric,
+            "psychic" => enums::types::psychic,
+            "ice" => enums::types::ice,
+            "dragon" => enums::types::dragon,
+            "dark" => enums::types::dark,
+            "fairy" => enums::types::fairy,
+            _ => enums::types::undefined,
+        }
     }
 
     pub fn get_power(&self) -> Option<u16> {
@@ -120,23 +115,190 @@ impl Technique {
         self.accuracy
     }
 
-    pub fn has_priority(&self) -> bool {
+    pub fn get_priority(&self) -> i8 {
         self.priority
     }
 
     pub fn get_target(&self) -> enums::Target {
-        self.target.clone()
+        let tmp: &str = &self.target;
+        match tmp {
+            "specific-move" => enums::Target::SpecificMove,
+            "selected-pokemon-me-first" => enums::Target::SelectedPokemonMeFirst,
+            "ally" => enums::Target::Ally,
+            "users-field" => enums::Target::UsersField,
+            "user-or-ally" => enums::Target::UserOrAlly,
+            "opponents-field" => enums::Target::OpponentsField,
+            "user" => enums::Target::User,
+            "random-opponent" => enums::Target::RandomOpponent,
+            "all-other-pokemon" => enums::Target::AllOtherPokemon,
+            "selected-pokemon" => enums::Target::SelectedPokemon,
+            "all-opponents" => enums::Target::AllOpponents,
+            "entire-field" => enums::Target::EntireField,
+            "user-and-allies" => enums::Target::UserAndAllies,
+            "all-pokemon" => enums::Target::AllPokemon,
+            _ => unreachable!(),
+        }
     }
 
     pub fn get_damage_class(&self) -> enums::DamageClass {
-        self.damage_class.clone()
+        let tmp: &str = &self.damage_class;
+        match tmp {
+            "physical" => enums::DamageClass::Physical,
+            "special" => enums::DamageClass::Special,
+            "status" => enums::DamageClass::Status,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn get_short_effect(&self) -> String {
+        self.effect_short.clone()
+    }
+
+    pub fn get_long_effect(&self) -> String {
+        self.effect_long.clone()
     }
 
     pub fn get_effect_chance(&self) -> u8 {
-        self.effect_chance
+        if self.effect_chance.is_some() {
+            return self.effect_chance.unwrap();
+        }
+        0
+    }
+
+    pub fn get_category(&self) -> enums::Move_Category {
+        let tmp: &str = &self.category;
+        match tmp {
+            "damage" => enums::Move_Category::Damage,
+            "ailment" => enums::Move_Category::Ailment,
+            "net-good-stats" => enums::Move_Category::Net_good_stats,
+            "heal" => enums::Move_Category::Heal,
+            "damage+ailment" => enums::Move_Category::Damage_and_ailment,
+            "swagger" => enums::Move_Category::Swagger,
+            "damage+lower" => enums::Move_Category::Damage_And_Lower,
+            "damage+raise" => enums::Move_Category::Damage_And_Raise,
+            "damage+heal" => enums::Move_Category::Damage_And_Heal,
+            "ohko" => enums::Move_Category::Ohko,
+            "whole-field-effect" => enums::Move_Category::Whole_Field_Effect,
+            "field-effect" => enums::Move_Category::Field_Effect,
+            "force-switch" => enums::Move_Category::Force_Switch,
+            "unique" => enums::Move_Category::Unique,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn get_ailment(&self) -> enums::Ailment {
+        let tmp: &str = &self.ailment;
+        match tmp {
+            "unknown" => enums::Ailment::Unknown,
+            "none" => enums::Ailment::Undefined,
+            "paralysis" => enums::Ailment::Paralysis,
+            "sleep" => enums::Ailment::Sleep,
+            "freeze" => enums::Ailment::Freeze,
+            "burn" => enums::Ailment::Burn,
+            "poison" => enums::Ailment::Poison,
+            "confusion" => enums::Ailment::Confusion,
+            "infatuation" => enums::Ailment::Infatuation,
+            "trap" => enums::Ailment::Trap,
+            "nightmare" => enums::Ailment::Nightmare,
+            "torment" => enums::Ailment::Torment,
+            "disable" => enums::Ailment::Disable,
+            "yawn" => enums::Ailment::Yawn,
+            "heal-block" => enums::Ailment::Heal_Block,
+            "no-type-immunity" => enums::Ailment::No_Type_Immunity,
+            "leech-seed" => enums::Ailment::Leech_Seed,
+            "embargo" => enums::Ailment::Embargo,
+            "perish-song" => enums::Ailment::Perish_Song,
+            "ingrain" => enums::Ailment::Ingrain,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn get_min_hits(&self) -> u8 {
+        if self.min_hits.is_some() {
+            return self.min_hits.unwrap();
+        }
+        1
+    }
+
+    pub fn get_max_hits(&self) -> u8 {
+        if self.max_hits.is_some() {
+            return self.max_hits.unwrap();
+        }
+        1
+    }
+
+    pub fn get_min_turn(&self) -> u8 {
+        if self.min_turns.is_some() {
+            return self.min_turns.unwrap();
+        }
+        1
+    }
+
+    pub fn get_max_turns(&self) -> u8 {
+        if self.max_turns.is_some() {
+            return self.max_turns.unwrap();
+        }
+        1
+    }
+
+    pub fn get_drain_percentage(&self) -> i8 {
+        self.drain_percentage
+    }
+
+    pub fn get_healing_percentage(&self) -> i8 {
+        self.healing_percentage
+    }
+
+    pub fn get_crit_rate(&self) -> u8 {
+        self.crit_rate
+    }
+
+    pub fn get_ailment_chance(&self) -> u8 {
+        self.ailment_chance
+    }
+
+    pub fn get_flinch_chance(&self) -> u8 {
+        self.flinch_chance
+    }
+
+    pub fn get_stat_chance(&self) -> u8 {
+        self.stat_chance
     }
 
     pub fn get_description(&self) -> String {
         self.description.clone()
+    }
+
+    pub fn get_stat(&self) -> enums::Stats {
+        if self.stat.is_some(){
+            return enums::Stats::from_i32(self.stat.unwrap()).unwrap();
+        }
+        enums::Stats::from_i32(0).unwrap()
+    }
+
+    pub fn get_stat_change_rate(&self) -> i8 {
+        if self.stat_change_rate.is_some() {
+            return self.stat_change_rate.unwrap();
+        }
+        0
+    }
+
+    pub fn get_effectivity_map(&self) -> HashMap<enums::types, i8> {
+        self.clone().effectivity_map.unwrap()
+    }
+
+    pub fn get_flags(&self) -> Vec<enums::MoveFlags> {
+        if self.move_flags.is_some() {
+            return self.move_flags.clone().unwrap();
+        }
+        Vec::new()
+    }
+
+    pub fn set_effectivity_map(&mut self, map: HashMap<enums::types, i8>) {
+        self.effectivity_map = Some(map);
+    }
+
+    pub fn set_flags(&mut self, flag: Vec<enums::MoveFlags>) {
+        self.move_flags = Some(flag);
     }
 }
