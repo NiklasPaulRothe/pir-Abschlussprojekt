@@ -8,5 +8,7 @@ pub trait Player {
     /// Returns the list of pokemon choosen by the player
     fn get_pokemon_list(&self) -> &Vec<PokemonToken>;
     /// Gets the amount of pokemon choosen by the player
-    fn get_pokemon_count(&self) -> &usize;
+    fn get_pokemon_count(&self) -> usize;
+    /// Returns the amount of pokemon with atleast one hp
+    fn get_alive(&self) -> usize;
 }
