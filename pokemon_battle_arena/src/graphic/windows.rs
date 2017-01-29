@@ -130,7 +130,6 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         }
 
         // Options button
-        // right now only prints option
         // TODO: draw new window with options menu
         if widget::Button::new()
             .border(1.0)
@@ -164,6 +163,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
     // draws Play-Screen
     if let Screen::Play = app.screen {
         // Singleplayer button
+        // not implemented yet
         if widget::Button::new()
             .border(1.0)
             .color(conrod::color::WHITE)
@@ -178,6 +178,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         }
 
         // Multiplayer button
+        // not implemented yet
         if widget::Button::new()
             .border(1.0)
             .color(conrod::color::WHITE)
@@ -206,6 +207,8 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
             println!("Back");
             app.screen = Screen::Title;
         }
-
     }
+
+    //draws Options-Screen
+    if let Screen::Options = app.screen {}
 }
