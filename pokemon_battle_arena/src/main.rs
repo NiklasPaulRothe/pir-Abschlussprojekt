@@ -13,16 +13,29 @@ use time::get_time;
 use player::Player;
 
 fn main() {
-    graphic::windows::draw_startscreen();
     println!("");
     println!("Hello and Welcome to the Pokemon Battle Arena");
     println!("");
-    //test_players();
+    testing();
 }
 
-fn test_players() {
-    let human = player::human::Human::new_by_id(&[5, 3]);
+// This function is for testing. Pls uncommend before commiting!
+fn testing() {
+    println!("Testing:");
+    // graphic::windows::draw_startscreen();
+    // test_players();
+}
 
+
+
+fn test_players() {
+
+    println!("The Player Section");
+    let human = player::human::Human::new_by_id(&[5, 3, 17]);
+
+    println!("{}", human.get_pokemon_count());
     println!("{}", human.get_pokemon_list()[0].name);
     println!("{}", human.get_pokemon_list()[1].name);
+    println!("{}", human.get_pokemon_list()[2].name);
+    println!("{}", human.get_alive());
 }

@@ -30,8 +30,10 @@ impl Player for Human {
     fn get_pokemon_list(&self) -> &Vec<PokemonToken> {
         &self.pokemon_list
     }
-
-    fn get_pokemon_count(&self) -> &usize {
-        &self.pokemon_count
+    fn get_pokemon_count(&self) -> usize {
+        self.pokemon_count
+    }
+    fn get_alive(&self) -> usize {
+        self.pokemon_list.iter().filter(|x| x.get_current().hp != 0).count()
     }
 }
