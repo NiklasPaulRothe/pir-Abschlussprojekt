@@ -38,9 +38,9 @@ pub struct Technique {
     stat_chance: u8,
     description: String,
     stat: Option<i32>,
-    stat_change_rate: Option<i8>,
     effectivity_map: Option<HashMap<enums::types, i8>>,
-    move_flags: Option<Vec<String>>,
+    move_flags: Option<Vec<enums::MoveFlags>>,
+    stat_change_rate: Option<i8>,
 }
 
 impl Technique {
@@ -119,13 +119,36 @@ impl Technique {
         self.priority
     }
 
-    // pub fn get_target(&self) -> enums::Target {
-    //     self.target.clone()
-    // }
+    pub fn get_target(&self) -> enums::Target {
+        let tmp: &str = &self.target;
+        match tmp {
+            "specific-move" => enums::Target::SpecificMove,
+            "selected-pokemon-me-first" => enums::Target::SelectedPokemonMeFirst,
+            "ally" => enums::Target::Ally,
+            "users-field" => enums::Target::UsersField,
+            "user-or-ally" => enums::Target::UserOrAlly,
+            "opponents-field" => enums::Target::OpponentsField,
+            "user" => enums::Target::User,
+            "random-opponent" => enums::Target::RandomOpponent,
+            "all-other-pokemon" => enums::Target::AllOtherPokemon,
+            "selected-pokemon" => enums::Target::SelectedPokemon,
+            "all-opponents" => enums::Target::AllOpponents,
+            "entire-field" => enums::Target::EntireField,
+            "user-and-allies" => enums::Target::UserAndAllies,
+            "all-pokemon" => enums::Target::AllPokemon,
+            _ => unreachable!(),
+        }
+    }
 
-    // pub fn get_damage_class(&self) -> enums::DamageClass {
-    //     self.damage_class.clone()
-    // }
+    pub fn get_damage_class(&self) -> enums::DamageClass {
+        let tmp: &str = &self.damage_class;
+        match tmp {
+            "physical" => enums::DamageClass::Physical,
+            "special" => enums::DamageClass::Special,
+            "status" => enums::DamageClass::Status,
+            _ => unreachable!(),
+        }
+    }
 
     pub fn get_short_effect(&self) -> String {
         self.effect_short.clone()
@@ -142,13 +165,53 @@ impl Technique {
         0
     }
 
-    // pub fn get_category(&self) -> enums::Move_Category {
-    //     self.category.clone()
-    // }
+    pub fn get_category(&self) -> enums::Move_Category {
+        let tmp: &str = &self.category;
+        match tmp {
+            "damage" => enums::Move_Category::Damage,
+            "ailment" => enums::Move_Category::Ailment,
+            "net-good-stats" => enums::Move_Category::Net_good_stats,
+            "heal" => enums::Move_Category::Heal,
+            "damage+ailment" => enums::Move_Category::Damage_and_ailment,
+            "swagger" => enums::Move_Category::Swagger,
+            "damage+lower" => enums::Move_Category::Damage_And_Lower,
+            "damage+raise" => enums::Move_Category::Damage_And_Raise,
+            "damage+heal" => enums::Move_Category::Damage_And_Heal,
+            "ohko" => enums::Move_Category::Ohko,
+            "whole-field-effect" => enums::Move_Category::Whole_Field_Effect,
+            "field-effect" => enums::Move_Category::Field_Effect,
+            "force-switch" => enums::Move_Category::Force_Switch,
+            "unique" => enums::Move_Category::Unique,
+            _ => unreachable!(),
+        }
+    }
 
-    // pub fn get_ailment(&self) -> enums::Ailment {
-
-    // }
+    pub fn get_ailment(&self) -> enums::Ailment {
+        let tmp: &str = &self.ailment;
+        match tmp {
+            "unknown" => enums::Ailment::Unknown,
+            "none" => enums::Ailment::Undefined,
+            "paralysis" => enums::Ailment::Paralysis,
+            "sleep" => enums::Ailment::Sleep,
+            "freeze" => enums::Ailment::Freeze,
+            "burn" => enums::Ailment::Burn,
+            "poison" => enums::Ailment::Poison,
+            "confusion" => enums::Ailment::Confusion,
+            "infatuation" => enums::Ailment::Infatuation,
+            "trap" => enums::Ailment::Trap,
+            "nightmare" => enums::Ailment::Nightmare,
+            "torment" => enums::Ailment::Torment,
+            "disable" => enums::Ailment::Disable,
+            "yawn" => enums::Ailment::Yawn,
+            "heal-block" => enums::Ailment::Heal_Block,
+            "no-type-immunity" => enums::Ailment::No_Type_Immunity,
+            "leech-seed" => enums::Ailment::Leech_Seed,
+            "embargo" => enums::Ailment::Embargo,
+            "perish-song" => enums::Ailment::Perish_Song,
+            "ingrain" => enums::Ailment::Ingrain,
+            _ => unreachable!(),
+        }
+    }
 
     pub fn get_min_hits(&self) -> u8 {
         if self.min_hits.is_some() {
@@ -224,7 +287,18 @@ impl Technique {
         self.clone().effectivity_map.unwrap()
     }
 
+    pub fn get_flags(&self) -> Vec<enums::MoveFlags> {
+        if self.move_flags.is_some() {
+            return self.move_flags.clone().unwrap();
+        }
+        Vec::new()
+    }
+
     pub fn set_effectivity_map(&mut self, map: HashMap<enums::types, i8>) {
         self.effectivity_map = Some(map);
+    }
+
+    pub fn set_flags(&mut self, flag: Vec<enums::MoveFlags>) {
+        self.move_flags = Some(flag);
     }
 }

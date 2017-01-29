@@ -47,8 +47,31 @@ enum_from_primitive! {
         Field_Effect = 11,
         Force_Switch = 12,
         Unique = 13,
-
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum Ailment {
+    Unknown,
+    Undefined,
+    Paralysis,
+    Sleep,
+    Freeze,
+    Burn,
+    Poison,
+    Confusion,
+    Infatuation,
+    Trap,
+    Nightmare,
+    Torment,
+    Disable,
+    Yawn,
+    Heal_Block,
+    No_Type_Immunity,
+    Leech_Seed,
+    Embargo,
+    Perish_Song,
+    Ingrain,
 }
 
 #[derive(Debug, Clone)]
@@ -111,6 +134,32 @@ enum_from_primitive! {
         EntireField = 12,
         UserAndAllies = 13,
         AllPokemon = 14,
+    }
+}
+
+enum_from_primitive! {
+    #[derive(Debug, RustcDecodable, Clone)]
+    pub enum MoveFlags {
+        Contact = 1,
+        Charge = 2,
+        Recharge = 3,
+        Protect = 4,
+        Reflectable = 5,
+        Snatch = 6,
+        Mirror = 7,
+        Punch = 8,
+        Sound = 9,
+        Gravity = 10,
+        Defrost = 11,
+        Distance = 12,
+        Heal = 13,
+        Authentic = 14,
+        Powder = 15,
+        Bite = 16,
+        Pulse = 17,
+        Balistic = 18,
+        Mental = 19,
+        Non_Sky_Battle = 20,
     }
 }
 

@@ -67,6 +67,21 @@ impl Movedex {
             moves.push(move_tmp);
         }
 
+        let mut flags = Vec::new();
+        let mut last_id = 1;
+        let mut flag_db = csv::Reader::from_file("./src/db/tables/move_flag_map.csv").unwrap();
+        for record in flag_db.decode() {
+            let (id, identifier): (usize, i32) = record.unwrap();
+            if id < 617 {
+                if !(id == last_id) {
+                    moves[last_id -1].set_flags(flags);
+                    last_id = id;
+                    flags = Vec::new();
+                }
+                flags.push(enums::MoveFlags::from_i32(identifier).unwrap());
+            }
+        }
+
         Movedex {
             entries: moves,
             complete: true,
