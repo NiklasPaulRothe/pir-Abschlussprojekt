@@ -43,4 +43,8 @@ impl PokemonToken {
         }
         None
     }
+
+    pub fn get_current(&self) -> stats::Stats {
+        self.current_stats.clone()
+    }
 }

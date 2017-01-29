@@ -1,6 +1,6 @@
 extern crate rand;
 
-use rand::{Rng, thread_rng};
+use self::rand::{Rng, thread_rng};
 use super::pokemon_model;
 
 #[derive(Debug, Clone)]
