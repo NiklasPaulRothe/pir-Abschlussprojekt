@@ -1,0 +1,42 @@
+#[macro_use] extern crate enum_primitive;
+#[macro_use] extern crate conrod;
+extern crate rustc_serialize;
+extern crate time;
+extern crate piston_window;
+
+mod arena;
+mod db;
+mod graphic;
+mod player;
+
+use time::get_time;
+use player::Player;
+
+fn main() {
+    println!();
+    println!("Hello and Welcome to the Pokemon Battle Arena");
+    println!();
+    testing();
+}
+
+// This function is for testing. Pls uncomment before commiting!
+fn testing() {
+    println!("Testing:");
+    println!(">>> graphic::windows::draw_window()");
+    graphic::windows::draw_window();
+    // test_players();
+}
+
+
+
+fn test_players() {
+
+    println!("The Player Section");
+    let human = player::human::Human::new_by_id(&[5, 3, 17]);
+
+    println!("{}", human.get_pokemon_count());
+    println!("{}", human.get_pokemon_list()[0].name);
+    println!("{}", human.get_pokemon_list()[1].name);
+    println!("{}", human.get_pokemon_list()[2].name);
+    println!("{}", human.get_alive());
+}

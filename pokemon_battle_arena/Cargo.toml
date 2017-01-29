@@ -1,0 +1,23 @@
+[package]
+name = "PokemonBattleArena"
+version = "0.1.0"
+authors = [
+    "Artur Kaul",
+    "Luka Vukusic",
+    "Matthias Thien",
+    "Niklas Rothe"
+    ]
+
+[dependencies]
+csv = "0.14"
+enum_primitive = "0.1"
+num = "0.1"
+rand = "0.3"
+rustc-serialize = "0.3.22"
+regex = "0.2"
+time = "0.1"
+conrod = "0.49.0"
+piston = "0.28.0"
+piston2d-graphics = "0.20.0"
+find_folder = "0.3.0"
+piston_window = "0.62.0"

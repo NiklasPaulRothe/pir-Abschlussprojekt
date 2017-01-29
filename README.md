@@ -1,13 +1,22 @@
-# pir-Abschlussprojekt
+# Notizen
 
-Ideen Doc: https://docs.google.com/document/d/1I86jCiSxkUiOldzZ_XSB1ZsVTcj7TMt-E8Wmi-W6avo/edit
+## Commits: 
+  * auf Master nur kompilierende Sachen commiten
+  * englische Commits
+  * beschreibung nur wenn nötig
 
-Piston Links:
+
+## Ideen Doc: 
+https://docs.google.com/document/d/1I86jCiSxkUiOldzZ_XSB1ZsVTcj7TMt-E8Wmi-W6avo/edit
+
+## Piston Links:
 * https://www.reddit.com/r/rust_gamedev/
 * https://github.com/PistonDevelopers/Piston-Tutorials
 * https://github.com/pistondevelopers/piston-examples
+* http://piston-tutorial.logdown.com/
 
 
+## E-Mail:
 Ihr habt den Umfang auch im Wesentlichen schon gut abgesteckt; also 
 Kampfarena (vielleicht erstmal mit nur einem Modus und dann könnt ihr 
 weitersehen ;)) mit 2D-Graphik -- vielleicht so wie in den frühen 
@@ -34,3 +43,9 @@ extrahieren kann, indem man z.B. die entsprechenden HTML-Seiten in einem
 Rust-Programm herunterlädt und die gesuchten Dinge herausparst oder eben 
 direkt entsprechende Datenbanken anzapft. Dann müsst ihr euch auch nicht 
 mehr auf die ersten 151 beschränken. ;)
+
+### tl;dr
+* Kampfarena mit einem Modus
+* 2D-Graphik
+* einfache KI
+* ...dann mehr
