@@ -13,17 +13,16 @@ use time::get_time;
 use player::Player;
 
 fn main() {
-    println!();
+    println!("");
     println!("Hello and Welcome to the Pokemon Battle Arena");
-    println!();
+    println!("");
     testing();
 }
 
-// This function is for testing. Pls uncomment before commiting!
+// This function is for testing. Pls uncommend before commiting!
 fn testing() {
     println!("Testing:");
-    println!(">>> graphic::windows::draw_window()");
-    graphic::windows::draw_window();
+    // graphic::windows::draw_startscreen();
     // test_players();
 }
 
