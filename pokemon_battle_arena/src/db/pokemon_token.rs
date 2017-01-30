@@ -10,12 +10,12 @@ use super::determinant_values;
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
     pokedex_id: usize,
-    pub name: String,
+    name: String,
     gender: enums::Gender,
-    pub type_one: enums::types,
-    pub type_two: enums::types,
+    type_one: enums::types,
+    type_two: enums::types,
     nature: natures::Nature,
-    pub dv: determinant_values::Dv,
+    dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
     mega_evolution: Option<pokemon_model::PokemonModel>,
@@ -43,15 +43,42 @@ impl PokemonToken {
             mega_evolution: model.get_mega(),
         }
     }
+    pub fn get_id(&self) -> usize {
+        self.pokedex_id
+    }
+
+    pub fn get_name(&self) -> String {
+        self.clone().name
+    }
+
+    pub fn get_gender(&self) -> enums::Gender {
+        self.clone().gender
+    }
+
+    pub fn get_types(&self) -> (enums::types, enums::types) {
+        (self.clone().type_one, self.clone().type_two)
+    }
+
+    pub fn get_nature(&self) -> natures::Nature {
+        self.clone().nature
+    }
+
+    pub fn get_dv(&self) -> determinant_values::Dv {
+        self.clone().dv
+    }
+
+    pub fn get_current(&self) -> stats::Stats {
+        self.current_stats.clone()
+    }
+
+    pub fn get_base(&self) -> stats::Stats {
+        self.base_stats.clone()
+    }
 
     pub fn get_mega(&self) -> Option<PokemonToken> {
         if self.mega_evolution.is_some() {
             return Some(PokemonToken::from_model(self.mega_evolution.clone().unwrap()));
         }
         None
-    }
-
-    pub fn get_current(&self) -> stats::Stats {
-        self.current_stats.clone()
     }
 }

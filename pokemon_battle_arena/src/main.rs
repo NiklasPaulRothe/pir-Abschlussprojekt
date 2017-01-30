@@ -34,8 +34,8 @@ fn test_players() {
     let human = player::human::Human::new_by_id(&[5, 3, 17]);
 
     println!("{}", human.get_pokemon_count());
-    println!("{}", human.get_pokemon_list()[0].name);
-    println!("{}", human.get_pokemon_list()[1].name);
-    println!("{}", human.get_pokemon_list()[2].name);
+    println!("{}", human.get_pokemon_list()[0].get_name());
+    println!("{}", human.get_pokemon_list()[1].get_name());
+    println!("{}", human.get_pokemon_list()[2].get_name());
     println!("{}", human.get_alive());
 }

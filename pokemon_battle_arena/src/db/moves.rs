@@ -60,12 +60,14 @@ impl Technique {
     ///how effective the move is. Returns an appropriate enum for further calculations.
     pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> enums::TypeEffectiveness {
         let mut eff_count = 0;
-        if self.clone().effectivity_map.unwrap().contains_key(&enemy.type_one) {
-            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.type_one).unwrap();
+        if self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().0) {
+            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().0)
+            .unwrap();
         }
-        if enemy.type_two != enums::types::undefined
-        && self.clone().effectivity_map.unwrap().contains_key(&enemy.type_one) {
-            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.type_two).unwrap();
+        if enemy.get_types().1 != enums::types::undefined
+        && self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().1) {
+            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().1)
+            .unwrap();
         }
         match eff_count {
             -2 => enums::TypeEffectiveness::NotEffective,
