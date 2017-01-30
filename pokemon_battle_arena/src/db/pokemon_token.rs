@@ -25,6 +25,11 @@ pub struct PokemonToken {
 impl PokemonToken {
     ///Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
+        //TODO: Hier muss eine Methode aufgerufen werden, die die Stats für den Token errechnet und
+        //das Ergebnis muss unten in den Struct geschrieben werden. Unter umständen müssen dafür die
+        //DVs bereits zuvor errechnet werden, damit sie für die Berechnung herangezogen werden kön-
+        //nen.
+
         PokemonToken {
             pokedex_id: model.pokedex_id,
             name: model.clone().name,
