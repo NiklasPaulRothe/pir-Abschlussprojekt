@@ -11,6 +11,9 @@ use super::determinant_values;
 pub struct PokemonToken {
     pokedex_id: usize,
     name: String,
+    level: u8,
+    height: u8,
+    weight: u16,
     gender: enums::Gender,
     type_one: enums::types,
     type_two: enums::types,
@@ -18,6 +21,7 @@ pub struct PokemonToken {
     dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
+    description: String,
     mega_evolution: Option<pokemon_model::PokemonModel>,
 }
 
@@ -33,13 +37,17 @@ impl PokemonToken {
         PokemonToken {
             pokedex_id: model.get_id(),
             name: model.get_name(),
-            gender: enums::get_gender(),
+            level: 50,
+            height: model.get_height(),
+            weight: model.get_weight(),
+            gender: enums::get_gender(model.clone().get_gender_rate()),
             type_one: model.get_types().0,
             type_two: model.get_types().1,
             nature: natures::Nature::get_random_nature(),
             dv: determinant_values::Dv::get_dv(model.clone()),
             base_stats: model.get_stats(),
             current_stats: model.get_stats(),
+            description: model.get_description(),
             mega_evolution: model.get_mega(),
         }
     }
@@ -49,6 +57,10 @@ impl PokemonToken {
 
     pub fn get_name(&self) -> String {
         self.clone().name
+    }
+
+    pub fn get_level(&self) -> u8 {
+        self.clone().level
     }
 
     pub fn get_gender(&self) -> enums::Gender {

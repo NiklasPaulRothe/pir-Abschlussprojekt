@@ -2,6 +2,7 @@ extern crate num;
 extern crate rand;
 
 use self::num::FromPrimitive;
+use self::rand::{Rng, thread_rng};
 
 ///enum for the pokemon/attack types.
 ///Can be assigned from i32 value.
@@ -163,9 +164,43 @@ enum_from_primitive! {
     }
 }
 
-pub fn get_gender() -> Gender {
-    if rand::random() {
-        return Gender::Male
+pub fn get_gender(gender_rate: i8) -> Gender {
+    let mut rng = thread_rng();
+    let probability = rng.gen_range(1, 101);
+    match gender_rate {
+        -1 => Gender::Genderless,
+        0 => Gender::Male,
+        1 => {
+            if probability < 87 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        2 => {
+            if probability < 75 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        4 => {
+            if probability < 50 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        6 => {
+            if probability < 25 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        7 => {
+            if probability < 13 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        8 => Gender::Female,
+        _ => Gender::Genderless,
     }
-    Gender::Female
 }

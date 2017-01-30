@@ -9,6 +9,10 @@ use std::borrow::BorrowMut;
 pub struct PokemonModel {
     pokedex_id: usize,
     name: String,
+    height: u8,
+    weight: u16,
+    gender_rate: i8,
+    description: String,
     type_one: enums::types,
     type_two: enums::types,
     base_stats: stats::Stats,
@@ -16,10 +20,15 @@ pub struct PokemonModel {
 }
 
 impl PokemonModel {
-    pub fn new(id: usize, name: String) -> PokemonModel {
+    pub fn new(id: usize, name: String, height: u8, weight: u16, gender_rate: i8,
+        flavor_text: String) -> PokemonModel {
         PokemonModel {
                     pokedex_id: id,
                     name: name,
+                    height: height,
+                    weight: weight,
+                    gender_rate: gender_rate,
+                    description: flavor_text,
                     type_one: enums::types::from_i32(19).unwrap(),
                     type_two: enums::types::from_i32(19).unwrap(),
                     base_stats: stats::Stats::default(),
@@ -33,6 +42,22 @@ impl PokemonModel {
 
     pub fn get_name(&self) -> String {
         self.name.clone()
+    }
+
+    pub fn get_height(&self) -> u8 {
+        self.clone().height
+    }
+
+    pub fn get_weight(&self) -> u16 {
+        self.clone().weight
+    }
+
+    pub fn get_gender_rate(&self) -> i8 {
+        self.clone().gender_rate
+    }
+
+    pub fn get_description(&self) -> String {
+        self.clone().description
     }
 
     pub fn get_types(&self) -> (enums::types, enums::types) {

@@ -62,17 +62,17 @@ impl Pokedex {
         //creates the basic pokemon model with pokedex ID and name.
         let mut pokemon_db = csv::Reader::from_file("./src/db/tables/pokemon.csv").unwrap();
         for record in pokemon_db.decode() {
-            let(id, name, species, _, _, _, _, _):
-            (usize, String, usize, usize, usize, usize, usize, usize) = record.unwrap();
+            let(id, name, species_id, height, weight, gender_rate, flavor_text):
+            (usize, String, usize, u8, u16, i8, String) = record.unwrap();
             let re = Regex::new(r"mega").unwrap();
             if id < 722 {
-                pokemon.push(PokemonModel::new(id, name));
+                pokemon.push(PokemonModel::new(id, name, height, weight, gender_rate, flavor_text));
             }
             //adds mega evolutions if available
             else if id > 10000 && re.is_match(&name) {
-                pokemon[species - 1].set_mega(PokemonModel::new(id, name));
+                pokemon[species_id - 1].set_mega(PokemonModel::new(id, name, height, weight, gender_rate, flavor_text));
                 //saves where to find the mega evolutions by their ID
-                mega.insert(id, species);
+                mega.insert(id, species_id);
             }
         }
 
