@@ -6,6 +6,7 @@ use super::enums;
 use super::stats;
 use super::determinant_values;
 
+///Represents a single Token of a Pokemon with individual values for this token.
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
     pokedex_id: usize,
@@ -22,6 +23,7 @@ pub struct PokemonToken {
 
 
 impl PokemonToken {
+    ///Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
         PokemonToken {
             pokedex_id: model.pokedex_id,

@@ -8,3 +8,4 @@ mod natures;
 mod pokemon_model;
 mod moves;
 mod determinant_values;
+mod resolve;

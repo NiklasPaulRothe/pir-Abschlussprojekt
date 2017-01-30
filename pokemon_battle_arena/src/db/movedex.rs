@@ -5,6 +5,10 @@ use super::enums;
 use std::collections::HashMap;
 use enum_primitive::FromPrimitive;
 
+///Manages the list of moves that are available. Contains a bool that is true whenever all available
+///moves are inside the entries to make an easier search possible.
+///By now the whole movedex contains 617 moves, which are nearly all moves from the main game
+///series. 4 Moves are missing due to missing data in the used database.
 pub struct Movedex {
     entries: Vec<Technique>,
     complete: bool,
@@ -14,6 +18,8 @@ pub struct Movedex {
 //DB must be extended and if statements adjusted accordingly
 
 impl Movedex {
+    ///takes an ID and a movedex and returns an option with the move that can be find with the
+    ///given ID. Returns None if the ID isn't in the movedex.
     pub fn move_by_id(&self, id: usize) -> Option<Technique> {
         if id < 617 && self.is_complete() {
             return Some(self.get_entries()[id - 1].clone());
@@ -36,8 +42,10 @@ impl Movedex {
         self.complete
     }
 
-    ///creates similar to the pokedex a Vec that contains all known moves.
+    ///Creates a complete Movedex from the type_efficacy, moves_whole and move_flag_map databases in
+    ///the table folder.
     pub fn new() -> Movedex {
+        //In the first step creates a vec with the effectivities for every type.
         let mut effectivity = Vec::new();
         let mut effective_db = csv::Reader::from_file("./src/db/tables/type_efficacy.csv").unwrap();
         for record in effective_db.decode() {
@@ -45,6 +53,8 @@ impl Movedex {
             effectivity.push((off, def, factor));
         }
 
+        //Creates the main part with most simpel values and directly adds a Hash Map for the type
+        //efficiency of the move.
         let mut moves = Vec::new();
         let mut move_db = csv::Reader::from_file("./src/db/tables/moves_whole.csv").unwrap();
         for record in move_db.decode() {
@@ -67,6 +77,7 @@ impl Movedex {
             moves.push(move_tmp);
         }
 
+        //Adds all flags, that are valid for the moves.
         let mut flags = Vec::new();
         let mut last_id = 1;
         let mut flag_db = csv::Reader::from_file("./src/db/tables/move_flag_map.csv").unwrap();

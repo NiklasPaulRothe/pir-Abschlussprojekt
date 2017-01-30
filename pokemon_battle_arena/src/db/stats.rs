@@ -1,4 +1,4 @@
-///contains the main stats for every Pokemon.
+///Contains the main stats for every Pokemon.
 #[derive(Debug, Clone)]
 pub struct Stats {
     pub hp: u16,
