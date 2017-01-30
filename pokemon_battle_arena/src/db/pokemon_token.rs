@@ -18,7 +18,7 @@ pub struct PokemonToken {
     pub dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
-    mega_evolution: Box<Option<pokemon_model::PokemonModel>>,
+    mega_evolution: Option<pokemon_model::PokemonModel>,
 }
 
 
@@ -31,16 +31,16 @@ impl PokemonToken {
         //nen.
 
         PokemonToken {
-            pokedex_id: model.pokedex_id,
-            name: model.clone().name,
+            pokedex_id: model.get_id(),
+            name: model.get_name(),
             gender: enums::get_gender(),
-            type_one: model.clone().type_one,
-            type_two: model.clone().type_two,
+            type_one: model.get_types().0,
+            type_two: model.get_types().1,
             nature: natures::Nature::get_random_nature(),
             dv: determinant_values::Dv::get_dv(model.clone()),
-            base_stats: model.base_stats.clone(),
-            current_stats: model.base_stats,
-            mega_evolution: model.mega_evolution,
+            base_stats: model.get_stats(),
+            current_stats: model.get_stats(),
+            mega_evolution: model.get_mega(),
         }
     }
 
