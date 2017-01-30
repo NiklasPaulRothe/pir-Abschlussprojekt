@@ -23,7 +23,7 @@ fn main() {
 fn testing() {
     println!("Testing:");
     // for entry in db::pokedex::Pokedex::new().get_entries() {
-    //     println!("{:?}", db::pokemon_token::PokemonToken::from_model(entry));
+    //     println!("{:?}", db::pokemon_token::PokemonToken::from_model(entry).get_moves(db::movedex::Movedex::new()));
     // }
     // graphic::windows::draw_startscreen();
     // test_players();

@@ -9,6 +9,7 @@ use enum_primitive::FromPrimitive;
 ///moves are inside the entries to make an easier search possible.
 ///By now the whole movedex contains 617 moves, which are nearly all moves from the main game
 ///series. 4 Moves are missing due to missing data in the used database.
+#[derive(Debug)]
 pub struct Movedex {
     entries: Vec<Technique>,
     complete: bool,
@@ -32,6 +33,24 @@ impl Movedex {
             }
         }
         None
+    }
+
+    pub fn for_token(&self, level: u16, id: usize) -> Movedex {
+        let mut new_dex = Vec::new();
+        let mut move_db = csv::Reader::from_file("./src/db/tables/pokemon_moves.csv").unwrap();
+        for record in move_db.decode() {
+            let(poke_id, version, move_id, _, move_level, _): (usize, u8, usize, usize, u16,
+                Option<usize>) = record.unwrap();
+            if move_id < 617 && move_level <= level && poke_id == id && version == 16 {
+                if self.move_by_id(move_id).is_some() {
+                    new_dex.push(self.move_by_id(move_id).unwrap());
+                }
+            }
+        }
+        Movedex {
+            entries: new_dex,
+            complete: false,
+        }
     }
 
     pub fn get_entries(&self) -> Vec<Technique> {

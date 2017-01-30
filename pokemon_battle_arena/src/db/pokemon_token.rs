@@ -5,13 +5,14 @@ use super::natures;
 use super::enums;
 use super::stats;
 use super::determinant_values;
+use super::movedex;
 
 ///Represents a single Token of a Pokemon with individual values for this token.
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
     pokedex_id: usize,
     name: String,
-    level: u8,
+    level: u16,
     height: u8,
     weight: u16,
     gender: enums::Gender,
@@ -51,6 +52,11 @@ impl PokemonToken {
             mega_evolution: model.get_mega(),
         }
     }
+
+    pub fn get_moves(&self, dex: movedex::Movedex) -> movedex::Movedex {
+        dex.for_token(self.get_level(), self.pokedex_id)
+    }
+
     pub fn get_id(&self) -> usize {
         self.pokedex_id
     }
@@ -59,7 +65,7 @@ impl PokemonToken {
         self.clone().name
     }
 
-    pub fn get_level(&self) -> u8 {
+    pub fn get_level(&self) -> u16 {
         self.clone().level
     }
 
