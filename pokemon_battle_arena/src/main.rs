@@ -22,6 +22,9 @@ fn main() {
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
     println!("Testing:");
+    // for entry in db::pokedex::Pokedex::new().get_entries() {
+    //     println!("{:?}", entry);
+    // }
     // graphic::windows::draw_startscreen();
     // test_players();
 }
