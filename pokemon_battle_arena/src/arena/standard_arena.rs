@@ -1,5 +1,6 @@
 use player::Player;
 use db::pokemon_token::PokemonToken;
+use db::enums;
 
 /// The standard arena is based on the default 1v1 fight.
 
@@ -13,8 +14,8 @@ pub fn fight(mut player_one: &Player, mut player_two: &Player) {
 
 
     loop {
-        if p1_pokemon[p1_current].get_current().speed >=
-            p2_pokemon[p2_current].get_current().speed {
+        if p1_pokemon[p1_current].get_current().get_stat(enums::Stats::Speed) >=
+            p2_pokemon[p2_current].get_current().get_stat(enums::Stats::Speed) {
             // pokemon from p1 is faster and starts
             battle(&p1_pokemon[p1_current], &p2_pokemon[p2_current]);
         } else {

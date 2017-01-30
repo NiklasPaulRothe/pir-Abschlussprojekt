@@ -1,5 +1,6 @@
 use db::pokemon_token::*;
 use player::Player;
+use db::enums;
 
 /// Representing a SimpleAi
 pub struct SimpleAi {
@@ -16,6 +17,6 @@ impl Player for SimpleAi {
         self.pokemon_count
     }
     fn get_alive(&self) -> usize {
-        self.pokemon_list.iter().filter(|x| x.get_current().hp != 0).count()
+        self.pokemon_list.iter().filter(|x| x.get_current().get_stat(enums::Stats::Hp) != 0).count()
     }
 }

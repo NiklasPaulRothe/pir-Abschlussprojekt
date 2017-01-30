@@ -22,14 +22,7 @@ impl PokemonModel {
                     name: name,
                     type_one: enums::types::from_i32(19).unwrap(),
                     type_two: enums::types::from_i32(19).unwrap(),
-                    base_stats: stats::Stats {
-                        hp: 0,
-                        attack: 0,
-                        defense: 0,
-                        special_attack: 0,
-                        special_defense: 0,
-                        speed: 0,
-                    },
+                    base_stats: stats::Stats::default(),
                     mega_evolution: Box::new(None),
                 }
     }
