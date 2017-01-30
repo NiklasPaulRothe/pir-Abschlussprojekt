@@ -3,6 +3,7 @@ extern crate conrod;
 
 use conrod::backend::piston::{self, Window, WindowEvents, OpenGL};
 use conrod::backend::piston::event::UpdateEvent;
+use db;
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
@@ -13,6 +14,7 @@ enum Screen {
     Title,
     Play,
     Options,
+    PokemonChoose,
 }
 
 struct App {
@@ -102,6 +104,9 @@ widget_ids! {
         button_sp,
         button_mp,
         button_play_back,
+        button_up,
+        button_down,
+        button_choose,
     }
 }
 
@@ -141,6 +146,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
             .set(ids.button_options, ui)
             .was_clicked()
         {
+            app.screen = Screen::Options;
             println!("Options");
         }
 
@@ -174,6 +180,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
             .set(ids.button_sp, ui)
             .was_clicked()
         {
+            app.screen = Screen::PokemonChoose;
             println!("Singleplayer");
         }
 
@@ -210,5 +217,88 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
     }
 
     //draws Options-Screen
-    if let Screen::Options = app.screen {}
+    if let Screen::Options = app.screen {
+        if widget::Button::new()
+            .border(1.0)
+            .color(conrod::color::WHITE)
+            .label("Back")
+            .label_color(app.label_color)
+            .down_from(ids.button_mp, 0.0)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_play_back, ui)
+            .was_clicked()
+        {
+            println!("Back");
+            app.screen = Screen::Title;
+        }
+    }
+
+    // Pokemon choose Screen should be able to setup a vec with atleast one but a maximum of 6
+    // pokemon for a player.
+    let mut index = 0;
+    if let Screen::PokemonChoose = app.screen {
+
+        // let pokedex = db::pokedex::Pokedex::new();
+        // let entries = pokedex.get_entries();
+        let string1: String = index.to_string();
+        let string: &str = &string1;
+
+        if widget::Button::new()
+            .border(1.0)
+            .color(conrod::color::WHITE)
+            .label("<-")
+            .label_color(app.label_color)
+            .middle_of(ids.canvas)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_up, ui)
+            .was_clicked()
+        {
+            println!("<-");
+            index -= 1;
+            app.screen = Screen::PokemonChoose;
+        }
+
+        if widget::Button::new()
+            .border(1.0)
+            .color(conrod::color::WHITE)
+            .label(string)
+            .label_color(app.label_color)
+            .down_from(ids.button_up, 0.0)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_choose, ui)
+            .was_clicked()
+        {
+            println!("{}", index);
+            app.screen = Screen::PokemonChoose;
+        }
+
+        if widget::Button::new()
+            .border(1.0)
+            .color(conrod::color::WHITE)
+            .label("->")
+            .label_color(app.label_color)
+            .down_from(ids.button_choose, 0.0)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_down, ui)
+            .was_clicked()
+        {
+            println!("->");
+            index += 1;
+            app.screen = Screen::PokemonChoose;
+        }
+
+        if widget::Button::new()
+            .border(1.0)
+            .color(conrod::color::WHITE)
+            .label("Back")
+            .label_color(app.label_color)
+            .down_from(ids.button_down, 0.0)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_play_back, ui)
+            .was_clicked()
+        {
+            println!("Back");
+            app.screen = Screen::Title;
+        }
+    }
 }
