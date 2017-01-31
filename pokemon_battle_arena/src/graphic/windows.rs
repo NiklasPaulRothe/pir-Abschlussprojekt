@@ -17,9 +17,16 @@ enum Screen {
     PokemonChoose,
 }
 
+/// App struct, which contains important data
+///     screen:         screen that gets drawn
+///     label_color:    color of labels (text)
+///     bg_color:       background color
+///     pokedex_index:  current position in the pokedex
 struct App {
     screen: Screen,
     label_color: conrod::Color,
+    bg_color: conrod::Color,
+    pokedex_index: u32,
 }
 
 impl App {
@@ -27,6 +34,8 @@ impl App {
         App {
             screen: Screen::Title,
             label_color: conrod::color::BLACK,
+            bg_color: conrod::color::WHITE,
+            pokedex_index: 0,
         }
     }
 }
@@ -114,7 +123,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
     use conrod::{widget, Borderable, Colorable, Labelable, Positionable, Sizeable, Widget};
 
     // Create new empty canvas
-    widget::Canvas::new().color(conrod::color::WHITE).set(ids.canvas, ui);
+    widget::Canvas::new().color(app.bg_color).set(ids.canvas, ui);
 
     // draws Title-Screen
     if let Screen::Title = app.screen {
@@ -122,7 +131,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // Shows Play-Screen when clicked
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Play")
             .label_color(app.label_color)
             .middle_of(ids.canvas)
@@ -138,7 +147,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // TODO: draw new window with options menu
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Options")
             .label_color(app.label_color)
             .down_from(ids.button_play, 0.0)
@@ -154,7 +163,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // closes the window
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Exit")
             .label_color(app.label_color)
             .down_from(ids.button_options, 0.0)
@@ -169,10 +178,9 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
     // draws Play-Screen
     if let Screen::Play = app.screen {
         // Singleplayer button
-        // not implemented yet
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Singleplayer")
             .label_color(app.label_color)
             .middle_of(ids.canvas)
@@ -188,7 +196,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // not implemented yet
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Multiplayer")
             .label_color(app.label_color)
             .down_from(ids.button_sp, 0.0)
@@ -203,7 +211,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // returns to previous screen
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Back")
             .label_color(app.label_color)
             .down_from(ids.button_mp, 0.0)
@@ -220,7 +228,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
     if let Screen::Options = app.screen {
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Back")
             .label_color(app.label_color)
             .down_from(ids.button_mp, 0.0)
@@ -235,17 +243,13 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
 
     // Pokemon choose Screen should be able to setup a vec with atleast one but a maximum of 6
     // pokemon for a player.
-    let mut index = 0;
     if let Screen::PokemonChoose = app.screen {
-
         // let pokedex = db::pokedex::Pokedex::new();
         // let entries = pokedex.get_entries();
-        let string1: String = index.to_string();
-        let string: &str = &string1;
 
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("<-")
             .label_color(app.label_color)
             .middle_of(ids.canvas)
@@ -254,27 +258,28 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
             .was_clicked()
         {
             println!("<-");
-            index -= 1;
+            app.pokedex_index -= 1;
+            println!("Index: {}", app.pokedex_index);
             app.screen = Screen::PokemonChoose;
         }
 
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
-            .label(string)
+            .color(app.bg_color)
+            .label(&app.pokedex_index.to_string())
             .label_color(app.label_color)
             .down_from(ids.button_up, 0.0)
             .w_h(BUTTON_W, BUTTON_H)
             .set(ids.button_choose, ui)
             .was_clicked()
         {
-            println!("{}", index);
+            println!("Index: {}", app.pokedex_index);
             app.screen = Screen::PokemonChoose;
         }
 
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("->")
             .label_color(app.label_color)
             .down_from(ids.button_choose, 0.0)
@@ -283,13 +288,14 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
             .was_clicked()
         {
             println!("->");
-            index += 1;
+            app.pokedex_index += 1;
+            println!("Index: {}", app.pokedex_index);
             app.screen = Screen::PokemonChoose;
         }
 
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Back")
             .label_color(app.label_color)
             .down_from(ids.button_down, 0.0)
