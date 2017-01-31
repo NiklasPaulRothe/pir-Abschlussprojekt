@@ -95,6 +95,20 @@ enum_from_primitive! {
     }
 }
 
+pub enum Weather {
+    Clear_Sky,
+    Sunlight,
+    //no need to handle it right now, only caused by abilities
+    Hars_Sunlight,
+    Rain,
+    //no need to handle it right now, only caused by abilities
+    Heavy_Rain,
+    Sandstorm,
+    Hail,
+    //no need to handle it right now, only caused by abilities
+    Air_Current,
+}
+
 ///enum for the Damage Class of a attack.
 ///Can be assigned from a i32 value.
 enum_from_primitive! {
