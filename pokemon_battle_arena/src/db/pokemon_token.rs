@@ -1,35 +1,105 @@
+extern crate csv;
+
 use super::pokemon_model;
 use super::natures;
 use super::enums;
 use super::stats;
+use super::determinant_values;
+use super::movedex;
+use super::moves;
 
+///Represents a single Token of a Pokemon with individual values for this token.
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
     pokedex_id: usize,
-    pub name: String,
+    name: String,
+    level: u16,
+    height: u8,
+    weight: u16,
     gender: enums::Gender,
-    pub type_one: enums::types,
-    pub type_two: enums::types,
+    type_one: enums::types,
+    type_two: enums::types,
+    move_one: Option<(moves::Technique, u8)>,
+    move_two: Option<(moves::Technique, u8)>,
+    move_three: Option<(moves::Technique, u8)>,
+    move_four: Option<(moves::Technique, u8)>,
     nature: natures::Nature,
+    dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
-    mega_evolution: Box<Option<pokemon_model::PokemonModel>>,
+    description: String,
+    mega_evolution: Option<pokemon_model::PokemonModel>,
 }
 
 
 impl PokemonToken {
+    ///Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
+        //TODO: Hier muss eine Methode aufgerufen werden, die die Stats für den Token errechnet und
+        //das Ergebnis muss unten in den Struct geschrieben werden. Unter umständen müssen dafür die
+        //DVs bereits zuvor errechnet werden, damit sie für die Berechnung herangezogen werden kön-
+        //nen.
+
         PokemonToken {
-            pokedex_id: model.pokedex_id,
-            name: model.name,
-            gender: enums::Gender::Male,
-            type_one: model.type_one,
-            type_two: model.type_two,
-            nature: natures::get_random_nature(),
-            base_stats: model.base_stats.clone(),
-            current_stats: model.base_stats,
-            mega_evolution: model.mega_evolution,
+            pokedex_id: model.get_id(),
+            name: model.get_name(),
+            level: 50,
+            height: model.get_height(),
+            weight: model.get_weight(),
+            gender: enums::get_gender(model.clone().get_gender_rate()),
+            type_one: model.get_types().0,
+            type_two: model.get_types().1,
+            move_one: None,
+            move_two: None,
+            move_three: None,
+            move_four: None,
+            nature: natures::Nature::get_random_nature(),
+            dv: determinant_values::Dv::get_dv(model.clone()),
+            base_stats: model.get_stats(),
+            current_stats: model.get_stats(),
+            description: model.get_description(),
+            mega_evolution: model.get_mega(),
         }
+    }
+
+    pub fn get_moves(&self, dex: movedex::Movedex) -> movedex::Movedex {
+        dex.for_token(self.get_level(), self.pokedex_id)
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.pokedex_id
+    }
+
+    pub fn get_name(&self) -> String {
+        self.clone().name
+    }
+
+    pub fn get_level(&self) -> u16 {
+        self.clone().level
+    }
+
+    pub fn get_gender(&self) -> enums::Gender {
+        self.clone().gender
+    }
+
+    pub fn get_types(&self) -> (enums::types, enums::types) {
+        (self.clone().type_one, self.clone().type_two)
+    }
+
+    pub fn get_nature(&self) -> natures::Nature {
+        self.clone().nature
+    }
+
+    pub fn get_dv(&self) -> determinant_values::Dv {
+        self.clone().dv
+    }
+
+    pub fn get_current(&self) -> stats::Stats {
+        self.current_stats.clone()
+    }
+
+    pub fn get_base(&self) -> stats::Stats {
+        self.base_stats.clone()
     }
 
     pub fn get_mega(&self) -> Option<PokemonToken> {
@@ -37,5 +107,18 @@ impl PokemonToken {
             return Some(PokemonToken::from_model(self.mega_evolution.clone().unwrap()));
         }
         None
+    }
+
+    pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {
+        self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
+        if moves.len() >= 1 {
+            self.move_two = Some((moves[1].clone(), moves[1].get_power_points().unwrap()));
+        }
+        if moves.len() >= 2 {
+            self.move_three = Some((moves[2].clone(), moves[2].get_power_points().unwrap()));
+        }
+        if moves.len() >= 3 {
+            self.move_four = Some((moves[3].clone(), moves[3].get_power_points().unwrap()));
+        }
     }
 }
