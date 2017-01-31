@@ -4,7 +4,7 @@ use super::moves::Technique;
 use super::pokemon_token::PokemonToken;
 use super::enums;
 use self::rand::{Rng, thread_rng};
-use player;
+use player::Player;
 
 ///Resolves moves that simply deals damage to the opponent.
 pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) {
@@ -30,9 +30,18 @@ pub fn ailment(ailment: enums::Ailment, effect_chance: u8, target: PokemonToken)
 //und den Stat entsprechend verringert/erhöht, wenn Stage 6/-6 noch nicht erreicht ist. Gibt einen
 //bool zurück der anzeigt, ob der Stat verändert wurde oder nicht.
 pub fn change_stats(stages: i8, stat: enums::Stats, target: PokemonToken) -> bool {
-    unimplemented!();
+    true
 }
 
 pub fn heal(attack: Technique, user: PokemonToken, target: PokemonToken) {
     unimplemented!();
+}
+
+pub fn switch_pokemon<T> (target: T)
+    where T: Player {
+        unimplemented!();
+}
+
+pub fn ko_attack (target: PokemonToken) {
+    target.get_current().set_stats(enums::Stats::Hp, 0);
 }

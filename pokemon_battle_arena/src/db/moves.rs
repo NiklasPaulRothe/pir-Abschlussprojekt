@@ -53,39 +53,66 @@ impl Technique {
         where T: Player, U: Player {
         if self.hits(target.clone(), user.clone()) {
             match self.get_category() {
+
                 enums::Move_Category::Damage => resolve::deal_damage(self.clone(), user, target),
+
                 enums::Move_Category::Ailment => resolve::ailment(self.get_ailment(), 100, target),
+
                 enums::Move_Category::Net_Good_Stats => {},
+
                 enums::Move_Category::Heal => {
                     resolve::heal(self.clone(), user, target);
                 },
+
                 enums::Move_Category::Damage_And_Ailment => {
                     resolve::deal_damage(self.clone(), user.clone(), target.clone());
                     resolve::ailment(self.get_ailment(), self.get_effect_chance(), target);
                 },
+
+                //apart from the Math done
                 enums::Move_Category::Swagger => {
                     if resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
                         target.clone()) {
                         resolve::ailment(self.get_ailment(), 100, target);
                     }
                 },
+
                 enums::Move_Category::Damage_And_Lower => {
                     resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                    let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), target);
+                    let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
+                        target);
                 },
+
                 enums::Move_Category::Damage_And_Raise => {
                     resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                    let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), target);
+                    let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
+                        target);
                 },
+
                 enums::Move_Category::Damage_And_Heal => {
                     resolve::deal_damage(self.clone(), user.clone(), target.clone());
                     resolve::heal(self.clone(), user ,target);
                 },
-                enums::Move_Category::Ohko => {},
+
+                enums::Move_Category::Ohko => {
+                    if ((self.get_name() == "guillotine" || self.get_name() == "sheer-cold") &&
+                    user.get_level() >= target.get_level()) || ((self.get_name() == "horn-drill" ||
+                    self.get_name() == "fissure") && user.get_current().get_stat(enums::Stats::Speed)
+                    >= target.get_current().get_stat(enums::Stats::Speed))  {
+                        resolve::ko_attack(target);
+                    } else {
+                        println!("{} was not affected by {}", target.get_name(), self.get_name());
+                    }
+                },
+
                 enums::Move_Category::Whole_Field_Effect => {},
+
                 enums::Move_Category::Field_Effect => {},
-                enums::Move_Category::Force_Switch => {},
+
+                enums::Move_Category::Force_Switch => resolve::switch_pokemon(defender),
+
                 enums::Move_Category::Unique => {},
+
             };
         } else {
             println!("{} missed {}", user.get_name(), target.get_name());
