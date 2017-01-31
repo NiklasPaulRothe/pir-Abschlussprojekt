@@ -7,7 +7,7 @@ use self::rand::{Rng, thread_rng};
 use player::Player;
 
 ///Resolves moves that simply deals damage to the opponent.
-pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) {
+pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) -> u16 {
     unimplemented!();
     //TODO: Methode die matcht zwischen Attacken die direkt verrechnet werden können und denen,
     //die variable Power haben. Hier muss eine Möglichkeit gefunden werden die Power möglichst
@@ -33,14 +33,14 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: PokemonToken) -> boo
     true
 }
 
-pub fn heal(target: PokemonToken, percentage: u16) {
-    let half = target.get_base().get_stat(enums::Stats::Hp) / 2;
-    if half >= target.get_current().get_stat(enums::Stats::Hp) {
+pub fn heal(target: PokemonToken, value: u16) {
+    if value + target.get_current().get_stat(enums::Stats::Hp) >= target.get_base().
+    get_stat(enums::Stats::Hp) {
         target.get_current().set_stats(enums::Stats::Hp, target.get_base().
             get_stat(enums::Stats::Hp));
     } else {
         target.get_current().set_stats(enums::Stats::Hp, (target.get_current().
-            get_stat(enums::Stats::Hp) + half));
+            get_stat(enums::Stats::Hp) + value));
     }
 }
 

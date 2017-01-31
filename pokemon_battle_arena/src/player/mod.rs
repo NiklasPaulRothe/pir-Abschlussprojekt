@@ -14,9 +14,9 @@ pub trait Player {
 }
 
 
-//Dont mention this section, it's only a note for me which work needs to be done:
+//Ignore this section, it's only a note for me which work needs to be done:
 
-//moves: TODOs in resolve_effect method (2x Heal)
+//moves: TODOs in resolve_effect method (2x Heal), is_asleep methode für PokemonToken
 
 //TODO Artur: hits in moves.rs, change stats + deal damage in resolve.rs, Methode zum errechnen
 //der stats in stats.rs

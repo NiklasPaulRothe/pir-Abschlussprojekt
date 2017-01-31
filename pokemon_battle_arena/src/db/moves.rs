@@ -61,7 +61,7 @@ impl Technique {
                 match self.get_category() {
 
                     enums::Move_Category::Damage => {
-                        resolve::deal_damage(self.clone(), user.clone(), target)
+                        let _ = resolve::deal_damage(self.clone(), user.clone(), target);
                     },
 
                     enums::Move_Category::Ailment => {
@@ -73,29 +73,29 @@ impl Technique {
                     enums::Move_Category::Heal => {
                         if !(user.get_current().get_stat(enums::Stats::Hp) ==
                             user.get_base().get_stat(enums::Stats::Hp)) {
-                            let mut percentage = 0;
+                            let mut value = 0;
                             if (self.get_name() == String::from("moonlight")) ||
                             (self.get_name() == String::from("synthesis")) ||
                             (self.get_name() == String::from("morning-sun")) {
                                 match field.get_weather() {
                                     enums::Weather::Clear_Sky => {
-                                        percentage = user.get_base().get_stat(enums::Stats::Hp) / 2;
+                                        value = user.get_base().get_stat(enums::Stats::Hp) / 2;
                                     },
                                     enums::Weather::Sunlight => {
-                                        percentage = (user.get_base().get_stat(enums::Stats::Hp)
+                                        value = (user.get_base().get_stat(enums::Stats::Hp)
                                          / 4) * 3;
                                     },
                                     _ => {
                                         if self.get_name() == String::from("morning-sun") {
-                                            percentage = user.get_base().
+                                            value = user.get_base().
                                                 get_stat(enums::Stats::Hp) / 4
                                         } else {
-                                            percentage = user.get_base().
+                                            value = user.get_base().
                                                 get_stat(enums::Stats::Hp) / 8
                                         }
                                     }
                                 };
-                                resolve::heal(target, percentage);
+                                resolve::heal(target, value);
                             } else if self.get_name() == String::from("heal-pulse") {
                                 resolve::heal(target, 50);
                             } else if self.get_name() == String::from("swallow") {
@@ -141,7 +141,19 @@ impl Technique {
                     },
 
                     enums::Move_Category::Damage_And_Heal => {
-                        unimplemented!();
+                        if self.get_name() == String::from("dream-eater")
+                        /*&& !target.is_asleep()*/ {
+                            println!("Dream Eater failed");
+                            break;
+                        }
+                        let mut value = resolve::deal_damage(self.clone(), user.clone(),
+                            target.clone());
+                        match self.get_drain_percentage() {
+                            50 => value = value / 2,
+                            75 => value = (value /4) * 3,
+                            _ => unreachable!(),
+                        }
+                        resolve::heal(user.clone(), value);
                     },
 
                     //totally done
