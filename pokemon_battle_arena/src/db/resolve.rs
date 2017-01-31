@@ -14,12 +14,12 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
     //effizient für alle Attacken zu berechnen.
 }
 
-pub fn ailment(attack: Technique, user: PokemonToken, target: PokemonToken) {
+pub fn ailment(ailment: enums::Ailment, effect_chance: u8, target: PokemonToken) {
     let mut rng = thread_rng();
     let random = rng.gen_range(1, 101);
-    let probability = attack.get_effect_chance();
+    let probability = effect_chance;
     if random <= probability {
-        match attack.get_ailment() {
+        match ailment {
             enums::Ailment::Confusion => {},
             _ => {},
         }

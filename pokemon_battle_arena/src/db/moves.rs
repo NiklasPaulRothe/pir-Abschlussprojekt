@@ -51,38 +51,51 @@ impl Technique {
     pub fn resolve<T,U> (&self, user: pokemon_token::PokemonToken,
         target: pokemon_token::PokemonToken, attacker: T, defender: U)
         where T: Player, U: Player {
-        match self.get_category() {
-            enums::Move_Category::Damage => resolve::deal_damage(self.clone(), user, target),
-            enums::Move_Category::Ailment => resolve::ailment(self.clone(), user, target),
-            enums::Move_Category::Net_Good_Stats => {},
-            enums::Move_Category::Heal => {
-                resolve::heal(self.clone(), user, target);
-            },
-            enums::Move_Category::Damage_And_Ailment => {
-                resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                resolve::ailment(self.clone(), user, target);
-            },
-            enums::Move_Category::Swagger => {},
-            enums::Move_Category::Damage_And_Lower => {
-                resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                resolve::change_stats(self.clone().get_stat_change_rate(), self.clone().get_stat(),
-                    target);
-            },
-            enums::Move_Category::Damage_And_Raise => {
-                resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                resolve::change_stats(self.clone().get_stat_change_rate(), self.clone().get_stat(),
-                    target);
-            },
-            enums::Move_Category::Damage_And_Heal => {
-                resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                resolve::heal(self.clone(), user ,target);
-            },
-            enums::Move_Category::Ohko => {},
-            enums::Move_Category::Whole_Field_Effect => {},
-            enums::Move_Category::Field_Effect => {},
-            enums::Move_Category::Force_Switch => {},
-            enums::Move_Category::Unique => {},
-        };
+        if self.hits(target.clone(), user.clone()) {
+            match self.get_category() {
+                enums::Move_Category::Damage => resolve::deal_damage(self.clone(), user, target),
+                enums::Move_Category::Ailment => resolve::ailment(self.get_ailment(), 100, target),
+                enums::Move_Category::Net_Good_Stats => {},
+                enums::Move_Category::Heal => {
+                    resolve::heal(self.clone(), user, target);
+                },
+                enums::Move_Category::Damage_And_Ailment => {
+                    resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                    resolve::ailment(self.get_ailment(), self.get_effect_chance(), target);
+                },
+                enums::Move_Category::Swagger => {
+                    if resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
+                        target.clone()) {
+                        resolve::ailment(self.get_ailment(), 100, target);
+                    }
+                },
+                enums::Move_Category::Damage_And_Lower => {
+                    resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                    let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), target);
+                },
+                enums::Move_Category::Damage_And_Raise => {
+                    resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                    let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), target);
+                },
+                enums::Move_Category::Damage_And_Heal => {
+                    resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                    resolve::heal(self.clone(), user ,target);
+                },
+                enums::Move_Category::Ohko => {},
+                enums::Move_Category::Whole_Field_Effect => {},
+                enums::Move_Category::Field_Effect => {},
+                enums::Move_Category::Force_Switch => {},
+                enums::Move_Category::Unique => {},
+            };
+        } else {
+            println!("{} missed {}", user.get_name(), target.get_name());
+        }
+    }
+
+    pub fn hits(&self, user: pokemon_token::PokemonToken, target: pokemon_token::PokemonToken)
+        -> bool {
+        //TODO: Calculate if a move hits the target
+        true
     }
 
     ///Takes the attacked Pokemon as an input besides the move and calculate from their types
