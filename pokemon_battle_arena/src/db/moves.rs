@@ -129,17 +129,18 @@ impl Technique {
                     },
 
                     enums::Move_Category::Damage_And_Lower => {
-                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                        let _ = resolve::deal_damage(self.clone(), user.clone(), target.clone());
                         let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
                             target);
                     },
 
                     enums::Move_Category::Damage_And_Raise => {
-                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                        let _ = resolve::deal_damage(self.clone(), user.clone(), target.clone());
                         let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
                             target);
                     },
 
+                    //done apart from math for damage
                     enums::Move_Category::Damage_And_Heal => {
                         if self.get_name() == String::from("dream-eater")
                         /*&& !target.is_asleep()*/ {
