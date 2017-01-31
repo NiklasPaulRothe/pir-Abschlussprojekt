@@ -99,7 +99,7 @@ pub enum Weather {
     Clear_Sky,
     Sunlight,
     //no need to handle it right now, only caused by abilities
-    Hars_Sunlight,
+    Harsh_Sunlight,
     Rain,
     //no need to handle it right now, only caused by abilities
     Heavy_Rain,

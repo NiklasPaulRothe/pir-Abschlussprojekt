@@ -33,8 +33,15 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: PokemonToken) -> boo
     true
 }
 
-pub fn heal(attack: Technique, user: PokemonToken, target: PokemonToken) {
-    unimplemented!();
+pub fn heal(target: PokemonToken, percentage: u8) {
+    let half = target.get_base().get_stat(enums::Stats::Hp) / 2;
+    if half >= target.get_current().get_stat(enums::Stats::Hp) {
+        target.get_current().set_stats(enums::Stats::Hp, target.get_base().
+            get_stat(enums::Stats::Hp));
+    } else {
+        target.get_current().set_stats(enums::Stats::Hp, (target.get_current().
+            get_stat(enums::Stats::Hp) + half));
+    }
 }
 
 pub fn switch_pokemon<T> (target: T)

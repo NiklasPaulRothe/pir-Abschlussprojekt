@@ -9,6 +9,7 @@ use super::resolve;
 use self::num::FromPrimitive;
 use std::collections::HashMap;
 use player::Player;
+use arena::Arena;
 
 ///Struct that is a representation of a move a pokemon can learn. Contains everything that is
 ///needed to calculate it's impact given a user and a target Pokemon.
@@ -49,74 +50,119 @@ impl Technique {
     ///Matches over the category of a move and calls a specific method in resolve.rs for this
     ///category. All calculation is done inside the method, therefore no return is needed.
     pub fn resolve<T,U> (&self, user: pokemon_token::PokemonToken,
-        target: pokemon_token::PokemonToken, attacker: T, defender: U)
-        where T: Player, U: Player {
-        if self.hits(target.clone(), user.clone()) {
-            match self.get_category() {
+        targets: Vec<pokemon_token::PokemonToken>, attacker: T, defender: U, field: Arena)
+        where T: Player, U: Player+Clone {
+        for target in targets.clone() {
+            if self.hits(target.clone(), user.clone()) {
+                match self.get_category() {
 
-                enums::Move_Category::Damage => resolve::deal_damage(self.clone(), user, target),
+                    enums::Move_Category::Damage => {
+                        resolve::deal_damage(self.clone(), user.clone(), target)
+                    },
 
-                enums::Move_Category::Ailment => resolve::ailment(self.get_ailment(), 100, target),
+                    enums::Move_Category::Ailment => resolve::ailment(self.get_ailment(), 100, target),
 
-                enums::Move_Category::Net_Good_Stats => {},
+                    enums::Move_Category::Net_Good_Stats => {},
 
-                enums::Move_Category::Heal => {
-                    resolve::heal(self.clone(), user, target);
-                },
+                    enums::Move_Category::Heal => {
+                        if !(user.get_current().get_stat(enums::Stats::Hp) ==
+                            user.get_base().get_stat(enums::Stats::Hp)) {
+                            let mut percentage = 0;
+                            if (self.get_name() == String::from("moonlight")) ||
+                            (self.get_name() == String::from("synthesis")) ||
+                            (self.get_name() == String::from("morning-sun")) {
+                                percentage = match field.get_weather() {
+                                    enums::Weather::Clear_Sky => user.get_base().get_stat(enums::Stats::Hp) / 2,
+                                    enums::Weather::Sunlight => {
+                                        (user.get_base().get_stat(enums::Stats::Hp) / 4) * 3
+                                    },
+                                    _ => {
+                                        if self.get_name() == String::from("morning-sun") {
+                                            user.get_base().
+                                                get_stat(enums::Stats::Hp) / 4
+                                        } else {
+                                            user.get_base().
+                                                get_stat(enums::Stats::Hp) / 8
+                                        }
+                                    }
+                                }
+                                resolve::heal(target, percentage);
+                            } else if self.get_name() == String::from("heal-pulse") {
+                                resolve::heal(target, 50);
+                            } else if self.get_name() == String::from("swallow") {
+                                //TODO: find a way to get a percentage according to the use of
+                                //stockpile in the rounds before
+                                resolve::heal(target, 25);
+                            } else if self.get_name() == String::from("roost") {
+                                //TODO: find a way to change type of user for one round
+                                resolve::heal(target, 50);
+                            } else {
+                                resolve::heal(target, 50);
+                            }
 
-                enums::Move_Category::Damage_And_Ailment => {
-                    resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                    resolve::ailment(self.get_ailment(), self.get_effect_chance(), target);
-                },
 
-                //apart from the Math done
-                enums::Move_Category::Swagger => {
-                    if resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                        target.clone()) {
-                        resolve::ailment(self.get_ailment(), 100, target);
-                    }
-                },
+                        } else {
+                            println!("{} failed", self.get_name());
+                        }
+                    },
 
-                enums::Move_Category::Damage_And_Lower => {
-                    resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                    let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                        target);
-                },
+                    enums::Move_Category::Damage_And_Ailment => {
+                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                        resolve::ailment(self.get_ailment(), self.get_effect_chance(), target);
+                    },
 
-                enums::Move_Category::Damage_And_Raise => {
-                    resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                    let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                        target);
-                },
+                    //apart from the Math done
+                    enums::Move_Category::Swagger => {
+                        if resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
+                            target.clone()) {
+                            resolve::ailment(self.get_ailment(), 100, target);
+                        }
+                    },
 
-                enums::Move_Category::Damage_And_Heal => {
-                    resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                    resolve::heal(self.clone(), user ,target);
-                },
+                    enums::Move_Category::Damage_And_Lower => {
+                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                        let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
+                            target);
+                    },
 
-                //totally done
-                enums::Move_Category::Ohko => {
-                    if ((self.get_name() == "guillotine" || self.get_name() == "sheer-cold") &&
-                    user.get_level() >= target.get_level()) || ((self.get_name() == "horn-drill" ||
-                    self.get_name() == "fissure") && user.get_current().get_stat(enums::Stats::Speed)
-                    >= target.get_current().get_stat(enums::Stats::Speed))  {
-                        resolve::ko_attack(target);
-                    } else {
-                        println!("{} was not affected by {}", target.get_name(), self.get_name());
-                    }
-                },
+                    enums::Move_Category::Damage_And_Raise => {
+                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                        let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
+                            target);
+                    },
 
-                enums::Move_Category::Whole_Field_Effect => {},
+                    enums::Move_Category::Damage_And_Heal => {
+                        unimplemented!();
+                    },
 
-                enums::Move_Category::Field_Effect => {},
+                    //totally done
+                    enums::Move_Category::Ohko => {
+                        if ((self.get_name() == String::from("guillotine") ||
+                            self.get_name() == String::from("sheer-cold")) &&
+                        user.get_level() >= target.get_level()) ||
+                        ((self.get_name() == String::from("horn-drill") ||
+                        self.get_name() == String::from("fissure")) &&
+                        user.get_current().get_stat(enums::Stats::Speed)
+                        >= target.get_current().get_stat(enums::Stats::Speed))  {
+                            resolve::ko_attack(target);
+                        } else {
+                            println!("{} was not affected by {}", target.get_name(), self.get_name());
+                        }
+                    },
 
-                enums::Move_Category::Force_Switch => resolve::switch_pokemon(defender),
+                    enums::Move_Category::Whole_Field_Effect => {},
 
-                enums::Move_Category::Unique => {},
+                    enums::Move_Category::Field_Effect => {},
 
-            };
-        } else {
-            println!("{} missed {}", user.get_name(), target.get_name());
+                    enums::Move_Category::Force_Switch => resolve::switch_pokemon(defender.clone()),
+
+                    enums::Move_Category::Unique => {},
+                };
+            } else {
+                if targets.len() == 1 {
+                    println!("{} missed {}", user.get_name(), target.get_name());
+                }
+            }
         }
     }
 
