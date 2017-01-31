@@ -94,6 +94,7 @@ impl Technique {
                     resolve::heal(self.clone(), user ,target);
                 },
 
+                //totally done
                 enums::Move_Category::Ohko => {
                     if ((self.get_name() == "guillotine" || self.get_name() == "sheer-cold") &&
                     user.get_level() >= target.get_level()) || ((self.get_name() == "horn-drill" ||
