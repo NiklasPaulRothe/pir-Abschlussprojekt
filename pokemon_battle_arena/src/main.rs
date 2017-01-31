@@ -12,6 +12,7 @@ mod player;
 use time::get_time;
 use player::Player;
 use arena::Arena;
+use db::enums;
 
 fn main() {
     println!("");
@@ -24,7 +25,9 @@ fn main() {
 fn testing() {
     println!("Testing:");
     // for entry in db::movedex::Movedex::new().get_entries() {
-    //     println!("{:?}", entry.get_ailment_chance());
+    //     if entry.get_category() == enums::Move_Category::Swagger {
+    //         println!("{:?}", entry.get_name());
+    //     }
     // }
     // graphic::windows::draw_window();
     // test_players();
