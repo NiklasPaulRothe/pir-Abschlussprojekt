@@ -155,7 +155,8 @@ impl Technique {
                         >= target.get_current().get_stat(enums::Stats::Speed))  {
                             resolve::ko_attack(target);
                         } else {
-                            println!("{} was not affected by {}", target.get_name(), self.get_name());
+                            println!("{} was not affected by {}", target.get_name(),
+                                self.get_name());
                         }
                     },
 
