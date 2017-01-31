@@ -94,7 +94,7 @@ enum_from_primitive! {
         Speed = 6
     }
 }
-
+#[derive(Debug, Clone)]
 pub enum Weather {
     Clear_Sky,
     Sunlight,
