@@ -33,7 +33,7 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: PokemonToken) -> boo
     true
 }
 
-pub fn heal(target: PokemonToken, percentage: u8) {
+pub fn heal(target: PokemonToken, percentage: u16) {
     let half = target.get_base().get_stat(enums::Stats::Hp) / 2;
     if half >= target.get_current().get_stat(enums::Stats::Hp) {
         target.get_current().set_stats(enums::Stats::Hp, target.get_base().

@@ -6,6 +6,7 @@ use super::pokemon_model;
 use super::pokemon_token;
 use super::enums;
 use super::resolve;
+use super::pokedex::Pokedex;
 use self::num::FromPrimitive;
 use std::collections::HashMap;
 use player::Player;
@@ -50,8 +51,11 @@ impl Technique {
     ///Matches over the category of a move and calls a specific method in resolve.rs for this
     ///category. All calculation is done inside the method, therefore no return is needed.
     pub fn resolve<T,U> (&self, user: pokemon_token::PokemonToken,
-        targets: Vec<pokemon_token::PokemonToken>, attacker: T, defender: U, field: Arena)
+        mut targets: Vec<pokemon_token::PokemonToken>, attacker: T, defender: U, field: Arena)
         where T: Player, U: Player+Clone {
+        if targets.is_empty() {
+            targets.push(user.clone());
+        }
         for target in targets.clone() {
             if self.hits(target.clone(), user.clone()) {
                 match self.get_category() {
@@ -60,7 +64,9 @@ impl Technique {
                         resolve::deal_damage(self.clone(), user.clone(), target)
                     },
 
-                    enums::Move_Category::Ailment => resolve::ailment(self.get_ailment(), 100, target),
+                    enums::Move_Category::Ailment => {
+                        resolve::ailment(self.get_ailment(), 100, target);
+                    },
 
                     enums::Move_Category::Net_Good_Stats => {},
 
@@ -71,21 +77,24 @@ impl Technique {
                             if (self.get_name() == String::from("moonlight")) ||
                             (self.get_name() == String::from("synthesis")) ||
                             (self.get_name() == String::from("morning-sun")) {
-                                percentage = match field.get_weather() {
-                                    enums::Weather::Clear_Sky => user.get_base().get_stat(enums::Stats::Hp) / 2,
+                                match field.get_weather() {
+                                    enums::Weather::Clear_Sky => {
+                                        percentage = user.get_base().get_stat(enums::Stats::Hp) / 2;
+                                    },
                                     enums::Weather::Sunlight => {
-                                        (user.get_base().get_stat(enums::Stats::Hp) / 4) * 3
+                                        percentage = (user.get_base().get_stat(enums::Stats::Hp)
+                                         / 4) * 3;
                                     },
                                     _ => {
                                         if self.get_name() == String::from("morning-sun") {
-                                            user.get_base().
+                                            percentage = user.get_base().
                                                 get_stat(enums::Stats::Hp) / 4
                                         } else {
-                                            user.get_base().
+                                            percentage = user.get_base().
                                                 get_stat(enums::Stats::Hp) / 8
                                         }
                                     }
-                                }
+                                };
                                 resolve::heal(target, percentage);
                             } else if self.get_name() == String::from("heal-pulse") {
                                 resolve::heal(target, 50);
