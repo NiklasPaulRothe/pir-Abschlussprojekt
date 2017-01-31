@@ -6,6 +6,7 @@ use super::enums;
 use super::stats;
 use super::determinant_values;
 use super::movedex;
+use super::moves;
 
 ///Represents a single Token of a Pokemon with individual values for this token.
 #[derive(Debug, Clone)]
@@ -18,6 +19,10 @@ pub struct PokemonToken {
     gender: enums::Gender,
     type_one: enums::types,
     type_two: enums::types,
+    move_one: Option<(moves::Technique, u8)>,
+    move_two: Option<(moves::Technique, u8)>,
+    move_three: Option<(moves::Technique, u8)>,
+    move_four: Option<(moves::Technique, u8)>,
     nature: natures::Nature,
     dv: determinant_values::Dv,
     base_stats: stats::Stats,
@@ -44,6 +49,10 @@ impl PokemonToken {
             gender: enums::get_gender(model.clone().get_gender_rate()),
             type_one: model.get_types().0,
             type_two: model.get_types().1,
+            move_one: None,
+            move_two: None,
+            move_three: None,
+            move_four: None,
             nature: natures::Nature::get_random_nature(),
             dv: determinant_values::Dv::get_dv(model.clone()),
             base_stats: model.get_stats(),
@@ -98,5 +107,18 @@ impl PokemonToken {
             return Some(PokemonToken::from_model(self.mega_evolution.clone().unwrap()));
         }
         None
+    }
+
+    pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {
+        self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
+        if moves.len() >= 1 {
+            self.move_two = Some((moves[1].clone(), moves[1].get_power_points().unwrap()));
+        }
+        if moves.len() >= 2 {
+            self.move_three = Some((moves[2].clone(), moves[2].get_power_points().unwrap()));
+        }
+        if moves.len() >= 3 {
+            self.move_four = Some((moves[3].clone(), moves[3].get_power_points().unwrap()));
+        }
     }
 }

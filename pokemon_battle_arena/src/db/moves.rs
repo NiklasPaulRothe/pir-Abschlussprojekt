@@ -48,11 +48,37 @@ pub struct Technique {
 impl Technique {
     ///Matches over the category of a move and calls a specific method in resolve.rs for this
     ///category. All calculation is done inside the method, therefore no return is needed.
-    pub fn resolve_effect(&self, user: pokemon_token::PokemonToken,
+    pub fn resolve(&self, user: pokemon_token::PokemonToken,
         target: pokemon_token::PokemonToken) {
         match self.get_category() {
             enums::Move_Category::Damage => resolve::deal_damage(self.clone(), user, target),
-            _ => {},
+            enums::Move_Category::Ailment => resolve::ailment(self.clone(), user, target),
+            enums::Move_Category::Net_Good_Stats => {},
+            enums::Move_Category::Heal => {
+                resolve::heal(self.clone(), user, target);
+            },
+            enums::Move_Category::Damage_And_Ailment => {
+                resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                resolve::ailment(self.clone(), user, target);
+            },
+            enums::Move_Category::Swagger => {},
+            enums::Move_Category::Damage_And_Lower => {
+                resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                resolve::change_stats(self.clone(), user, target);
+            },
+            enums::Move_Category::Damage_And_Raise => {
+                resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                resolve::change_stats(self.clone(), user, target);
+            },
+            enums::Move_Category::Damage_And_Heal => {
+                resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                resolve::heal(self.clone(), user ,target);
+            },
+            enums::Move_Category::Ohko => {},
+            enums::Move_Category::Whole_Field_Effect => {},
+            enums::Move_Category::Field_Effect => {},
+            enums::Move_Category::Force_Switch => {},
+            enums::Move_Category::Unique => {},
         };
     }
 
@@ -171,7 +197,7 @@ impl Technique {
         if self.effect_chance.is_some() {
             return self.effect_chance.unwrap();
         }
-        0
+        100
     }
 
     pub fn get_category(&self) -> enums::Move_Category {
@@ -179,9 +205,9 @@ impl Technique {
         match tmp {
             "damage" => enums::Move_Category::Damage,
             "ailment" => enums::Move_Category::Ailment,
-            "net-good-stats" => enums::Move_Category::Net_good_stats,
+            "net-good-stats" => enums::Move_Category::Net_Good_Stats,
             "heal" => enums::Move_Category::Heal,
-            "damage+ailment" => enums::Move_Category::Damage_and_ailment,
+            "damage+ailment" => enums::Move_Category::Damage_And_Ailment,
             "swagger" => enums::Move_Category::Swagger,
             "damage+lower" => enums::Move_Category::Damage_And_Lower,
             "damage+raise" => enums::Move_Category::Damage_And_Raise,

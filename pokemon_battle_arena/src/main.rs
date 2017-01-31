@@ -21,11 +21,11 @@ fn main() {
 
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
-    println!("Testing:");
-    // for entry in db::pokedex::Pokedex::new().get_entries() {
-    //     println!("{:?}", db::pokemon_token::PokemonToken::from_model(entry).get_moves(db::movedex::Movedex::new()));
+    // println!("Testing:");
+    // for entry in db::movedex::Movedex::new().get_entries() {
+    //     println!("{:?}", entry.get_ailment_chance());
     // }
-    // graphic::windows::draw_startscreen();
+    // graphic::windows::draw_window();
     // test_players();
 }
 

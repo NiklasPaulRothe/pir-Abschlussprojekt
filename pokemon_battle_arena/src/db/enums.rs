@@ -36,9 +36,9 @@ enum_from_primitive! {
     pub enum Move_Category {
         Damage = 0,
         Ailment = 1,
-        Net_good_stats = 2,
+        Net_Good_Stats = 2,
         Heal = 3,
-        Damage_and_ailment = 4,
+        Damage_And_Ailment = 4,
         Swagger = 5,
         Damage_And_Lower = 6,
         Damage_And_Raise = 7,
