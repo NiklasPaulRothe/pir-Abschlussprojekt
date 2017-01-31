@@ -29,7 +29,7 @@ fn testing() {
     //         println!("{:?}", entry.get_name());
     //     }
     // }
-    // graphic::windows::draw_window();
+    graphic::windows::draw_window();
     // test_players();
     // test_arena()
 }
