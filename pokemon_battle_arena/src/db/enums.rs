@@ -32,7 +32,7 @@ enum_from_primitive! {
 }
 
 enum_from_primitive! {
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, PartialEq)]
     pub enum Move_Category {
         Damage = 0,
         Ailment = 1,

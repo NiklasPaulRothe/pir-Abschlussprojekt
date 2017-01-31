@@ -8,7 +8,7 @@ use super::enums;
 use super::resolve;
 use self::num::FromPrimitive;
 use std::collections::HashMap;
-use std;
+use player::Player;
 
 ///Struct that is a representation of a move a pokemon can learn. Contains everything that is
 ///needed to calculate it's impact given a user and a target Pokemon.
@@ -48,8 +48,9 @@ pub struct Technique {
 impl Technique {
     ///Matches over the category of a move and calls a specific method in resolve.rs for this
     ///category. All calculation is done inside the method, therefore no return is needed.
-    pub fn resolve(&self, user: pokemon_token::PokemonToken,
-        target: pokemon_token::PokemonToken) {
+    pub fn resolve<T,U> (&self, user: pokemon_token::PokemonToken,
+        target: pokemon_token::PokemonToken, attacker: T, defender: U)
+        where T: Player, U: Player {
         match self.get_category() {
             enums::Move_Category::Damage => resolve::deal_damage(self.clone(), user, target),
             enums::Move_Category::Ailment => resolve::ailment(self.clone(), user, target),
@@ -64,11 +65,13 @@ impl Technique {
             enums::Move_Category::Swagger => {},
             enums::Move_Category::Damage_And_Lower => {
                 resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                resolve::change_stats(self.clone(), user, target);
+                resolve::change_stats(self.clone().get_stat_change_rate(), self.clone().get_stat(),
+                    target);
             },
             enums::Move_Category::Damage_And_Raise => {
                 resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                resolve::change_stats(self.clone(), user, target);
+                resolve::change_stats(self.clone().get_stat_change_rate(), self.clone().get_stat(),
+                    target);
             },
             enums::Move_Category::Damage_And_Heal => {
                 resolve::deal_damage(self.clone(), user.clone(), target.clone());
