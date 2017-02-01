@@ -11,6 +11,8 @@ pub struct Arena {
 }
 
 impl Arena {
+    /// Creates a new arena with a list of players for both teams, the default effect and the
+    /// default weather
     pub fn new(i_team_1: Vec<Box<Player>>, i_team_2: Vec<Box<Player>>, i_effect: enums::types,
         i_weather: enums::Weather) -> Self {
         Arena {
@@ -20,36 +22,49 @@ impl Arena {
             team_2: i_team_2,
         }
     }
+
+    //
     // Getter Methods
+    //
+    /// Gets the type of the arena
     pub fn get_effect(&self) -> enums::types {
         self.effect.clone()
     }
+    /// Gets the actual weather of the arena
     pub fn get_weather(&self) -> enums::Weather {
         self.weather.clone()
     }
+    /// Returns a player of team one
     pub fn get_team_1_player(&self, player: usize) -> Option<&Box<Player>> {
         if player <= self.get_team_2_count() && player > 0 {
             return Some(&self.team_1[player - 1]);
         }
         None
     }
+    /// Returns a player of team two
     pub fn get_team_2_player(&self, player: usize) -> Option<&Box<Player>> {
         if player <= self.get_team_2_count() && player > 0 {
             return Some(&self.team_2[player - 1]);
         }
         None
     }
+    /// Returns the amount of players in team 1
     pub fn get_team_1_count(&self) -> usize {
         self.team_1.len()
     }
+    /// Returns the amount of players in team 2
     pub fn get_team_2_count(&self) -> usize {
         self.team_2.len()
     }
 
+    //
     // Setter Methods
+    //
+    /// Sets the effect of the arena
     pub fn set_effect(&mut self, new: enums::types) {
         self.effect = new;
     }
+    /// Sets the weather in the arena
     pub fn set_weather(&mut self, new: enums::Weather) {
         self.weather = new;
     }
