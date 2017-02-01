@@ -2,6 +2,7 @@ extern crate num;
 extern crate rand;
 
 use self::num::FromPrimitive;
+use self::rand::{Rng, thread_rng};
 
 ///enum for the pokemon/attack types.
 ///Can be assigned from i32 value.
@@ -31,13 +32,13 @@ enum_from_primitive! {
 }
 
 enum_from_primitive! {
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, PartialEq)]
     pub enum Move_Category {
         Damage = 0,
         Ailment = 1,
-        Net_good_stats = 2,
+        Net_Good_Stats = 2,
         Heal = 3,
-        Damage_and_ailment = 4,
+        Damage_And_Ailment = 4,
         Swagger = 5,
         Damage_And_Lower = 6,
         Damage_And_Raise = 7,
@@ -92,6 +93,20 @@ enum_from_primitive! {
         Special_Defense = 5,
         Speed = 6
     }
+}
+#[derive(Debug, Clone)]
+pub enum Weather {
+    Clear_Sky,
+    Sunlight,
+    //no need to handle it right now, only caused by abilities
+    Harsh_Sunlight,
+    Rain,
+    //no need to handle it right now, only caused by abilities
+    Heavy_Rain,
+    Sandstorm,
+    Hail,
+    //no need to handle it right now, only caused by abilities
+    Air_Current,
 }
 
 ///enum for the Damage Class of a attack.
@@ -163,9 +178,43 @@ enum_from_primitive! {
     }
 }
 
-pub fn get_gender() -> Gender {
-    if rand::random() {
-        return Gender::Male
+pub fn get_gender(gender_rate: i8) -> Gender {
+    let mut rng = thread_rng();
+    let probability = rng.gen_range(1, 101);
+    match gender_rate {
+        -1 => Gender::Genderless,
+        0 => Gender::Male,
+        1 => {
+            if probability < 87 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        2 => {
+            if probability < 75 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        4 => {
+            if probability < 50 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        6 => {
+            if probability < 25 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        7 => {
+            if probability < 13 {
+            return Gender::Male
+            }
+        Gender::Female
+        },
+        8 => Gender::Female,
+        _ => Gender::Genderless,
     }
-    Gender::Female
 }

@@ -3,6 +3,7 @@ extern crate conrod;
 
 use conrod::backend::piston::{self, Window, WindowEvents, OpenGL};
 use conrod::backend::piston::event::UpdateEvent;
+use db;
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
@@ -13,11 +14,19 @@ enum Screen {
     Title,
     Play,
     Options,
+    PokemonChoose,
 }
 
+/// App struct, which contains important data
+///     screen:         screen that gets drawn
+///     label_color:    color of labels (text)
+///     bg_color:       background color
+///     pokedex_index:  current position in the pokedex
 struct App {
     screen: Screen,
     label_color: conrod::Color,
+    bg_color: conrod::Color,
+    pokedex_index: u32,
 }
 
 impl App {
@@ -25,6 +34,8 @@ impl App {
         App {
             screen: Screen::Title,
             label_color: conrod::color::BLACK,
+            bg_color: conrod::color::WHITE,
+            pokedex_index: 0,
         }
     }
 }
@@ -102,6 +113,9 @@ widget_ids! {
         button_sp,
         button_mp,
         button_play_back,
+        button_up,
+        button_down,
+        button_choose,
     }
 }
 
@@ -109,7 +123,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
     use conrod::{widget, Borderable, Colorable, Labelable, Positionable, Sizeable, Widget};
 
     // Create new empty canvas
-    widget::Canvas::new().color(conrod::color::WHITE).set(ids.canvas, ui);
+    widget::Canvas::new().color(app.bg_color).set(ids.canvas, ui);
 
     // draws Title-Screen
     if let Screen::Title = app.screen {
@@ -117,7 +131,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // Shows Play-Screen when clicked
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Play")
             .label_color(app.label_color)
             .middle_of(ids.canvas)
@@ -133,7 +147,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // TODO: draw new window with options menu
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Options")
             .label_color(app.label_color)
             .down_from(ids.button_play, 0.0)
@@ -141,6 +155,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
             .set(ids.button_options, ui)
             .was_clicked()
         {
+            app.screen = Screen::Options;
             println!("Options");
         }
 
@@ -148,7 +163,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // closes the window
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Exit")
             .label_color(app.label_color)
             .down_from(ids.button_options, 0.0)
@@ -163,10 +178,9 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
     // draws Play-Screen
     if let Screen::Play = app.screen {
         // Singleplayer button
-        // not implemented yet
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Singleplayer")
             .label_color(app.label_color)
             .middle_of(ids.canvas)
@@ -174,6 +188,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
             .set(ids.button_sp, ui)
             .was_clicked()
         {
+            app.screen = Screen::PokemonChoose;
             println!("Singleplayer");
         }
 
@@ -181,7 +196,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // not implemented yet
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Multiplayer")
             .label_color(app.label_color)
             .down_from(ids.button_sp, 0.0)
@@ -196,7 +211,7 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
         // returns to previous screen
         if widget::Button::new()
             .border(1.0)
-            .color(conrod::color::WHITE)
+            .color(app.bg_color)
             .label("Back")
             .label_color(app.label_color)
             .down_from(ids.button_mp, 0.0)
@@ -210,5 +225,86 @@ fn set_ui(ui: &mut conrod::UiCell, ids: &mut Ids, app: &mut App) {
     }
 
     //draws Options-Screen
-    if let Screen::Options = app.screen {}
+    if let Screen::Options = app.screen {
+        if widget::Button::new()
+            .border(1.0)
+            .color(app.bg_color)
+            .label("Back")
+            .label_color(app.label_color)
+            .down_from(ids.button_mp, 0.0)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_play_back, ui)
+            .was_clicked()
+        {
+            println!("Back");
+            app.screen = Screen::Title;
+        }
+    }
+
+    // Pokemon choose Screen should be able to setup a vec with atleast one but a maximum of 6
+    // pokemon for a player.
+    if let Screen::PokemonChoose = app.screen {
+        // let pokedex = db::pokedex::Pokedex::new();
+        // let entries = pokedex.get_entries();
+
+        if widget::Button::new()
+            .border(1.0)
+            .color(app.bg_color)
+            .label("<-")
+            .label_color(app.label_color)
+            .middle_of(ids.canvas)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_up, ui)
+            .was_clicked()
+        {
+            println!("<-");
+            app.pokedex_index -= 1;
+            println!("Index: {}", app.pokedex_index);
+            app.screen = Screen::PokemonChoose;
+        }
+
+        if widget::Button::new()
+            .border(1.0)
+            .color(app.bg_color)
+            .label(&app.pokedex_index.to_string())
+            .label_color(app.label_color)
+            .down_from(ids.button_up, 0.0)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_choose, ui)
+            .was_clicked()
+        {
+            println!("Index: {}", app.pokedex_index);
+            app.screen = Screen::PokemonChoose;
+        }
+
+        if widget::Button::new()
+            .border(1.0)
+            .color(app.bg_color)
+            .label("->")
+            .label_color(app.label_color)
+            .down_from(ids.button_choose, 0.0)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_down, ui)
+            .was_clicked()
+        {
+            println!("->");
+            app.pokedex_index += 1;
+            println!("Index: {}", app.pokedex_index);
+            app.screen = Screen::PokemonChoose;
+        }
+
+        if widget::Button::new()
+            .border(1.0)
+            .color(app.bg_color)
+            .label("Back")
+            .label_color(app.label_color)
+            .down_from(ids.button_down, 0.0)
+            .w_h(BUTTON_W, BUTTON_H)
+            .set(ids.button_play_back, ui)
+            .was_clicked()
+        {
+            println!("Back");
+            app.screen = Screen::Title;
+        }
+    }
 }

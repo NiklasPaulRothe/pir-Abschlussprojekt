@@ -6,6 +6,8 @@ use super::enums;
 use self::rand::{Rng, thread_rng};
 use enum_primitive::FromPrimitive;
 
+///The nature struct contains an individual ID, the name and the stats that are decreased and
+///increased when calculating the base stats.
 #[derive(Debug, Clone)]
 pub struct Nature {
     id: usize,
@@ -14,7 +16,7 @@ pub struct Nature {
     increase_stat: enums::Stats,
 }
 
-///creates a Vec with all natures in it.
+///creates a Vec that contains every possible nature.
 pub fn create_naturedb() -> Vec<Nature> {
     let mut natures = Vec::new();
     let mut nature_db = csv::Reader::from_file("./src/db/tables/natures.csv").unwrap();
@@ -32,6 +34,7 @@ pub fn create_naturedb() -> Vec<Nature> {
 }
 
 impl Nature {
+    ///Randomly provides a nature for a Pokemon Token
     pub fn get_random_nature() -> Nature {
         let dex = create_naturedb();
         let mut rng = thread_rng();
