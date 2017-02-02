@@ -16,7 +16,8 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
     //effizient für alle Attacken zu berechnen.
 }
 
-pub fn ailment(name: String, ailment: enums::Ailment, effect_chance: u8, mut target: PokemonToken) {
+pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, effect_chance: u8,
+    mut target: PokemonToken) {
     let mut rng = thread_rng();
     let random = rng.gen_range(1, 101);
     let probability = effect_chance;
@@ -53,9 +54,36 @@ pub fn ailment(name: String, ailment: enums::Ailment, effect_chance: u8, mut tar
                             enums::print_non_volatile(target.get_non_volatile().0));
                     }
                 },
-                enums::Ailment::Freeze => {},
-                enums::Ailment::Burn => {},
-                enums::Ailment::Poison => {},
+                enums::Ailment::Freeze => {
+                    if (target.get_types().0 == enums::types::ice || target.get_types().1 ==
+                    enums::types::ice) && move_type == enums::types::ice {
+                        println!("{} could not be freezed", target.get_name());
+                    } else {
+                        target.set_non_volatile(enums::Non_Volatile::Freeze);
+                    }
+                },
+                enums::Ailment::Burn => {
+                    if target.get_types().0 == enums::types::fire || target.get_types().1 ==
+                    enums::types::fire {
+                        println!("{} could not be burned", target.get_name());
+                    } else {
+                        target.set_non_volatile(enums::Non_Volatile::Burn);
+                    }
+                },
+                enums::Ailment::Poison => {
+                    if target.get_types().0 == enums::types::poison || target.get_types().0 ==
+                    enums::types::steel || target.get_types().1 == enums::types::poison ||
+                    target.get_types().1 == enums::types::steel {
+                        println!("{} could not be poisoned", target.get_name());
+                    } else {
+                        if name == String::from("toxic") {
+                            target.set_non_volatile(enums::Non_Volatile::Bad_Poison);
+                            //TODO: add counter for damage in badly poison state.
+                        } else {
+                            target.set_non_volatile(enums::Non_Volatile::Poison);
+                        }
+                    }
+                },
                 _ => {},
             }
         }
