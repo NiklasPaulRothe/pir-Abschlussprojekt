@@ -35,6 +35,7 @@ impl Movedex {
         None
     }
 
+    ///Returns a list of all learnable moves by level for a specific pokemon with a specific level.
     pub fn for_token(&self, level: u16, id: usize) -> Movedex {
         let mut new_dex = Vec::new();
         let mut move_db = csv::Reader::from_file("./src/db/tables/pokemon_moves.csv").unwrap();
@@ -53,10 +54,12 @@ impl Movedex {
         }
     }
 
+    ///Returns the entry field of a movedex.
     pub fn get_entries(&self) -> Vec<Technique> {
         self.entries.clone()
     }
 
+    ///Returns true if the movedex contains all possible moves, and false if not.
     fn is_complete(&self) -> bool {
         self.complete
     }

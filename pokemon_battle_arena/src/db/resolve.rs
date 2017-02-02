@@ -16,23 +16,31 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
     //effizient für alle Attacken zu berechnen.
 }
 
+//resolves ailment effects
 pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, effect_chance: u8,
     mut target: PokemonToken) {
     let mut rng = thread_rng();
     let random = rng.gen_range(1, 101);
+    //only works if the effect chance of the move is met.
     let probability = effect_chance;
     if random <= probability {
         let powder = Regex::new(r"powder").unwrap();
         let spore = Regex::new(r"spore").unwrap();
         let tmp: &str = & name;
+        //some sort of attacks did not work against grass types.
         if (target.get_types().0 == enums::types::grass ||
             target.get_types().1 == enums::types::grass) && (powder.is_match(tmp)
             || spore.is_match(tmp)) {
             println!("{} was not affected by {}", target.get_name(), name);
         } else {
+            //categorize the moves by the ailment they cause. Ailments usually automatically fail
+            //if the target already was hit by a move that caused the same ailment and still suffer
+            //from it's effect. Non volatile Ailments even fail if the target is under the effect
+            //of one of these kind.
             match ailment {
 
                 enums::Ailment::Paralysis => {
+                    //electric type pokemon are immune to paralysis
                     if target.get_non_volatile().0 == enums::Non_Volatile::Undefined {
                         if !(target.get_types().0 == enums::types::electric) &&
                         !(target.get_types().1 == enums::types::electric) {
@@ -58,6 +66,8 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                 },
 
                 enums::Ailment::Freeze => {
+                    //ice type pokemon are immune to freeze, but only if the used move is also
+                    //from the type ice.
                     if (target.get_types().0 == enums::types::ice || target.get_types().1 ==
                     enums::types::ice) && move_type == enums::types::ice {
                         println!("{} could not be freezed", target.get_name());
@@ -67,6 +77,7 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                 },
 
                 enums::Ailment::Burn => {
+                    //Fire types can not be burned (seems logical).
                     if target.get_types().0 == enums::types::fire || target.get_types().1 ==
                     enums::types::fire {
                         println!("{} could not be burned", target.get_name());
@@ -76,6 +87,7 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                 },
 
                 enums::Ailment::Poison => {
+                    //Neither Poison nor steel pokemon can be poisoned in normal ways.
                     if target.get_types().0 == enums::types::poison || target.get_types().0 ==
                     enums::types::steel || target.get_types().1 == enums::types::poison ||
                     target.get_types().1 == enums::types::steel {
@@ -90,6 +102,8 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                 },
 
                 enums::Ailment::Leech_Seed => {
+                    //Has no effect on grass type (even though given the flavor text leech seeds
+                    //are a plant parasite...)
                     if target.get_types().0 == enums::types::grass || target.get_types().1 ==
                     enums::types::grass {
                         println!("{} was not affected by Leech Seed", target.get_name());
@@ -128,6 +142,8 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: PokemonToken) -> boo
     true
 }
 
+//heals the targets HP by the provided value, or, if this would raise the HP above the base stat,
+//to their base HP.
 pub fn heal(target: PokemonToken, value: u16) {
     if value + target.get_current().get_stat(enums::Stats::Hp) >= target.get_base().
     get_stat(enums::Stats::Hp) {
@@ -139,11 +155,13 @@ pub fn heal(target: PokemonToken, value: u16) {
     }
 }
 
+//switches the Pokemon of the target Player
 pub fn switch_pokemon<T> (target: T)
     where T: Player {
         unimplemented!();
 }
 
+//simply sets the HP of the target to 0 (Thats what K.O. mean I think.)
 pub fn ko_attack (target: PokemonToken) {
     target.get_current().set_stats(enums::Stats::Hp, 0);
 }

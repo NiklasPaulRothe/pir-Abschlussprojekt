@@ -46,6 +46,7 @@ impl Stats {
         }
     }
 
+    //Provides a default Stat struct with all Values set to 0
     pub fn default() -> Stats {
         Stats {
             hp: 0,

@@ -31,6 +31,8 @@ enum_from_primitive! {
     }
 }
 
+///Enum for the Categories a move can have. They are used to get smaller samples of moves when
+///resolve their effects.
 enum_from_primitive! {
     #[derive(Debug, Clone, PartialEq)]
     pub enum Move_Category {
@@ -51,6 +53,7 @@ enum_from_primitive! {
     }
 }
 
+///All ailments that are known and can be caused by one or more moves.
 #[derive(Debug, Clone)]
 pub enum Ailment {
     Unknown,
@@ -75,6 +78,7 @@ pub enum Ailment {
     Ingrain,
 }
 
+///All the major status Changes that can not be caused at the same time.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Non_Volatile {
     Undefined,
@@ -86,6 +90,7 @@ pub enum Non_Volatile {
     Bad_Poison,
 }
 
+///Flags that have a influence at the end of each turn.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum End_Of_Turn {
     Leech_Seed,
@@ -93,6 +98,7 @@ pub enum End_Of_Turn {
     Yawn,
 }
 
+///Print method for non volatile status changes.
 pub fn print_non_volatile(status: Non_Volatile) -> String {
     match status {
         Non_Volatile::Undefined => String::from(""),
@@ -104,6 +110,7 @@ pub fn print_non_volatile(status: Non_Volatile) -> String {
     }
 }
 
+///Enum for Genders
 #[derive(Debug, Clone)]
 pub enum Gender {
     Male,
@@ -111,6 +118,8 @@ pub enum Gender {
     Genderless,
 }
 
+
+///Makes it easier to acces the Stats directly
 enum_from_primitive! {
     #[derive(Debug, Clone)]
     pub enum Stats {
@@ -123,6 +132,8 @@ enum_from_primitive! {
         Speed = 6
     }
 }
+
+///Weather enum for the arena.
 #[derive(Debug, Clone)]
 pub enum Weather {
     Clear_Sky,
@@ -149,6 +160,7 @@ enum_from_primitive! {
     }
 }
 
+///Contains the effectivenes for a move against a pokemon with a specific type or type combination.
 #[derive(Debug)]
 pub enum TypeEffectiveness {
     Ineffective,
@@ -181,6 +193,8 @@ enum_from_primitive! {
     }
 }
 
+///All Flags that can be important for a move. Contains for example if a move is influenced by
+///another move or condition the pokemon or arena is in.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone)]
     pub enum MoveFlags {
@@ -207,6 +221,7 @@ enum_from_primitive! {
     }
 }
 
+///More or less randomly provides a gender for a pokemon given the distribution for the species.
 pub fn get_gender(gender_rate: i8) -> Gender {
     let mut rng = thread_rng();
     let probability = rng.gen_range(1, 101);
