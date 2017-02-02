@@ -65,7 +65,7 @@ impl Technique {
                     },
 
                     enums::Move_Category::Ailment => {
-                        resolve::ailment(self.get_ailment(), 100, target);
+                        resolve::ailment(self.get_name(), self.get_ailment(), 100, target);
                     },
 
                     enums::Move_Category::Net_Good_Stats => {},
@@ -117,14 +117,14 @@ impl Technique {
 
                     enums::Move_Category::Damage_And_Ailment => {
                         resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                        resolve::ailment(self.get_ailment(), self.get_effect_chance(), target);
+                        resolve::ailment(self.get_name(), self.get_ailment(), self.get_effect_chance(), target);
                     },
 
                     //apart from the Math done
                     enums::Move_Category::Swagger => {
                         if resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
                             target.clone()) {
-                            resolve::ailment(self.get_ailment(), 100, target);
+                            resolve::ailment(self.get_name(), self.get_ailment(), 100, target);
                         }
                     },
 
@@ -151,7 +151,7 @@ impl Technique {
                             target.clone());
                         match self.get_drain_percentage() {
                             50 => value = value / 2,
-                            75 => value = (value /4) * 3,
+                            75 => value = (value / 4) * 3,
                             _ => unreachable!(),
                         }
                         resolve::heal(user.clone(), value);

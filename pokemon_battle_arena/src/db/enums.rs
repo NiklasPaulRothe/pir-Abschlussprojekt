@@ -75,6 +75,28 @@ pub enum Ailment {
     Ingrain,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum Non_Volatile {
+    Undefined,
+    Paralysis,
+    Sleep,
+    Freeze,
+    Burn,
+    Poison,
+    Bad_Poison,
+}
+
+pub fn print_non_volatile(status: Non_Volatile) -> String {
+    match status {
+        Non_Volatile::Undefined => String::from(""),
+        Non_Volatile::Paralysis => String::from("paralysed"),
+        Non_Volatile::Sleep => String::from("asleep"),
+        Non_Volatile::Freeze => String::from("freezed"),
+        Non_Volatile::Burn => String::from("burned"),
+        _ => String::from("poisoned")
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum Gender {
     Male,

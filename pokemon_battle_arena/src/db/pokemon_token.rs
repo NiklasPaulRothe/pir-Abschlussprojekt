@@ -19,6 +19,7 @@ pub struct PokemonToken {
     gender: enums::Gender,
     type_one: enums::types,
     type_two: enums::types,
+    non_volatile_status: (enums::Non_Volatile, u8),
     move_one: Option<(moves::Technique, u8)>,
     move_two: Option<(moves::Technique, u8)>,
     move_three: Option<(moves::Technique, u8)>,
@@ -49,6 +50,7 @@ impl PokemonToken {
             gender: enums::get_gender(model.clone().get_gender_rate()),
             type_one: model.get_types().0,
             type_two: model.get_types().1,
+            non_volatile_status: (enums::Non_Volatile::Undefined, 0),
             move_one: None,
             move_two: None,
             move_three: None,
@@ -90,6 +92,10 @@ impl PokemonToken {
         self.clone().nature
     }
 
+    pub fn get_non_volatile(&self) ->(enums::Non_Volatile, u8) {
+        self.clone().non_volatile_status
+    }
+
     pub fn get_dv(&self) -> determinant_values::Dv {
         self.clone().dv
     }
@@ -107,6 +113,10 @@ impl PokemonToken {
             return Some(PokemonToken::from_model(self.mega_evolution.clone().unwrap()));
         }
         None
+    }
+
+    pub fn set_non_volatile(&mut self, status: enums::Non_Volatile) {
+        self.non_volatile_status = (status, 0);
     }
 
     pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {

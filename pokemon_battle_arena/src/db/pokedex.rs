@@ -70,7 +70,8 @@ impl Pokedex {
             }
             //adds mega evolutions if available
             else if id > 10000 && re.is_match(&name) {
-                pokemon[species_id - 1].set_mega(PokemonModel::new(id, name, height, weight, gender_rate, flavor_text));
+                pokemon[species_id - 1].set_mega(PokemonModel::new(id, name, height, weight,
+                    gender_rate, flavor_text));
                 //saves where to find the mega evolutions by their ID
                 mega.insert(id, species_id);
             }

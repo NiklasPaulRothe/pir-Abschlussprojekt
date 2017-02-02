@@ -1,9 +1,11 @@
 extern crate rand;
+extern crate regex;
 
 use super::moves::Technique;
 use super::pokemon_token::PokemonToken;
 use super::enums;
 use self::rand::{Rng, thread_rng};
+use self::regex::Regex;
 use player::Player;
 
 ///Resolves moves that simply deals damage to the opponent.
@@ -14,14 +16,48 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
     //effizient für alle Attacken zu berechnen.
 }
 
-pub fn ailment(ailment: enums::Ailment, effect_chance: u8, target: PokemonToken) {
+pub fn ailment(name: String, ailment: enums::Ailment, effect_chance: u8, mut target: PokemonToken) {
     let mut rng = thread_rng();
     let random = rng.gen_range(1, 101);
     let probability = effect_chance;
     if random <= probability {
-        match ailment {
-            enums::Ailment::Confusion => {},
-            _ => {},
+        let powder = Regex::new(r"powder").unwrap();
+        let spore = Regex::new(r"spore").unwrap();
+        let tmp: &str = & name;
+        if (target.get_types().0 == enums::types::grass ||
+            target.get_types().1 == enums::types::grass) && (powder.is_match(tmp)
+            || spore.is_match(tmp)) {
+            println!("{} was not affected by {}", target.get_name(), name);
+        } else {
+            match ailment {
+                enums::Ailment::Paralysis => {
+                    if target.get_non_volatile().0 == enums::Non_Volatile::Undefined {
+                        if !(target.get_types().0 == enums::types::electric) &&
+                        !(target.get_types().1 == enums::types::electric) {
+                            target.set_non_volatile(enums::Non_Volatile::Paralysis);
+                            target.get_current().set_stats(enums::Stats::Speed, target.get_base().
+                                get_stat(enums::Stats::Speed) / 2)
+                        } else {
+                            println!("{} was not affected by {}", target.get_name(), name);
+                        }
+                    } else {
+                        println!("{} is already {}", target.get_name(),
+                            enums::print_non_volatile(target.get_non_volatile().0));
+                    }
+                },
+                enums::Ailment::Sleep => {
+                    if target.get_non_volatile().0 == enums::Non_Volatile::Undefined {
+                        target.set_non_volatile(enums::Non_Volatile::Sleep)
+                    } else {
+                        println!("{} is alreadey {}", target.get_name(),
+                            enums::print_non_volatile(target.get_non_volatile().0));
+                    }
+                },
+                enums::Ailment::Freeze => {},
+                enums::Ailment::Burn => {},
+                enums::Ailment::Poison => {},
+                _ => {},
+            }
         }
     }
 }
