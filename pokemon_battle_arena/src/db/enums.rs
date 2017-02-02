@@ -86,6 +86,13 @@ pub enum Non_Volatile {
     Bad_Poison,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum End_Of_Turn {
+    Leech_Seed,
+    Perish_Song,
+    Yawn,
+}
+
 pub fn print_non_volatile(status: Non_Volatile) -> String {
     match status {
         Non_Volatile::Undefined => String::from(""),

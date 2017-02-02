@@ -31,6 +31,7 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
             println!("{} was not affected by {}", target.get_name(), name);
         } else {
             match ailment {
+
                 enums::Ailment::Paralysis => {
                     if target.get_non_volatile().0 == enums::Non_Volatile::Undefined {
                         if !(target.get_types().0 == enums::types::electric) &&
@@ -46,14 +47,16 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                             enums::print_non_volatile(target.get_non_volatile().0));
                     }
                 },
+
                 enums::Ailment::Sleep => {
                     if target.get_non_volatile().0 == enums::Non_Volatile::Undefined {
                         target.set_non_volatile(enums::Non_Volatile::Sleep)
                     } else {
-                        println!("{} is alreadey {}", target.get_name(),
+                        println!("{} is already {}", target.get_name(),
                             enums::print_non_volatile(target.get_non_volatile().0));
                     }
                 },
+
                 enums::Ailment::Freeze => {
                     if (target.get_types().0 == enums::types::ice || target.get_types().1 ==
                     enums::types::ice) && move_type == enums::types::ice {
@@ -62,6 +65,7 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                         target.set_non_volatile(enums::Non_Volatile::Freeze);
                     }
                 },
+
                 enums::Ailment::Burn => {
                     if target.get_types().0 == enums::types::fire || target.get_types().1 ==
                     enums::types::fire {
@@ -70,6 +74,7 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                         target.set_non_volatile(enums::Non_Volatile::Burn);
                     }
                 },
+
                 enums::Ailment::Poison => {
                     if target.get_types().0 == enums::types::poison || target.get_types().0 ==
                     enums::types::steel || target.get_types().1 == enums::types::poison ||
@@ -78,12 +83,38 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                     } else {
                         if name == String::from("toxic") {
                             target.set_non_volatile(enums::Non_Volatile::Bad_Poison);
-                            //TODO: add counter for damage in badly poison state.
                         } else {
                             target.set_non_volatile(enums::Non_Volatile::Poison);
                         }
                     }
                 },
+
+                enums::Ailment::Leech_Seed => {
+                    if target.get_types().0 == enums::types::grass || target.get_types().1 ==
+                    enums::types::grass {
+                        println!("{} was not affected by Leech Seed", target.get_name());
+                    } else {
+                        target.add_end_flag(enums::End_Of_Turn::Leech_Seed);
+                    }
+                },
+
+                enums::Ailment::Perish_Song => {
+                    if target.get_end_of_turn_flags().contains_key(&enums::End_Of_Turn::Perish_Song) {
+                        println!("{} is already doomed", target.get_name());
+                    } else {
+                        target.add_end_flag(enums::End_Of_Turn::Perish_Song);
+                    }
+                },
+
+                enums::Ailment::Yawn => {
+                    if target.get_end_of_turn_flags().contains_key(&enums::End_Of_Turn::Yawn) ||
+                    target.get_non_volatile().0 == enums::Non_Volatile::Sleep {
+                        println!("{} was not affected by Yawn", target.get_name());
+                    } else {
+                        target.add_end_flag(enums::End_Of_Turn::Yawn);
+                    }
+                },
+
                 _ => {},
             }
         }
