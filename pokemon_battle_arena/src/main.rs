@@ -29,7 +29,7 @@ fn testing() {
     //         println!("{:?}", entry.get_name());
     //     }
     // }
-    graphic::windows::draw_window();
+    // graphic::windows::draw_window();
     // test_players();
     // test_arena()
 }
@@ -39,13 +39,22 @@ fn testing() {
 fn test_players() {
 
     println!("The Player Section");
-    let human = player::human::Human::new_by_id(&[5, 3, 17]);
+    let mut human = player::human::Human::new_by_id(&[5, 3, 17]);
 
-    println!("{}", human.get_pokemon_count());
-    println!("{}", human.get_pokemon_list()[0].get_name());
-    println!("{}", human.get_pokemon_list()[1].get_name());
-    println!("{}", human.get_pokemon_list()[2].get_name());
-    println!("{}", human.get_alive());
+    println!("Creating a player and testing count and getting the name");
+    println!("Count: {}", human.get_pokemon_count());
+    println!("Place 1: {}", human.get_pokemon_list()[0].get_name());
+    println!("Place 2: {}", human.get_pokemon_list()[1].get_name());
+    println!("Place 3: {}", human.get_pokemon_list()[2].get_name());
+
+    println!("Alive list:");
+    println!("Number: {}", human.get_alive_count());
+    println!("List: {:#?}", human.get_alive_list());
+
+    println!("Current:");
+    println!("Default: {}", human.get_current());
+    human.set_current(2);
+    println!("Custom: {}", human.get_current());
 }
 
 fn test_arena() {
