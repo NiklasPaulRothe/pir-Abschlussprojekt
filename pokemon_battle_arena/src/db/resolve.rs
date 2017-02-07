@@ -113,6 +113,9 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                 },
 
                 enums::Ailment::Perish_Song => {
+                    //actually only one Attack, that kills all Pokemon after 4 rounds, including
+                    //the user. Does not reset the counter if used again, therefore Pokemon, that
+                    //are already under the effect of Perish Song are not influenced
                     if target.get_end_of_turn_flags().contains_key(&enums::End_Of_Turn::Perish_Song) {
                         println!("{} is already doomed", target.get_name());
                     } else {
@@ -128,6 +131,12 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                         target.add_end_flag(enums::End_Of_Turn::Yawn);
                     }
                 },
+
+                enums::Ailment::Trap => {
+                    if !target.get_end_of_turn_flags().contains_key(&enums::End_Of_Turn::Trap) {
+                        target.add_end_flag(enums::End_Of_Turn::Trap);
+                    }
+                }
 
                 _ => {},
             }
@@ -156,12 +165,25 @@ pub fn heal(target: PokemonToken, value: u16) {
 }
 
 //switches the Pokemon of the target Player
-pub fn switch_pokemon<T> (target: T)
-    where T: Player {
-        unimplemented!();
+pub fn switch_pokemon<T> (mut target: T)
+    where T: Player + Clone {
+    let alive = target.get_alive_count();
+    if alive > 1 {
+        let mut rng = thread_rng();
+        let range = rng.gen_range(0, alive - 1);
+        let id = target.clone().get_alive_list()[range];
+        let mut position = 0;
+        for elem in target.clone().get_pokemon_list() {
+            if elem.get_id() == id {
+                target.set_current(position);
+                break;
+            }
+            position += 1;
+        }
+    }
 }
 
-//simply sets the HP of the target to 0 (Thats what K.O. mean I think.)
+//simply sets the HP of the target to 0 (Thats what K.O. means I suppose.)
 pub fn ko_attack (target: PokemonToken) {
     target.get_current().set_stats(enums::Stats::Hp, 0);
 }

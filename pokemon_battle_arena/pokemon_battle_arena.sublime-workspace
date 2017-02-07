@@ -4,8 +4,36 @@
 		"selected_items":
 		[
 			[
+				"Leech",
+				"Leech_Seed"
+			],
+			[
+				"end",
+				"end_of_turn"
+			],
+			[
 				"get",
-				"get_stat"
+				"get_name"
+			],
+			[
+				"set",
+				"set_non_volatile"
+			],
+			[
+				"se",
+				"set_non_volatile"
+			],
+			[
+				"gen_",
+				"get_non_volatile"
+			],
+			[
+				"non",
+				"non_volatile_status"
+			],
+			[
+				"Non",
+				"Non_Volatile"
 			],
 			[
 				"Pokem",
@@ -283,7 +311,34 @@
 			"file": "src/db/moves.rs",
 			"settings":
 			{
-				"buffer_size": 17192,
+				"buffer_size": 18980,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/db/resolve.rs",
+			"settings":
+			{
+				"buffer_size": 7765,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/db/stats.rs",
+			"settings":
+			{
+				"buffer_size": 1872,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/db/pokemon_token.rs",
+			"settings":
+			{
+				"buffer_size": 4612,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -293,94 +348,17 @@
 			"settings":
 			{
 				"buffer_size": 4087,
-				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
+			"contents": "\nuse super::enums;\nuse super::stats;\n\nuse enum_primitive::FromPrimitive;\nuse std::borrow::BorrowMut;\n\n///Basic values for Pokemon species. Equal for every instance of the given Pokemon.\n#[derive(Debug, Clone)]\npub struct PokemonModel {\n    pokedex_id: usize,\n    name: String,\n    height: u8,\n    weight: u16,\n    gender_rate: i8,\n    description: String,\n    type_one: enums::types,\n    type_two: enums::types,\n    base_stats: stats::Stats,\n    mega_evolution: Box<Option<PokemonModel>>,\n}\n\nimpl PokemonModel {\n    pub fn new(id: usize, name: String, height: u8, weight: u16, gender_rate: i8,\n        flavor_text: String) -> PokemonModel {\n        PokemonModel {\n                    pokedex_id: id,\n                    name: name,\n                    height: height,\n                    weight: weight,\n                    gender_rate: gender_rate,\n                    description: flavor_text,\n                    type_one: enums::types::from_i32(19).unwrap(),\n                    type_two: enums::types::from_i32(19).unwrap(),\n                    base_stats: stats::Stats::default(),\n                    mega_evolution: Box::new(None),\n                }\n    }\n\n    pub fn get_id(&self) -> usize {\n        self.pokedex_id\n    }\n\n    pub fn get_name(&self) -> String {\n        self.name.clone()\n    }\n\n    pub fn get_height(&self) -> u8 {\n        self.clone().height\n    }\n\n    pub fn get_weight(&self) -> u16 {\n        self.clone().weight\n    }\n\n    pub fn get_gender_rate(&self) -> i8 {\n        self.clone().gender_rate\n    }\n\n    pub fn get_description(&self) -> String {\n        self.clone().description\n    }\n\n    pub fn get_types(&self) -> (enums::types, enums::types) {\n        (self.clone().type_one, self.clone().type_two)\n    }\n\n    pub fn get_stats(&self) -> stats::Stats {\n        self.clone().base_stats\n    }\n\n    pub fn get_mega(&self) -> Option<PokemonModel> {\n        if self.has_mega() {\n           return Some(self.clone().mega_evolution.unwrap());\n        }\n        None\n    }\n\n    pub fn has_mega(&self) -> bool {\n        if self.mega_evolution.is_some() {\n            return true;\n        }\n        false\n    }\n\n    pub fn set_type(&mut self, type_id: i32, slot: u16) {\n        match slot {\n            1 => self.type_one = enums::types::from_i32(type_id).unwrap(),\n            2 => self.type_two = enums::types::from_i32(type_id).unwrap(),\n            _ => unreachable!(),\n        }\n    }\n\n    pub fn set_mega(&mut self, model: PokemonModel) {\n        self.mega_evolution = Box::new(Some(model));\n    }\n\n    pub fn set_stats(&mut self, stat_id: i32, value: u16) {\n        self.base_stats.set_stats(enums::Stats::from_i32(stat_id).unwrap(), value);\n    }\n}\n",
 			"file": "src/db/pokemon_model.rs",
+			"file_size": 2779,
+			"file_write_time": 131302857598134902,
 			"settings":
 			{
-				"buffer_size": 2679,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/db/pokemon_token.rs",
-			"settings":
-			{
-				"buffer_size": 3806,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/db/determinant_values.rs",
-			"settings":
-			{
-				"buffer_size": 1219,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/db/natures.rs",
-			"settings":
-			{
-				"buffer_size": 1467,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/arena/standard_arena.rs",
-			"settings":
-			{
-				"buffer_size": 972,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/db/resolve.rs",
-			"settings":
-			{
-				"buffer_size": 1893,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/db/stats.rs",
-			"settings":
-			{
-				"buffer_size": 1810,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/player/mod.rs",
-			"settings":
-			{
-				"buffer_size": 756,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/db/enums.rs",
-			"settings":
-			{
-				"buffer_size": 4537,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/main.rs",
-			"settings":
-			{
-				"buffer_size": 1833,
-				"encoding": "UTF-8",
+				"buffer_size": 2680,
 				"line_ending": "Windows"
 			}
 		}
@@ -441,25 +419,27 @@
 	],
 	"file_history":
 	[
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/move_flag_map.csv",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/movedex.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/enums.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/determinant_values.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/pokemon_token.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/arena/standard_arena.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/resolve.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/stats.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/moves.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/player/human/mod.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/main.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/player/mod.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/arena/mod.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/determinant_values.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/stats.rs",
-		"/C/Users/Paul/Desktop/tables/pokemon_moves.csv",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/movedex.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/graphic/windows.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/enums.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/pokemon_model.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/arena/standard_arena.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/natures.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/pokemon_model.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/pokedex.rs",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/move_flag_map.csv",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/arena/mod.rs",
+		"/C/Users/Paul/Desktop/tables/pokemon_moves.csv",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/graphic/windows.rs",
 		"/C/Users/Paul/Desktop/tables/pokemon_species.csv",
 		"/C/Users/Paul/Desktop/Pokemon.csv",
 		"/C/Users/Paul/Desktop/tables/pokemon_species_flavor_text.csv",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/pokedex.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/moves.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/pokemon.csv",
 		"/C/Users/Paul/Desktop/tables/pokemon_species_prose.csv",
 		"/C/Users/Paul/Desktop/tables/genders.csv",
@@ -488,9 +468,7 @@
 		"/C/Users/Paul/Desktop/tables/pokemon_species_names.csv",
 		"/C/Users/Paul/Desktop/tables/pokemon_shape_prose.csv",
 		"/C/Users/Paul/Desktop/tables/pokemon_move_methods.csv",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/resolve.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/player/ki/mod.rs",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/player/human/mod.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/mod.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/resolve.rs",
 		"/C/Users/Paul/Desktop/tables/move_meta.csv",
@@ -586,6 +564,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			");\n",
 			"an",
 			"5",
 			"-1",
@@ -618,7 +597,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -627,15 +606,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 17192,
+						"buffer_size": 18980,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6868,
-								6868
+								11590,
+								11590
 							]
 						],
 						"settings":
@@ -645,177 +624,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2904.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/db/pokedex.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4087,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2394,
-								2394
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 198.0,
+						"translation.y": 264.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "src/db/pokemon_model.rs",
+					"buffer": 1,
+					"file": "src/db/resolve.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2679,
+						"buffer_size": 7765,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 264.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/db/pokemon_token.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3806,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 660.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "src/db/determinant_values.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1219,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/db/natures.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1467,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								806,
-								806
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 264.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/arena/standard_arena.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 972,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								823,
-								823
+								7503,
+								7503
 							]
 						],
 						"settings":
@@ -832,40 +661,42 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "src/db/resolve.rs",
+					"buffer": 2,
+					"file": "src/db/stats.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1893,
+						"buffer_size": 1872,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1564,
-								1564
+								1654,
+								1654
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax"
+							"syntax": "Packages/Rust/Rust.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 330.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "src/db/stats.rs",
-					"semi_transient": true,
+					"buffer": 3,
+					"file": "src/db/pokemon_token.rs",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1810,
+						"buffer_size": 4612,
 						"regions":
 						{
 						},
@@ -883,55 +714,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 132.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "src/player/mod.rs",
+					"buffer": 4,
+					"file": "src/db/pokedex.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 756,
+						"buffer_size": 4087,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								480,
-								480
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/db/enums.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4537,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1772,
-								1772
+								0,
+								0
 							]
 						],
 						"settings":
@@ -941,27 +744,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1782.0,
+						"translation.y": 1452.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
-					"file": "src/main.rs",
+					"buffer": 5,
+					"file": "src/db/pokemon_model.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1833,
+						"buffer_size": 2680,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								644,
-								644
+								1,
+								1
 							]
 						],
 						"settings":
@@ -974,7 +777,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]

@@ -68,6 +68,10 @@ impl PokemonToken {
         }
     }
 
+    pub fn is_asleep(&self) -> bool {
+        self.non_volatile_status.0 == enums::Non_Volatile::Sleep
+    }
+
     pub fn get_moves(&self, dex: movedex::Movedex) -> movedex::Movedex {
         dex.for_token(self.get_level(), self.pokedex_id)
     }
@@ -141,6 +145,14 @@ impl PokemonToken {
         }
         if moves.len() >= 3 {
             self.move_four = Some((moves[3].clone(), moves[3].get_power_points().unwrap()));
+        }
+    }
+
+    pub fn set_type(&mut self, position: u8, change: enums::types) {
+        match position {
+            0 => self.type_one = change,
+            1 => self.type_two = change,
+            _ => unreachable!(),
         }
     }
 

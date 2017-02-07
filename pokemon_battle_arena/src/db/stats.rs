@@ -11,6 +11,8 @@ pub struct Stats {
     special_attack: u16,
     special_defense: u16,
     speed: u16,
+    accuracy: u16,
+    evasion: u16,
 }
 
 
@@ -55,6 +57,8 @@ impl Stats {
             special_attack: 0,
             special_defense: 0,
             speed: 0,
+            accuracy: 0,
+            evasion: 0,
         }
     }
 }

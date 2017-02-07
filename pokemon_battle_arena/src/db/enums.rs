@@ -93,9 +93,23 @@ pub enum Non_Volatile {
 ///Flags that have a influence at the end of each turn.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum End_Of_Turn {
+    //absorbs some HP at the End of every Turn
     Leech_Seed,
+    //Counts from 0 to 4, one step each round, even in the turn it was initially used.
+    //When 4 is reached the Pokemon faints. Counting only continues when the Pokemon is part of
+    //the battle, but the counter will not be resetted if the Pokemon is changed.
     Perish_Song,
+    //Changes the Non_Volatile Status of the Pokemon to Sleep after one round if possible.
     Yawn,
+    //Is set after a flying type uses roost. This changes the flying type either to undefined, if
+    //the Pokemon has two types, or to Normal if it has only one. Because of the possible
+    //combination of normal and flying it is needed to have two indicators to determine which type
+    //must be changed back.
+    Roost_Type_One,
+    Roost_Type_Two,
+    //Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
+    //changed out. Lasts at least 2 and at most 5 turns.
+    Trap,
 }
 
 ///Print method for non volatile status changes.
@@ -129,7 +143,9 @@ enum_from_primitive! {
         Defense = 3,
         Special_Attack = 4,
         Special_Defense = 5,
-        Speed = 6
+        Speed = 6,
+        Accuracy = 7,
+        Evasion = 8,
     }
 }
 
