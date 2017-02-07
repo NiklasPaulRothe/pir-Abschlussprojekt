@@ -21,8 +21,8 @@ pub fn create_naturedb() -> Vec<Nature> {
     let mut natures = Vec::new();
     let mut nature_db = csv::Reader::from_file("./src/db/tables/natures.csv").unwrap();
     for record in nature_db.decode() {
-        let (id, name, decrease, increase, _, _, _): (usize, String, i32, i32, usize, usize, usize) =
-        record.unwrap();
+        let (id, name, decrease, increase, _, _, _): (usize, String, i32, i32, usize, usize, usize)
+        = record.unwrap();
         natures.push( Nature {
             id: id,
             name: name,

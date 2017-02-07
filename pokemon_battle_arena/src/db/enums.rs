@@ -31,6 +31,8 @@ enum_from_primitive! {
     }
 }
 
+///Enum for the Categories a move can have. They are used to get smaller samples of moves when
+///resolve their effects.
 enum_from_primitive! {
     #[derive(Debug, Clone, PartialEq)]
     pub enum Move_Category {
@@ -51,6 +53,7 @@ enum_from_primitive! {
     }
 }
 
+///All ailments that are known and can be caused by one or more moves.
 #[derive(Debug, Clone)]
 pub enum Ailment {
     Unknown,
@@ -75,6 +78,53 @@ pub enum Ailment {
     Ingrain,
 }
 
+///All the major status Changes that can not be caused at the same time.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Non_Volatile {
+    Undefined,
+    Paralysis,
+    Sleep,
+    Freeze,
+    Burn,
+    Poison,
+    Bad_Poison,
+}
+
+///Flags that have a influence at the end of each turn.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum End_Of_Turn {
+    //absorbs some HP at the End of every Turn
+    Leech_Seed,
+    //Counts from 0 to 4, one step each round, even in the turn it was initially used.
+    //When 4 is reached the Pokemon faints. Counting only continues when the Pokemon is part of
+    //the battle, but the counter will not be resetted if the Pokemon is changed.
+    Perish_Song,
+    //Changes the Non_Volatile Status of the Pokemon to Sleep after one round if possible.
+    Yawn,
+    //Is set after a flying type uses roost. This changes the flying type either to undefined, if
+    //the Pokemon has two types, or to Normal if it has only one. Because of the possible
+    //combination of normal and flying it is needed to have two indicators to determine which type
+    //must be changed back.
+    Roost_Type_One,
+    Roost_Type_Two,
+    //Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
+    //changed out. Lasts at least 2 and at most 5 turns.
+    Trap,
+}
+
+///Print method for non volatile status changes.
+pub fn print_non_volatile(status: Non_Volatile) -> String {
+    match status {
+        Non_Volatile::Undefined => String::from(""),
+        Non_Volatile::Paralysis => String::from("paralysed"),
+        Non_Volatile::Sleep => String::from("asleep"),
+        Non_Volatile::Freeze => String::from("freezed"),
+        Non_Volatile::Burn => String::from("burned"),
+        _ => String::from("poisoned")
+    }
+}
+
+///Enum for Genders
 #[derive(Debug, Clone)]
 pub enum Gender {
     Male,
@@ -82,6 +132,8 @@ pub enum Gender {
     Genderless,
 }
 
+
+///Makes it easier to acces the Stats directly
 enum_from_primitive! {
     #[derive(Debug, Clone)]
     pub enum Stats {
@@ -91,9 +143,13 @@ enum_from_primitive! {
         Defense = 3,
         Special_Attack = 4,
         Special_Defense = 5,
-        Speed = 6
+        Speed = 6,
+        Accuracy = 7,
+        Evasion = 8,
     }
 }
+
+///Weather enum for the arena.
 #[derive(Debug, Clone)]
 pub enum Weather {
     Clear_Sky,
@@ -120,6 +176,7 @@ enum_from_primitive! {
     }
 }
 
+///Contains the effectivenes for a move against a pokemon with a specific type or type combination.
 #[derive(Debug)]
 pub enum TypeEffectiveness {
     Ineffective,
@@ -152,6 +209,8 @@ enum_from_primitive! {
     }
 }
 
+///All Flags that can be important for a move. Contains for example if a move is influenced by
+///another move or condition the pokemon or arena is in.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone)]
     pub enum MoveFlags {
@@ -178,6 +237,7 @@ enum_from_primitive! {
     }
 }
 
+///More or less randomly provides a gender for a pokemon given the distribution for the species.
 pub fn get_gender(gender_rate: i8) -> Gender {
     let mut rng = thread_rng();
     let probability = rng.gen_range(1, 101);
