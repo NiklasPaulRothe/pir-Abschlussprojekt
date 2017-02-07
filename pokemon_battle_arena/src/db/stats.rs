@@ -24,20 +24,20 @@ impl Stats {
     pub fn calculate_stats(model: PokemonModel, dv: Dv) -> Stats {
         let mut level = 50;
         let hp = (
-            (2 * model.base_stats + dv.hp * level) / 100.0 + level + 10
+            (2 * model.get_stats().get_stat(enums::Stats::Hp) + dv.hp * level) / 100.0 + level + 10
             ) as u16;
 
-        fn stat_formula(model: PokemonModel, level: u8) -> u16 {
+        fn stat_formula(model: PokemonModel, dv: Dv, level: u8) -> u16 {
             ((2 * model + dv.hp * level) / 100.0 + 5.0) as u16
         }
 
         Stats {
             hp: hp,
-            attack: stat_formula(model.attack, level),
-            defense: stat_formula(model.defense, level),
-            speed: stat_formula(model.speed, level),
-            special_attack: stat_formula(model.special_attack, level),
-            special_defense: stat_formula(model.special_defense, level),
+            attack: stat_formula(model.get_stats().get_stat(enums::Stats::Attack), dv.attack, level),
+            defense: stat_formula(model.get_stats().get_stat(enums::Stats::Defense), dv.defense, level),
+            speed: stat_formula(model.get_stats().get_stat(enums::Stats::Speed), dv.speed, level),
+            special_attack: stat_formula(model.get_stats().get_stat(enums::Stats::Special_attack), dv.special_attack, level),
+            special_defense: stat_formula(model.get_stats().get_stat(enums::Stats::Special_defense), dv.special_defense, level),
         }
     }
 
