@@ -34,6 +34,19 @@ impl Pokedex {
         None
     }
 
+    pub fn type_filter(&self, types: Vec<enums::types>) -> Pokedex {
+        let mut new_dex = Pokedex {
+            entries: Vec::new(),
+            complete: false,
+        };
+        for entry in self.entries.clone() {
+            if types.contains(&entry.get_types().0) || types.contains(&entry.get_types().1) {
+                new_dex.entries.push(entry);
+            }
+        }
+        new_dex
+    }
+
     ///returns a pokemon from it's name
     pub fn pokemon_by_name(&self, name: String) -> Option<PokemonModel> {
         for entry in self.entries.clone() {
