@@ -13,6 +13,7 @@ use super::enums;
 ///Pokedex struct that is used to get an overview over the possible Pokemon. Besides the entries
 ///Vector with PokemonModels inside, it contains a bool variable which tells if the pokedex contains
 ///every known Pokemon or not.
+#[derive(Clone)]
 pub struct Pokedex {
     entries: Vec<PokemonModel>,
     complete: bool,
@@ -32,6 +33,19 @@ impl Pokedex {
             }
         }
         None
+    }
+
+    pub fn type_filter(&self, types: Vec<enums::types>) -> Pokedex {
+        let mut new_dex = Pokedex {
+            entries: Vec::new(),
+            complete: false,
+        };
+        for entry in self.entries.clone() {
+            if types.contains(&entry.get_types().0) || types.contains(&entry.get_types().1) {
+                new_dex.entries.push(entry);
+            }
+        }
+        new_dex
     }
 
     ///returns a pokemon from it's name

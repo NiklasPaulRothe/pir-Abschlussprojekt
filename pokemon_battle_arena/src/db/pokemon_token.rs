@@ -8,6 +8,8 @@ use super::determinant_values;
 use super::movedex;
 use super::moves;
 
+use std::collections::HashMap;
+
 ///Represents a single Token of a Pokemon with individual values for this token.
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
@@ -28,6 +30,7 @@ pub struct PokemonToken {
     dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
+    end_of_turn_flags: HashMap<enums::End_Of_Turn, u8>,
     description: String,
     mega_evolution: Option<pokemon_model::PokemonModel>,
 }
@@ -36,10 +39,8 @@ pub struct PokemonToken {
 impl PokemonToken {
     ///Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
-        //TODO: Hier muss eine Methode aufgerufen werden, die die Stats für den Token errechnet und
-        //das Ergebnis muss unten in den Struct geschrieben werden. Unter umständen müssen dafür die
-        //DVs bereits zuvor errechnet werden, damit sie für die Berechnung herangezogen werden kön-
-        //nen.
+        let dv = determinant_values::Dv::get_dvs(model.clone());
+        let current = stats::Stats::calculate_stats(model.clone(), dv.clone());
 
         PokemonToken {
             pokedex_id: model.get_id(),
@@ -56,12 +57,17 @@ impl PokemonToken {
             move_three: None,
             move_four: None,
             nature: natures::Nature::get_random_nature(),
-            dv: determinant_values::Dv::get_dv(model.clone()),
+            dv: dv,
             base_stats: model.get_stats(),
-            current_stats: model.get_stats(),
+            current_stats: current,
+            end_of_turn_flags: HashMap::new(),
             description: model.get_description(),
             mega_evolution: model.get_mega(),
         }
+    }
+
+    pub fn is_asleep(&self) -> bool {
+        self.non_volatile_status.0 == enums::Non_Volatile::Sleep
     }
 
     pub fn get_moves(&self, dex: movedex::Movedex) -> movedex::Movedex {
@@ -108,6 +114,10 @@ impl PokemonToken {
         self.base_stats.clone()
     }
 
+    pub fn get_end_of_turn_flags(&self) -> HashMap<enums::End_Of_Turn, u8> {
+        self.clone().end_of_turn_flags
+    }
+
     pub fn get_mega(&self) -> Option<PokemonToken> {
         if self.mega_evolution.is_some() {
             return Some(PokemonToken::from_model(self.mega_evolution.clone().unwrap()));
@@ -133,6 +143,10 @@ impl PokemonToken {
         self.non_volatile_status = (status, 0);
     }
 
+    pub fn add_end_flag(&mut self, flag: enums::End_Of_Turn) {
+        self.end_of_turn_flags.insert(flag, 0);
+    }
+
     pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {
         self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
         if moves.len() >= 1 {
@@ -144,5 +158,17 @@ impl PokemonToken {
         if moves.len() >= 3 {
             self.move_four = Some((moves[3].clone(), moves[3].get_power_points().unwrap()));
         }
+    }
+
+    pub fn set_type(&mut self, position: u8, change: enums::types) {
+        match position {
+            0 => self.type_one = change,
+            1 => self.type_two = change,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn decrement_ap(&mut self) {
+        unimplemented!();
     }
 }

@@ -6,6 +6,7 @@ pub mod moves;
 
 mod stats;
 mod natures;
-mod pokemon_model;
+pub mod pokemon_model;
+mod moves;
 mod determinant_values;
 mod resolve;
