@@ -14,6 +14,18 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
     //TODO: Methode die matcht zwischen Attacken die direkt verrechnet werden können und denen,
     //die variable Power haben. Hier muss eine Möglichkeit gefunden werden die Power möglichst
     //effizient für alle Attacken zu berechnen.
+    let mut stab = 0;
+    let mut rng = thread_rng();
+    let random = rng.gen_range(0.85, 1);
+    if attack.get_type() == user.get_types().0 ||
+       attack.get_type() == user.get_types().1 {
+        stab = 1.5;
+    } else {
+        stab = 1;
+
+    }
+    let mut modifier = stab*user.get_types()*random;
+    (((2*user.get_level()+10)/250)*user.get_dv().1/user.get_dv().2*attack.get_power()+2)*modifier as u16
 }
 
 //resolves ailment effects
