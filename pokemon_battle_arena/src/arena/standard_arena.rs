@@ -1,11 +1,17 @@
 use player::Player;
 use db::pokemon_token::PokemonToken;
 use db::enums;
+use arena;
+use arena::to_ui::Move;
+use std::boxed::Box;
+use std::borrow::BorrowMut;
 
 /// The standard arena is based on the default XvX fight.
 
 impl super::Arena {
     pub fn fight(&self) {
+        
+
 
         // Move der Spieler von Team 1 abfragen. (Methode in Player?)
         // Move der Spieler von Team 2 abfragen. (Methode in Player?)
@@ -46,9 +52,4 @@ fn battle(pokemon_one: &PokemonToken, pokemon_two: &PokemonToken) {
     // Noch unklar: Schlaf, Paralyse, Vernarrtheit, etc.
     // XvX Kampf mit Area Attack wie Surfer: Attacke als Attacke gegen ein Pokemon ansehen und math
     // öfters aufrufen?
-}
-
-fn math<T>(pokemon_one: &PokemonToken, pokemon_two: &PokemonToken) {
-    // Verändert die Stats des Angreifenden und des Verteidigenden Pkmn nach angegebener Attacke
-    // Wetterverhältnisse und typ der arena werden hier miteinbezogen
 }

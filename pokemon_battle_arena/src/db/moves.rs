@@ -50,9 +50,8 @@ pub struct Technique {
 impl Technique {
     ///Matches over the category of a move and calls a specific method in resolve.rs for this
     ///category. All calculation is done inside the method, therefore no return is needed.
-    pub fn resolve<T,U> (&self, user: pokemon_token::PokemonToken,
-        mut targets: Vec<pokemon_token::PokemonToken>, attacker: T, defender: U, field: Arena)
-        where T: Player, U: Player+Clone {
+    pub fn resolve(&self, user: pokemon_token::PokemonToken,
+        mut targets: Vec<pokemon_token::PokemonToken>, attacker: Player, defender: Player, field: Arena) {
         if targets.is_empty() {
             targets.push(user.clone());
         }

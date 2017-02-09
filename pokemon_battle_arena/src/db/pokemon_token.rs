@@ -115,6 +115,20 @@ impl PokemonToken {
         None
     }
 
+// TO-DO: Getter methoden für move bestimmt fehlerbehaftet (unwrap() Aufruf)
+    pub fn get_move_one(self) -> Option<moves::Technique> {
+        Some(self.move_one.unwrap().0)
+    }
+    pub fn get_move_two(self) -> Option<moves::Technique> {
+        Some(self.move_two.unwrap().0)
+    }
+    pub fn get_move_three(self) -> Option<moves::Technique> {
+        Some(self.move_three.unwrap().0)
+    }
+    pub fn get_move_four(self) -> Option<moves::Technique> {
+        Some(self.move_four.unwrap().0)
+    }
+
     pub fn set_non_volatile(&mut self, status: enums::Non_Volatile) {
         self.non_volatile_status = (status, 0);
     }

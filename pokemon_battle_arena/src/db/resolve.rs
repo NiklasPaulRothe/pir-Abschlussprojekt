@@ -108,8 +108,7 @@ pub fn heal(target: PokemonToken, value: u16) {
     }
 }
 
-pub fn switch_pokemon<T> (target: T)
-    where T: Player {
+pub fn switch_pokemon<Player> (target: Player) {
         unimplemented!();
 }
 
