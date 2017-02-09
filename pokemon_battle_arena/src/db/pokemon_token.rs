@@ -39,10 +39,8 @@ pub struct PokemonToken {
 impl PokemonToken {
     ///Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
-        //TODO: Hier muss eine Methode aufgerufen werden, die die Stats für den Token errechnet und
-        //das Ergebnis muss unten in den Struct geschrieben werden. Unter umständen müssen dafür die
-        //DVs bereits zuvor errechnet werden, damit sie für die Berechnung herangezogen werden kön-
-        //nen.
+        let dv = determinant_values::Dv::get_dvs(model.clone());
+        let current = stats::Stats::calculate_stats(model.clone(), dv.clone());
 
         PokemonToken {
             pokedex_id: model.get_id(),
@@ -59,9 +57,9 @@ impl PokemonToken {
             move_three: None,
             move_four: None,
             nature: natures::Nature::get_random_nature(),
-            dv: determinant_values::Dv::get_dvs(model.clone()),
+            dv: dv,
             base_stats: model.get_stats(),
-            current_stats: model.get_stats(),
+            current_stats: current,
             end_of_turn_flags: HashMap::new(),
             description: model.get_description(),
             mega_evolution: model.get_mega(),

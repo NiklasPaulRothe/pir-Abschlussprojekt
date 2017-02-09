@@ -22,25 +22,44 @@ impl Stats {
     //     //wenn noch was nötig ist muss das im Kopf ergänzt werden.
 
     // }
-    // pub fn calculate_stats(model: PokemonModel, dv: Dv) -> Stats {
-    //     let mut level = 50;
-    //     let hp = (
-    //         (2 * model.get_stats().get_stat(enums::Stats::Hp) + dv.get_dv().0 * level) / 100.0 + level + 10
-    //         ) as u16;
+    pub fn calculate_stats(model: PokemonModel, dv: Dv) -> Stats {
+        let mut level = 50;
+        let hp = (
+            (2.0 * model.get_stats().get_stat(enums::Stats::Hp) as f32 +
+                dv.get_dv(enums::Stats::Hp) as f32 * level as f32) / 100.0 + level as f32 + 10.0
+            ) as u16;
 
-    //     fn stat_formula(model: PokemonModel, dv: Dv, level: u8) -> u16 {
-    //         ((2 * model.get_stats().get_stat(enums::Stats::Hp) + dv.get_dv().0 * level) / 100.0 + 5.0) as u16
-    //     }
+        fn stat_formula(base: u16, stat: enums::Stats, dv: u8, level: u8) -> u16 {
+            ((2.0 * base as f32 + dv as f32 * level as f32)
+                / 100.0 + 5.0) as u16
+        }
 
-    //     Stats {
-    //         hp: hp,
-    //         attack: stat_formula(model.get_stats().get_stat(enums::Stats::Attack), dv.get_dv().1, level),
-    //         defense: stat_formula(model.get_stats().get_stat(enums::Stats::Defense), dv.get_dv().2, level),
-    //         speed: stat_formula(model.get_stats().get_stat(enums::Stats::Speed), dv.get_dv().5, level),
-    //         special_attack: stat_formula(model.get_stats().get_stat(enums::Stats::Special_attack), dv.get_dv().3, level),
-    //         special_defense: stat_formula(model.get_stats().get_stat(enums::Stats::Special_defense), dv.get_dv().4, level),
-    //     }
-    // }
+        Stats {
+            hp: hp,
+            attack:{
+             stat_formula(model.get_stats().get_stat(enums::Stats::Attack),
+                enums::Stats::Attack, dv.get_dv(enums::Stats::Attack), level)
+            },
+            defense:{
+             stat_formula(model.get_stats().get_stat(enums::Stats::Defense),
+                enums::Stats::Defense, dv.get_dv(enums::Stats::Defense), level)
+            },
+            speed:{
+             stat_formula(model.get_stats().get_stat(enums::Stats::Speed),
+                enums::Stats::Speed, dv.get_dv(enums::Stats::Speed), level)
+            },
+            special_attack:{
+             stat_formula(model.get_stats().get_stat(enums::Stats::Special_Attack),
+                enums::Stats::Special_Attack, dv.get_dv(enums::Stats::Special_Attack), level)
+            },
+            special_defense:{
+             stat_formula(model.get_stats().get_stat(enums::Stats::Special_Defense),
+                enums::Stats::Special_Defense, dv.get_dv(enums::Stats::Special_Defense), level)
+            },
+            accuracy: 100,
+            evasion: 100,
+        }
+    }
 
     pub fn get_stat(&self, stat: enums::Stats) -> u16 {
         match stat {

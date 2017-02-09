@@ -23,7 +23,7 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
     let mut damage = 0;
     if attack.get_power().is_some() {
         let mut modifier = stab * attack.get_effectiveness(target.clone()) * random;
-        damage = ((((2.0 * user.get_level() as f32 + 10.0)/250.0) * user.get_current().
+        damage = ((((2.0 * user.get_level() as f32 + 10.0) / 250.0) * user.get_current().
             get_stat(enums::Stats::Attack) as f32 /target.get_current().
             get_stat(enums::Stats::Defense) as f32 * attack.get_power().unwrap() as f32 + 2.0)
             * modifier) as u16;
