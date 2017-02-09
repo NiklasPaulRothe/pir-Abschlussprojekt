@@ -3,7 +3,7 @@ use super::determinant_values::Dv;
 use super::enums;
 
 ///Contains the main stats for every Pokemon.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Stats {
     hp: u16,
     attack: u16,
@@ -14,7 +14,6 @@ pub struct Stats {
     accuracy: u16,
     evasion: u16,
 }
-
 
 impl Stats {
     // pub fn calculate_stats(model: PokemonModel, dv: Dv) -> Stats {
