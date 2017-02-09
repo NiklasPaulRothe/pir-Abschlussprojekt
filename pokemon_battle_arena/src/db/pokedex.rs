@@ -13,6 +13,7 @@ use super::enums;
 ///Pokedex struct that is used to get an overview over the possible Pokemon. Besides the entries
 ///Vector with PokemonModels inside, it contains a bool variable which tells if the pokedex contains
 ///every known Pokemon or not.
+#[derive(Clone)]
 pub struct Pokedex {
     entries: Vec<PokemonModel>,
     complete: bool,

@@ -5,7 +5,7 @@ use enum_primitive::FromPrimitive;
 use std::borrow::BorrowMut;
 
 ///Basic values for Pokemon species. Equal for every instance of the given Pokemon.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PokemonModel {
     pokedex_id: usize,
     name: String,
