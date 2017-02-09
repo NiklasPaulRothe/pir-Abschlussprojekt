@@ -10,22 +10,25 @@ use player::Player;
 
 ///Resolves moves that simply deals damage to the opponent.
 pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) -> u16 {
-    unimplemented!();
     //TODO: Methode die matcht zwischen Attacken die direkt verrechnet werden können und denen,
     //die variable Power haben. Hier muss eine Möglichkeit gefunden werden die Power möglichst
     //effizient für alle Attacken zu berechnen.
-    let mut stab = 0;
+    let mut stab = 1.0;
     let mut rng = thread_rng();
-    let random = rng.gen_range(0.85, 1);
+    let random = rng.gen_range(0.85, 1.0);
     if attack.get_type() == user.get_types().0 ||
        attack.get_type() == user.get_types().1 {
         stab = 1.5;
-    } else {
-        stab = 1;
-
     }
-    let mut modifier = stab*user.get_types()*random;
-    (((2*user.get_level()+10)/250)*user.get_dv().1/user.get_dv().2*attack.get_power()+2)*modifier as u16
+    let mut damage = 0;
+    if attack.get_power().is_some() {
+        let mut modifier = stab * attack.get_effectiveness(target.clone()) * random;
+        damage = ((((2.0 * user.get_level() as f32 + 10.0)/250.0) * user.get_current().
+            get_stat(enums::Stats::Attack) as f32 /target.get_current().
+            get_stat(enums::Stats::Defense) as f32 * attack.get_power().unwrap() as f32 + 2.0)
+            * modifier) as u16;
+    }
+    damage
 }
 
 //resolves ailment effects

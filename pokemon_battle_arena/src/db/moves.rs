@@ -236,7 +236,7 @@ impl Technique {
 
     ///Takes the attacked Pokemon as an input besides the move and calculate from their types
     ///how effective the move is. Returns an appropriate enum for further calculations.
-    pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> enums::TypeEffectiveness {
+    pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> f32 {
         let mut eff_count = 0;
         if self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().0) {
             eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().0)
@@ -248,12 +248,12 @@ impl Technique {
             .unwrap();
         }
         match eff_count {
-            -2 => enums::TypeEffectiveness::NotEffective,
-            -1 => enums::TypeEffectiveness::NotVeryEffective,
-            0 => enums::TypeEffectiveness::Normal,
-            1 => enums::TypeEffectiveness::VeryEffective,
-            2 => enums::TypeEffectiveness::SuperEffective,
-            _ => enums::TypeEffectiveness::Ineffective,
+            -2 => 0.25,
+            -1 => 0.5,
+            0 => 1.0,
+            1 => 2.0,
+            2 => 4.0,
+            _ => 0.0,
         }
     }
 

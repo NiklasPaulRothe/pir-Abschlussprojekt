@@ -176,17 +176,6 @@ enum_from_primitive! {
     }
 }
 
-///Contains the effectivenes for a move against a pokemon with a specific type or type combination.
-#[derive(Debug)]
-pub enum TypeEffectiveness {
-    Ineffective,
-    NotEffective,
-    NotVeryEffective,
-    Normal,
-    VeryEffective,
-    SuperEffective,
-}
-
 ///Enum that contains the valid target(s) of a move.
 ///Can be assigned from a i32 value.
 enum_from_primitive! {

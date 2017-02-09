@@ -59,7 +59,7 @@ impl PokemonToken {
             move_three: None,
             move_four: None,
             nature: natures::Nature::get_random_nature(),
-            dv: determinant_values::Dv::get_dv(model.clone()),
+            dv: determinant_values::Dv::get_dvs(model.clone()),
             base_stats: model.get_stats(),
             current_stats: model.get_stats(),
             end_of_turn_flags: HashMap::new(),
