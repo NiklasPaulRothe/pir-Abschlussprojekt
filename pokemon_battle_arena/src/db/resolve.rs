@@ -25,7 +25,7 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
 
     }
     let mut modifier = stab*user.get_types()*random;
-    (((2*user.get_level()+10)/250)*user.dv.attack/user.dv.defense*attack.power+2)*modifier as u16
+    (((2*user.get_level()+10)/250)*user.get_dv().1/user.get_dv().2*attack.get_power()+2)*modifier as u16
 }
 
 //resolves ailment effects
