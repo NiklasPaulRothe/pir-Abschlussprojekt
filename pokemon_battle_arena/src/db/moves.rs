@@ -1,6 +1,7 @@
 extern crate csv;
 extern crate num;
 extern crate rustc_serialize;
+extern crate rand;
 
 use super::pokemon_model;
 use super::pokemon_token;
@@ -8,6 +9,7 @@ use super::enums;
 use super::resolve;
 use super::pokedex::Pokedex;
 use self::num::FromPrimitive;
+use self::rand::{Rng, thread_rng};
 use std::collections::HashMap;
 use player::Player;
 use arena::Arena;
@@ -229,8 +231,17 @@ impl Technique {
 
     pub fn hits(&self, user: pokemon_token::PokemonToken, target: pokemon_token::PokemonToken)
         -> bool {
-        //TODO: Calculate if a move hits the target
-        true
+        let mut probability = 100;
+        if self.accuracy.is_some() {
+            probability = self.accuracy.unwrap() * (user.get_current().get_stat(enums::Stats::Accuracy) /
+                target.get_current().get_stat(enums::Stats::Evasion))
+        }
+        let mut rng = thread_rng();
+        let random = rng.gen_range(0, 101);
+        if random <= probability {
+            return true;
+        }
+        false
     }
 
     ///Takes the attacked Pokemon as an input besides the move and calculate from their types

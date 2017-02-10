@@ -35,13 +35,13 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
 pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, effect_chance: u8,
     mut target: PokemonToken) {
     let mut rng = thread_rng();
-    let random = rng.gen_range(1, 101);
+    let random = rng.gen_range(0, 101);
     //only works if the effect chance of the move is met.
     let probability = effect_chance;
     if random <= probability {
         let powder = Regex::new(r"powder").unwrap();
         let spore = Regex::new(r"spore").unwrap();
-        let tmp: &str = & name;
+        let tmp: &str = &name;
         //some sort of attacks did not work against grass types.
         if (target.get_types().0 == enums::types::grass ||
             target.get_types().1 == enums::types::grass) && (powder.is_match(tmp)

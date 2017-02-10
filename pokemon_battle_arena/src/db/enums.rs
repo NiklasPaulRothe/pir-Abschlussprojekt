@@ -135,7 +135,7 @@ pub enum Gender {
 
 ///Makes it easier to acces the Stats directly
 enum_from_primitive! {
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, PartialEq)]
     pub enum Stats {
         Undefined = 0,
         Hp = 1,
@@ -229,36 +229,36 @@ enum_from_primitive! {
 ///More or less randomly provides a gender for a pokemon given the distribution for the species.
 pub fn get_gender(gender_rate: i8) -> Gender {
     let mut rng = thread_rng();
-    let probability = rng.gen_range(1, 101);
+    let probability = rng.gen_range(0.0, 100.1);
     match gender_rate {
         -1 => Gender::Genderless,
         0 => Gender::Male,
         1 => {
-            if probability < 87 {
+            if probability < 87.5 {
             return Gender::Male
             }
         Gender::Female
         },
         2 => {
-            if probability < 75 {
+            if probability < 75.0 {
             return Gender::Male
             }
         Gender::Female
         },
         4 => {
-            if probability < 50 {
+            if probability < 50.0 {
             return Gender::Male
             }
         Gender::Female
         },
         6 => {
-            if probability < 25 {
+            if probability < 25.0 {
             return Gender::Male
             }
         Gender::Female
         },
         7 => {
-            if probability < 13 {
+            if probability < 12.5 {
             return Gender::Male
             }
         Gender::Female

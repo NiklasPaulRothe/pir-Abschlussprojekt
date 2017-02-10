@@ -1,6 +1,7 @@
 use super::pokemon_model::PokemonModel;
 use super::determinant_values::Dv;
 use super::enums;
+use super::natures;
 
 ///Contains the main stats for every Pokemon.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -16,45 +17,49 @@ pub struct Stats {
 }
 
 impl Stats {
-    // pub fn calculate_stats(model: PokemonModel, dv: Dv) -> Stats {
-    //     //TODO: Methode erstellen, die die Stats errechnet, das Model wird für die Base stats auf
-    //     //jeden Fall gebraucht (evtl ist es einfach nur die Stats zu übergeben) und die DVs auch,
-    //     //wenn noch was nötig ist muss das im Kopf ergänzt werden.
-
-    // }
-    pub fn calculate_stats(model: PokemonModel, dv: Dv) -> Stats {
-        let mut level = 50;
+    ///Is used to calculate the stat when converting a Pokemon Model in a Pokemon Token.
+    pub fn calculate_stats(model: PokemonModel, dv: Dv, nature: natures::Nature, level: u16)
+        -> Stats {
         let hp = (
             (2.0 * model.get_stats().get_stat(enums::Stats::Hp) as f32 +
                 dv.get_dv(enums::Stats::Hp) as f32 * level as f32) / 100.0 + level as f32 + 10.0
             ) as u16;
 
-        fn stat_formula(base: u16, stat: enums::Stats, dv: u8, level: u8) -> u16 {
-            ((2.0 * base as f32 + dv as f32 * level as f32)
-                / 100.0 + 5.0) as u16
+        fn stat_formula(base: u16, stat: enums::Stats, dv: u8, level: u16, nature: natures::Nature)
+            -> u16 {
+                let mut nature_modifier = 1.0;
+                if nature.get_stats().0 == stat {
+                    nature_modifier = 0.9;
+                } else if nature.get_stats().1 == stat {
+                    nature_modifier = 1.1;
+                }
+            (((2.0 * base as f32 + dv as f32 * level as f32)
+                / 100.0 + 5.0) * nature_modifier) as u16
         }
 
         Stats {
             hp: hp,
             attack:{
              stat_formula(model.get_stats().get_stat(enums::Stats::Attack),
-                enums::Stats::Attack, dv.get_dv(enums::Stats::Attack), level)
+                enums::Stats::Attack, dv.get_dv(enums::Stats::Attack), level, nature.clone())
             },
             defense:{
              stat_formula(model.get_stats().get_stat(enums::Stats::Defense),
-                enums::Stats::Defense, dv.get_dv(enums::Stats::Defense), level)
+                enums::Stats::Defense, dv.get_dv(enums::Stats::Defense), level, nature.clone())
             },
             speed:{
              stat_formula(model.get_stats().get_stat(enums::Stats::Speed),
-                enums::Stats::Speed, dv.get_dv(enums::Stats::Speed), level)
+                enums::Stats::Speed, dv.get_dv(enums::Stats::Speed), level, nature.clone())
             },
             special_attack:{
              stat_formula(model.get_stats().get_stat(enums::Stats::Special_Attack),
-                enums::Stats::Special_Attack, dv.get_dv(enums::Stats::Special_Attack), level)
+                enums::Stats::Special_Attack, dv.get_dv(enums::Stats::Special_Attack),
+                level, nature.clone())
             },
             special_defense:{
              stat_formula(model.get_stats().get_stat(enums::Stats::Special_Defense),
-                enums::Stats::Special_Defense, dv.get_dv(enums::Stats::Special_Defense), level)
+                enums::Stats::Special_Defense, dv.get_dv(enums::Stats::Special_Defense),
+                level, nature)
             },
             accuracy: 100,
             evasion: 100,
