@@ -40,7 +40,8 @@ impl PokemonToken {
     ///Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
         let dv = determinant_values::Dv::get_dvs(model.clone());
-        let current = stats::Stats::calculate_stats(model.clone(), dv.clone());
+        let nature = natures::Nature::get_random_nature();
+        let stats = stats::Stats::calculate_stats(model.clone(), dv.clone(), nature.clone());
 
         PokemonToken {
             pokedex_id: model.get_id(),
@@ -56,10 +57,10 @@ impl PokemonToken {
             move_two: None,
             move_three: None,
             move_four: None,
-            nature: natures::Nature::get_random_nature(),
+            nature: nature,
             dv: dv,
-            base_stats: model.get_stats(),
-            current_stats: current,
+            base_stats: stats.clone(),
+            current_stats: stats,
             end_of_turn_flags: HashMap::new(),
             description: model.get_description(),
             mega_evolution: model.get_mega(),

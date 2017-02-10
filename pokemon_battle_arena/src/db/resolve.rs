@@ -41,7 +41,7 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
     if random <= probability {
         let powder = Regex::new(r"powder").unwrap();
         let spore = Regex::new(r"spore").unwrap();
-        let tmp: &str = & name;
+        let tmp: &str = &name;
         //some sort of attacks did not work against grass types.
         if (target.get_types().0 == enums::types::grass ||
             target.get_types().1 == enums::types::grass) && (powder.is_match(tmp)

@@ -135,7 +135,7 @@ pub enum Gender {
 
 ///Makes it easier to acces the Stats directly
 enum_from_primitive! {
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, PartialEq)]
     pub enum Stats {
         Undefined = 0,
         Hp = 1,

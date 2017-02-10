@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"Special",
+				"Special_Defense"
+			],
+			[
 				"get",
 				"get_types"
 			],
@@ -315,7 +319,7 @@
 			"file": "src/db/moves.rs",
 			"settings":
 			{
-				"buffer_size": 20086,
+				"buffer_size": 19856,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -324,7 +328,25 @@
 			"file": "src/main.rs",
 			"settings":
 			{
-				"buffer_size": 2190,
+				"buffer_size": 2192,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/db/determinant_values.rs",
+			"settings":
+			{
+				"buffer_size": 1662,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/db/tables/pokemon.csv",
+			"settings":
+			{
+				"buffer_size": 126427,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -333,7 +355,7 @@
 			"file": "src/db/resolve.rs",
 			"settings":
 			{
-				"buffer_size": 8737,
+				"buffer_size": 9392,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -342,7 +364,7 @@
 			"file": "src/db/enums.rs",
 			"settings":
 			{
-				"buffer_size": 6994,
+				"buffer_size": 6737,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -351,7 +373,7 @@
 			"file": "src/db/stats.rs",
 			"settings":
 			{
-				"buffer_size": 1958,
+				"buffer_size": 3600,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -360,7 +382,7 @@
 			"file": "src/db/pokemon_token.rs",
 			"settings":
 			{
-				"buffer_size": 4948,
+				"buffer_size": 4724,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -369,7 +391,7 @@
 			"file": "src/db/pokedex.rs",
 			"settings":
 			{
-				"buffer_size": 4087,
+				"buffer_size": 4512,
 				"line_ending": "Windows"
 			}
 		},
@@ -377,7 +399,7 @@
 			"file": "src/db/pokemon_model.rs",
 			"settings":
 			{
-				"buffer_size": 2679,
+				"buffer_size": 2700,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -438,6 +460,8 @@
 	],
 	"file_history":
 	[
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/pokemon_types.csv",
+		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/pokemon_moves.csv",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/player/mod.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/movedex.rs",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/enums.rs",
@@ -492,7 +516,6 @@
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/resolve.rs",
 		"/C/Users/Paul/Desktop/tables/move_meta.csv",
 		"/C/Users/Paul/Desktop/tables/move_meta_ailments.csv",
-		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/pokemon_types.csv",
 		"/D/Programmieren/Projekte/pir-Abschlussprojekt/pokemon_battle_arena/src/db/tables/moves_whole.csv",
 		"/C/Users/Paul/Desktop/tables/move_flag_map.csv",
 		"/C/Users/Paul/Desktop/tables/move_targets.csv",
@@ -564,8 +587,7 @@
 		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet9/task3/hash-macro.rs",
 		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet9/task2/swagger.rs",
 		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet9/task1/try-opt.rs",
-		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet8/task2/sort.rs",
-		"/C/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg/PCrossHairTest.cfg"
+		"/C/Users/Matze/OneDrive/Documents/Studium/Informatik/Rust/pir-task-nrothe-matthien/sheet8/task2/sort.rs"
 	],
 	"find":
 	{
@@ -616,7 +638,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -625,15 +647,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 20086,
+						"buffer_size": 19856,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6524,
-								6524
+								12449,
+								12449
 							]
 						],
 						"settings":
@@ -643,10 +665,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1518.0,
+						"translation.y": 4865.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
@@ -655,15 +677,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2190,
+						"buffer_size": 2192,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								640,
-								640
+								1203,
+								1203
 							]
 						],
 						"settings":
@@ -676,24 +698,24 @@
 						"translation.y": 330.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/db/resolve.rs",
+					"file": "src/db/determinant_values.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8737,
+						"buffer_size": 1662,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7067,
-								7067
+								1661,
+								1661
 							]
 						],
 						"settings":
@@ -703,57 +725,115 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 660.0,
+						"translation.y": 485.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/db/tables/pokemon.csv",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 126427,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								28455,
+								28455
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Advanced CSV/AdvancedCSV.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 9913.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/db/resolve.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9392,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								232,
+								232
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 220.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/db/enums.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6737,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4311,
+								4311
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3474.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "src/db/enums.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6994,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3797,
-								3797
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2706.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
+					"buffer": 6,
 					"file": "src/db/stats.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1958,
+						"buffer_size": 3600,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								334,
-								334
+								1000,
+								1000
 							]
 						],
 						"settings":
@@ -763,67 +843,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/db/pokemon_token.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4948,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3868,
-								3868
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 660.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/db/pokedex.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4087,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 320.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -831,11 +851,71 @@
 				},
 				{
 					"buffer": 7,
+					"file": "src/db/pokemon_token.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4724,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								950,
+								950
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 817.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "src/db/pokedex.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4512,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1044,
+								1044
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1904.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
 					"file": "src/db/pokemon_model.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2679,
+						"buffer_size": 2700,
 						"regions":
 						{
 						},
@@ -853,10 +933,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1584.0,
+						"translation.y": 1430.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 8,
 					"type": "text"
 				}
 			]
@@ -914,6 +994,10 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"",
+				"pokemon_battle_arena\\src\\db\\determinant_values.rs"
+			]
 		],
 		"width": 0.0
 	},
