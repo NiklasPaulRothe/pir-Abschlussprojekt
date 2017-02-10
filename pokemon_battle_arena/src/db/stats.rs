@@ -17,20 +17,15 @@ pub struct Stats {
 }
 
 impl Stats {
-    // pub fn calculate_stats(model: PokemonModel, dv: Dv) -> Stats {
-    //     //TODO: Methode erstellen, die die Stats errechnet, das Model wird für die Base stats auf
-    //     //jeden Fall gebraucht (evtl ist es einfach nur die Stats zu übergeben) und die DVs auch,
-    //     //wenn noch was nötig ist muss das im Kopf ergänzt werden.
-
-    // }
-    pub fn calculate_stats(model: PokemonModel, dv: Dv, nature: natures::Nature) -> Stats {
-        let mut level = 50;
+    ///Is used to calculate the stat when converting a Pokemon Model in a Pokemon Token.
+    pub fn calculate_stats(model: PokemonModel, dv: Dv, nature: natures::Nature, level: u16)
+        -> Stats {
         let hp = (
             (2.0 * model.get_stats().get_stat(enums::Stats::Hp) as f32 +
                 dv.get_dv(enums::Stats::Hp) as f32 * level as f32) / 100.0 + level as f32 + 10.0
             ) as u16;
 
-        fn stat_formula(base: u16, stat: enums::Stats, dv: u8, level: u8, nature: natures::Nature)
+        fn stat_formula(base: u16, stat: enums::Stats, dv: u8, level: u16, nature: natures::Nature)
             -> u16 {
                 let mut nature_modifier = 1.0;
                 if nature.get_stats().0 == stat {

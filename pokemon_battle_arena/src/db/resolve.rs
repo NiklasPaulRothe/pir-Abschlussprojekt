@@ -35,7 +35,7 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
 pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, effect_chance: u8,
     mut target: PokemonToken) {
     let mut rng = thread_rng();
-    let random = rng.gen_range(1, 101);
+    let random = rng.gen_range(0, 101);
     //only works if the effect chance of the move is met.
     let probability = effect_chance;
     if random <= probability {

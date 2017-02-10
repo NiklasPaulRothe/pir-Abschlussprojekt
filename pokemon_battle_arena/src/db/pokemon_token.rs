@@ -39,14 +39,15 @@ pub struct PokemonToken {
 impl PokemonToken {
     ///Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
+        let level = 50;
         let dv = determinant_values::Dv::get_dvs(model.clone());
         let nature = natures::Nature::get_random_nature();
-        let stats = stats::Stats::calculate_stats(model.clone(), dv.clone(), nature.clone());
+        let stats = stats::Stats::calculate_stats(model.clone(), dv.clone(), nature.clone(), level);
 
         PokemonToken {
             pokedex_id: model.get_id(),
             name: model.get_name(),
-            level: 50,
+            level: level,
             height: model.get_height(),
             weight: model.get_weight(),
             gender: enums::get_gender(model.clone().get_gender_rate()),
