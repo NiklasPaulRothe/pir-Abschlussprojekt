@@ -125,6 +125,29 @@ impl PokemonToken {
         None
     }
 
+
+    /// Getter function for move one. If the move is set, the function returns it, if not,
+    /// it returns None
+    pub fn get_move_one(self) -> Option<moves::Technique> {
+        Some(self.move_one.unwrap_or(return None).0)
+    }
+    /// Getter function for move two. If the move is set, the function returns it, if not,
+    /// it returns None
+    pub fn get_move_two(self) -> Option<moves::Technique> {
+        Some(self.move_two.unwrap_or(return None).0)
+    }
+    /// Getter function for move three. If the move is set, the function returns it, if not,
+    /// it returns None
+    pub fn get_move_three(self) -> Option<moves::Technique> {
+        Some(self.move_three.unwrap_or(return None).0)
+    }
+    /// Getter function for move four. If the move is set, the function returns it, if not,
+    /// it returns None
+    pub fn get_move_four(self) -> Option<moves::Technique> {
+        Some(self.move_four.unwrap_or(return None).0)
+    }
+
+
     pub fn set_non_volatile(&mut self, status: enums::Non_Volatile) {
         self.non_volatile_status = (status, 0);
     }

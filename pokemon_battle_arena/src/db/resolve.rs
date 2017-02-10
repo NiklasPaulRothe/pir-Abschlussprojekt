@@ -180,8 +180,7 @@ pub fn heal(target: PokemonToken, value: u16) {
 }
 
 //switches the Pokemon of the target Player
-pub fn switch_pokemon<T> (mut target: T)
-    where T: Player + Clone {
+pub fn switch_pokemon (mut target: Player){
     let alive = target.get_alive_count();
     if alive > 1 {
         let mut rng = thread_rng();
