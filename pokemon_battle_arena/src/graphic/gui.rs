@@ -85,7 +85,7 @@ pub fn draw_window() {
     let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap_or_else(
         |e| { panic!("Failed to find folder: {}", e) }
     );
-    let font_path = assets.join("fonts/calibri/calibri.ttf");
+    let font_path = assets.join("fonts/arial/arial.ttf");
     ui.fonts.insert_from_file(font_path).unwrap_or_else(
         |e| { panic!("Failed to get font: {}", e) }
     );
@@ -166,6 +166,9 @@ pub fn draw_window() {
             }
 
             // draws Play-Screen
+            // Contains:    Singleplayer-Button
+            //              Multiplayer-Button
+            //              Back-Button
             if let Screen::Play = app.screen {
                 // Singleplayer button
                 if widget::Button::new()
@@ -280,25 +283,13 @@ pub fn draw_window() {
 
                         // Add pokemon to team when button is pressed
                         Event::Selection(selection) => {
-                            println!("selected index Pokemon: {:?}", selection);
+                            println!("selected index (PokeDex): {:?}", selection);
 
-                            // as long as the team is not full add new pokemon...
-                            if app.pkmn_team.len() < 6 {
-                                app.pkmn_team.push(
-                                    db::pokemon_token::PokemonToken::from_model(
-                                        app.pokedex.pokemon_by_id(selection + 1).unwrap()
-                                    )
-                                );
-
-                                println!();
-                                println!("Current Team:");
-                                for i in 0..app.pkmn_team.len() {
-                                    println!("{:?}", app.pkmn_team[i].get_name());
-                                }
-                            // ...else give message that team is full
-                            } else {
-                                println!("Error: only 6 pokemon per team allowed");
-                            }
+                            app.sel_pkmn = Some(
+                                db::pokemon_token::PokemonToken::from_model(
+                                    app.pokedex.pokemon_by_id(selection + 1).unwrap()
+                                )
+                            );
                         }
                         _ => {},
                     }
@@ -348,7 +339,7 @@ pub fn draw_window() {
                         //  Change functionality such that the selected pokemon is displayed
                         //  in the middle of the screen (with stats, etc)
                         Event::Selection(selection) => {
-                            println!("selected index Team: {:?}", selection);
+                            println!("selected index (Team): {:?}", selection);
                             app.pkmn_team.remove(selection);
                         }
                         // Do nothing for every other event
@@ -356,19 +347,34 @@ pub fn draw_window() {
                     }
                 }
 
-                let stats = "
-                    ======= TEST =======\n\n
+                // ===================================
+                // = Description of selected Pokemon =
+                // ===================================
+                let stats = match app.sel_pkmn {
+                    None => "No Pokemon Selected".to_string(),
+                    Some(ref pkmn) => {
+                        let types = match pkmn.get_types() {
+                            (type1, db::enums::types::undefined) => type1.to_string(),
+                            (type1, type2) => [type1.to_string(), "/".to_string(), type2.to_string()].concat().to_string(),
+                        };
 
-                     Screen that shows:\n
-                      - Sprite
-                      - Stats
-                      - Attacks
-                ";
+                        [
+                            "#",
+                            &pkmn.get_id().to_string(),
+                            " ",
+                            &pkmn.get_name(),
+                            "\n\nType: ",
+                            &types,
+                            "\n",
+                            &pkmn.get_description()
+                        ].concat()
+                    }
+                };
 
-                widget::Text::new(stats)
+                widget::Text::new(&stats)
                     .color(app.label_color)
                     .middle_of(ids.canvas)
-                    .align_text_left()
+                    .align_text_middle()
                     .line_spacing(10.0)
                     .set(ids.text_sel_pkmn, ui);
 

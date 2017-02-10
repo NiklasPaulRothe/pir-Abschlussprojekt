@@ -118,6 +118,10 @@ impl PokemonToken {
         self.clone().end_of_turn_flags
     }
 
+    pub fn get_description(&self) -> String {
+        self.clone().description
+    }
+
     pub fn get_mega(&self) -> Option<PokemonToken> {
         if self.mega_evolution.is_some() {
             return Some(PokemonToken::from_model(self.mega_evolution.clone().unwrap()));
