@@ -1,33 +1,32 @@
 extern crate num;
 extern crate rand;
 
-use self::num::FromPrimitive;
 use self::rand::{Rng, thread_rng};
 
 /// enum for the pokemon/attack types.
 /// Can be assigned from i32 value.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash)]
-    pub enum types {
-        normal = 1,
-        fighting = 2,
-        flying = 3,
-        poison = 4,
-        ground = 5,
-        rock = 6,
-        bug = 7,
-        ghost = 8,
-        steel = 9,
-        fire = 10,
-        water = 11,
-        grass = 12,
-        electric = 13,
-        psychic = 14,
-        ice = 15,
-        dragon = 16,
-        dark = 17,
-        fairy = 18,
-        undefined = 19,
+    pub enum Types {
+        Normal = 1,
+        Fighting = 2,
+        Flying = 3,
+        Poison = 4,
+        Ground = 5,
+        Rock = 6,
+        Bug = 7,
+        Ghost = 8,
+        Steel = 9,
+        Fire = 10,
+        Water = 11,
+        Grass = 12,
+        Electric = 13,
+        Psychic = 14,
+        Ice = 15,
+        Dragon = 16,
+        Dark = 17,
+        Fairy = 18,
+        Undefined = 19,
     }
 }
 
@@ -63,20 +62,20 @@ impl ::std::fmt::Display for types {
 /// resolve their effects.
 enum_from_primitive! {
     #[derive(Debug, Clone, PartialEq)]
-    pub enum Move_Category {
+    pub enum MoveCategory {
         Damage = 0,
         Ailment = 1,
-        Net_Good_Stats = 2,
+        NetGoodStats = 2,
         Heal = 3,
-        Damage_And_Ailment = 4,
+        DamageAndAilment = 4,
         Swagger = 5,
-        Damage_And_Lower = 6,
-        Damage_And_Raise = 7,
-        Damage_And_Heal = 8,
+        DamageAndLower = 6,
+        DamageAndRaise = 7,
+        DamageAndHeal = 8,
         Ohko = 9,
-        Whole_Field_Effect = 10,
-        Field_Effect = 11,
-        Force_Switch = 12,
+        WholeFieldEffect = 10,
+        FieldEffect = 11,
+        ForceSwitch = 12,
         Unique = 13,
     }
 }
@@ -98,57 +97,57 @@ pub enum Ailment {
     Torment,
     Disable,
     Yawn,
-    Heal_Block,
-    No_Type_Immunity,
-    Leech_Seed,
+    HealBlock,
+    NoTypeImmunity,
+    LeechSeed,
     Embargo,
-    Perish_Song,
+    PerishSong,
     Ingrain,
 }
 
 /// All the major status Changes that can not be caused at the same time.
 #[derive(Debug, Clone, PartialEq)]
-pub enum Non_Volatile {
+pub enum NonVolatile {
     Undefined,
     Paralysis,
     Sleep,
     Freeze,
     Burn,
     Poison,
-    Bad_Poison,
+    BadPoison,
 }
 
 /// Flags that have a influence at the end of each turn.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum End_Of_Turn {
-    // absorbs some HP at the End of every Turn
-    Leech_Seed,
-    // Counts from 0 to 4, one step each round, even in the turn it was initially used.
-    // When 4 is reached the Pokemon faints. Counting only continues when the Pokemon is part of
-    // the battle, but the counter will not be resetted if the Pokemon is changed.
-    Perish_Song,
-    // Changes the Non_Volatile Status of the Pokemon to Sleep after one round if possible.
+pub enum EndOfTurn {
+    //absorbs some HP at the End of every Turn
+    LeechSeed,
+    //Counts from 0 to 4, one step each round, even in the turn it was initially used.
+    //When 4 is reached the Pokemon faints. Counting only continues when the Pokemon is part of
+    //the battle, but the counter will not be resetted if the Pokemon is changed.
+    PerishSong,
+    //Changes the NonVolatile Status of the Pokemon to Sleep after one round if possible.
     Yawn,
-    // Is set after a flying type uses roost. This changes the flying type either to undefined, if
-    // the Pokemon has two types, or to Normal if it has only one. Because of the possible
-    // combination of normal and flying it is needed to have two indicators to determine which type
-    // must be changed back.
-    Roost_Type_One,
-    Roost_Type_Two,
-    // Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
-    // changed out. Lasts at least 2 and at most 5 turns.
+    //Is set after a flying type uses roost. This changes the flying type either to undefined, if
+    //the Pokemon has two types, or to Normal if it has only one. Because of the possible
+    //combination of normal and flying it is needed to have two indicators to determine which type
+    //must be changed back.
+    RoostTypeOne,
+    RoostTypeTwo,
+    //Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
+    //changed out. Lasts at least 2 and at most 5 turns.
     Trap,
 }
 
-/// Print method for non volatile status changes.
-pub fn print_non_volatile(status: Non_Volatile) -> String {
+///Print method for non volatile status changes.
+pub fn print_non_volatile(status: NonVolatile) -> String {
     match status {
-        Non_Volatile::Undefined => String::from(""),
-        Non_Volatile::Paralysis => String::from("paralysed"),
-        Non_Volatile::Sleep => String::from("asleep"),
-        Non_Volatile::Freeze => String::from("freezed"),
-        Non_Volatile::Burn => String::from("burned"),
-        _ => String::from("poisoned"),
+        NonVolatile::Undefined => String::from(""),
+        NonVolatile::Paralysis => String::from("paralysed"),
+        NonVolatile::Sleep => String::from("asleep"),
+        NonVolatile::Freeze => String::from("freezed"),
+        NonVolatile::Burn => String::from("burned"),
+        _ => String::from("poisoned")
     }
 }
 
@@ -163,14 +162,14 @@ pub enum Gender {
 
 /// Makes it easier to acces the Stats directly
 enum_from_primitive! {
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, PartialEq)]
     pub enum Stats {
         Undefined = 0,
         Hp = 1,
         Attack = 2,
         Defense = 3,
-        Special_Attack = 4,
-        Special_Defense = 5,
+        SpecialAttack = 4,
+        SpecialDefense = 5,
         Speed = 6,
         Accuracy = 7,
         Evasion = 8,
@@ -180,17 +179,17 @@ enum_from_primitive! {
 /// Weather enum for the arena.
 #[derive(Debug, Clone)]
 pub enum Weather {
-    Clear_Sky,
+    ClearSky,
     Sunlight,
-    // no need to handle it right now, only caused by abilities
-    Harsh_Sunlight,
+    //no need to handle it right now, only caused by abilities
+    HarshSunlight,
     Rain,
-    // no need to handle it right now, only caused by abilities
-    Heavy_Rain,
+    //no need to handle it right now, only caused by abilities
+    HeavyRain,
     Sandstorm,
     Hail,
-    // no need to handle it right now, only caused by abilities
-    Air_Current,
+    //no need to handle it right now, only caused by abilities
+    AirCurrent,
 }
 
 /// enum for the Damage Class of a attack.
@@ -250,44 +249,44 @@ enum_from_primitive! {
         Pulse = 17,
         Balistic = 18,
         Mental = 19,
-        Non_Sky_Battle = 20,
+        NonSkyBattle = 20,
     }
 }
 
 /// More or less randomly provides a gender for a pokemon given the distribution for the species.
 pub fn get_gender(gender_rate: i8) -> Gender {
     let mut rng = thread_rng();
-    let probability = rng.gen_range(1, 101);
+    let probability = rng.gen_range(0.0, 100.1);
     match gender_rate {
         -1 => Gender::Genderless,
         0 => Gender::Male,
         1 => {
-            if probability < 87 {
-                return Gender::Male;
+            if probability < 87.5 {
+                return Gender::Male
             }
             Gender::Female
         }
         2 => {
-            if probability < 75 {
-                return Gender::Male;
+            if probability < 75.0 {
+                return Gender::Male
             }
             Gender::Female
         }
         4 => {
-            if probability < 50 {
-                return Gender::Male;
+            if probability < 50.0 {
+                return Gender::Male
             }
             Gender::Female
         }
         6 => {
-            if probability < 25 {
-                return Gender::Male;
+            if probability < 25.0 {
+                return Gender::Male
             }
             Gender::Female
         }
         7 => {
-            if probability < 13 {
-                return Gender::Male;
+            if probability < 12.5 {
+                return Gender::Male
             }
             Gender::Female
         }

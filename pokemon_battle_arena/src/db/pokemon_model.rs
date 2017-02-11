@@ -2,7 +2,6 @@ use super::enums;
 use super::stats;
 
 use enum_primitive::FromPrimitive;
-use std::borrow::BorrowMut;
 
 ///Basic values for Pokemon species. Equal for every instance of the given Pokemon.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -13,8 +12,8 @@ pub struct PokemonModel {
     weight: u16,
     gender_rate: i8,
     description: String,
-    type_one: enums::types,
-    type_two: enums::types,
+    type_one: enums::Types,
+    type_two: enums::Types,
     base_stats: stats::Stats,
     mega_evolution: Box<Option<PokemonModel>>,
 }
@@ -29,8 +28,8 @@ impl PokemonModel {
                     weight: weight,
                     gender_rate: gender_rate,
                     description: flavor_text,
-                    type_one: enums::types::from_i32(19).unwrap(),
-                    type_two: enums::types::from_i32(19).unwrap(),
+                    type_one: enums::Types::from_i32(19).unwrap(),
+                    type_two: enums::Types::from_i32(19).unwrap(),
                     base_stats: stats::Stats::default(),
                     mega_evolution: Box::new(None),
                 }
@@ -60,7 +59,7 @@ impl PokemonModel {
         self.clone().description
     }
 
-    pub fn get_types(&self) -> (enums::types, enums::types) {
+    pub fn get_types(&self) -> (enums::Types, enums::Types) {
         (self.clone().type_one, self.clone().type_two)
     }
 
@@ -84,8 +83,8 @@ impl PokemonModel {
 
     pub fn set_type(&mut self, type_id: i32, slot: u16) {
         match slot {
-            1 => self.type_one = enums::types::from_i32(type_id).unwrap(),
-            2 => self.type_two = enums::types::from_i32(type_id).unwrap(),
+            1 => self.type_one = enums::Types::from_i32(type_id).unwrap(),
+            2 => self.type_two = enums::Types::from_i32(type_id).unwrap(),
             _ => unreachable!(),
         }
     }

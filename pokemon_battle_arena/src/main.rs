@@ -1,5 +1,4 @@
-#![allow(dead_code, unused_variables, unused_imports, unused_mut, non_camel_case_types, unused_assignments)]
-
+#![allow(dead_code)]
 #[macro_use] extern crate enum_primitive;
 #[macro_use] extern crate conrod;
 extern crate rustc_serialize;
@@ -11,10 +10,9 @@ mod db;
 mod graphic;
 mod player;
 
-use time::get_time;
 use player::Player;
+use player::PlayerType;
 use arena::Arena;
-use db::enums;
 
 fn main() {
     println!("");
@@ -31,8 +29,8 @@ fn testing() {
     //         println!("{:?}", entry.get_name());
     //     }
     // }
-    // test_players();
-    // test_arena();
+    test_players();
+    test_arena();
     graphic::gui::draw_window();
 }
 
@@ -41,7 +39,7 @@ fn testing() {
 fn test_players() {
 
     println!("The Player Section");
-    let mut human = player::human::Human::new_by_id(&[5, 3, 17]);
+    let mut human = Player::new_by_id(&[5, 3, 17], PlayerType::Human);
 
     println!("Creating a player and testing count and getting the name");
     println!("Count: {}", human.get_pokemon_count());
@@ -60,13 +58,13 @@ fn test_players() {
 }
 
 fn test_arena() {
-    let human1 = player::human::Human::new_by_id(&[5, 3, 17]);
-    let human2 = player::human::Human::new_by_id(&[18, 19, 122]);
-    let arena = Arena::new(vec![Box::new(human1)], vec![Box::new(human2)],
-        db::enums::types::normal, db::enums::Weather::Clear_Sky);
-    println!("{}", arena.get_team_1_player(1).unwrap().get_pokemon_count());
-    println!("{}", arena.get_team_2_player(1).unwrap().get_pokemon_count());
-    println!("{:#?}", arena.get_team_1_player(1).unwrap().get_pokemon_list());
-    println!("{:#?}", arena.get_team_2_player(1).unwrap().get_pokemon_list());
+    let human1 = Player::new_by_id(&[5, 3, 17], PlayerType::Human);
+    let human2 = Player::new_by_id(&[18, 19, 122], PlayerType::Human);
+    let arena = Arena::new(human1, human2,
+        db::enums::Types::Normal, db::enums::Weather::ClearSky);
+    println!("{}", arena.get_player_one().get_pokemon_count());
+    println!("{}", arena.get_player_two().get_pokemon_count());
+    println!("{:#?}", arena.get_player_one().get_pokemon_list());
+    println!("{:#?}", arena.get_player_two().get_pokemon_list());
     println!("{:?}", arena.get_weather());
 }

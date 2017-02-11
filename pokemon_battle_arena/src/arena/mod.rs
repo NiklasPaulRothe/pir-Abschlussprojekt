@@ -1,25 +1,26 @@
-mod standard_arena;
+pub mod standard_arena;
+pub mod to_ui;
 
 use db::enums;
 use player::Player;
 
 pub struct Arena {
-    effect: enums::types,
+    effect: enums::Types,
     weather: enums::Weather,
-    team_1: Vec<Box<Player>>,
-    team_2: Vec<Box<Player>>,
+    player_1: Player,
+    player_2: Player,
 }
 
 impl Arena {
     /// Creates a new arena with a list of players for both teams, the default effect and the
     /// default weather
-    pub fn new(i_team_1: Vec<Box<Player>>, i_team_2: Vec<Box<Player>>, i_effect: enums::types,
+    pub fn new(i_player_1: Player, i_player_2: Player, i_effect: enums::Types,
         i_weather: enums::Weather) -> Self {
         Arena {
             effect: i_effect,
             weather: i_weather,
-            team_1: i_team_1,
-            team_2: i_team_2,
+            player_1: i_player_1,
+            player_2: i_player_2,
         }
     }
 
@@ -27,44 +28,36 @@ impl Arena {
     // Getter Methods
     //
     /// Gets the type of the arena
-    pub fn get_effect(&self) -> enums::types {
+    #[allow(dead_code)]
+    pub fn get_effect(&self) -> enums::Types {
         self.effect.clone()
     }
     /// Gets the actual weather of the arena
+    #[allow(dead_code)]
     pub fn get_weather(&self) -> enums::Weather {
         self.weather.clone()
     }
-    /// Returns a player of team one
-    pub fn get_team_1_player(&self, player: usize) -> Option<&Box<Player>> {
-        if player <= self.get_team_2_count() && player > 0 {
-            return Some(&self.team_1[player - 1]);
-        }
-        None
+    /// Returns a player one
+    #[allow(dead_code)]
+    pub fn get_player_one(&self) -> Player {
+        self.player_1.clone()
     }
-    /// Returns a player of team two
-    pub fn get_team_2_player(&self, player: usize) -> Option<&Box<Player>> {
-        if player <= self.get_team_2_count() && player > 0 {
-            return Some(&self.team_2[player - 1]);
-        }
-        None
-    }
-    /// Returns the amount of players in team 1
-    pub fn get_team_1_count(&self) -> usize {
-        self.team_1.len()
-    }
-    /// Returns the amount of players in team 2
-    pub fn get_team_2_count(&self) -> usize {
-        self.team_2.len()
+    /// Returns a player two
+    #[allow(dead_code)]
+    pub fn get_player_two(&self) -> Player {
+        self.player_2.clone()
     }
 
     //
     // Setter Methods
     //
     /// Sets the effect of the arena
-    pub fn set_effect(&mut self, new: enums::types) {
+    #[allow(dead_code)]
+    pub fn set_effect(&mut self, new: enums::Types) {
         self.effect = new;
     }
     /// Sets the weather in the arena
+    #[allow(dead_code)]
     pub fn set_weather(&mut self, new: enums::Weather) {
         self.weather = new;
     }
