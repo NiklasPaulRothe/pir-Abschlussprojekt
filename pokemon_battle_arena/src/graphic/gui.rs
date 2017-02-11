@@ -340,6 +340,7 @@ pub fn draw_window() {
                         //  in the middle of the screen (with stats, etc)
                         Event::Selection(selection) => {
                             println!("selected index (Team): {:?}", selection);
+                            app.sel_pkmn = Some(app.pkmn_team[selection].clone());
                             app.pkmn_team.remove(selection);
                         }
                         // Do nothing for every other event
@@ -381,9 +382,30 @@ pub fn draw_window() {
                 if widget::Button::new()
                     .border(1.0)
                     .color(app.bg_color)
+                    .label("Select")
+                    .label_color(app.label_color)
+                    .mid_bottom_with_margin(35.0)
+                    .w_h(BUTTON_W, BUTTON_H)
+                    .set(ids.button_select, ui)
+                    .was_clicked()
+                {
+                    println!("Select");
+
+                    match app.sel_pkmn.clone() {
+                        Some(pkmn) => {
+                            app.pkmn_team.push(pkmn.clone());
+                            app.sel_pkmn = None;
+                        }
+                        None => println!("Error: No Pokemon selected"),
+                    };
+                }
+
+                if widget::Button::new()
+                    .border(1.0)
+                    .color(app.bg_color)
                     .label("Back")
                     .label_color(app.label_color)
-                    .mid_bottom_with_margin(5.0)
+                    .bottom_left_with_margins(35.0, 250.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_back, ui)
                     .was_clicked()
@@ -395,15 +417,15 @@ pub fn draw_window() {
                 if widget::Button::new()
                     .border(1.0)
                     .color(app.bg_color)
-                    .label("FIGHT")
+                    .label("Fight")
                     .label_color(app.label_color)
-                    .up_from(ids.button_back, 0.0)
+                    .bottom_right_with_margins(35.0, 250.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_fight, ui)
                     .was_clicked()
                 {
                     // temporaryly goes back to title screen
-                    println!("FIGHT");
+                    println!("Fight");
                     app.screen = Screen::Title;
                 }
             }
@@ -434,6 +456,7 @@ widget_ids! {
         button_mp,
         button_back,
         button_fight,
+        button_select,
 
         // *** selection_list ***
         s_list_pkmn,
