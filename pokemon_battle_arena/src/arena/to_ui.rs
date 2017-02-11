@@ -1,22 +1,21 @@
-use player::Player;
-use db::pokemon_token::PokemonToken;
-use db::enums;
-use player::AttackSlot;
+// use db::pokemon_token::PokemonToken;
+// use player::AttackSlot;
 
+#[allow(dead_code)]
 pub enum Move {
     Swap,
     Attack,
 }
 
-
+#[allow(dead_code)]
 pub fn ui_move() -> Move {
     Move::Swap
 }
-
-pub fn ui_swap(pokemon: &Vec<PokemonToken>, current: usize) -> usize {
-    current
-}
-
-pub fn ui_attack(pokemon: PokemonToken) -> AttackSlot {
-    AttackSlot::One
-}
+// #[allow(dead_code)]
+// pub fn ui_swap(pokemon: &Vec<PokemonToken>, current: usize) -> usize {
+//     current
+// }
+// #[allow(dead_code)]
+// pub fn ui_attack(pokemon: PokemonToken) -> AttackSlot {
+//     AttackSlot::One
+// }

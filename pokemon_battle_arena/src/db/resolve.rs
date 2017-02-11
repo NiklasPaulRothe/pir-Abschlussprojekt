@@ -22,7 +22,7 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
     }
     let mut damage = 0;
     if attack.get_power().is_some() {
-        let mut modifier = stab * attack.get_effectiveness(target.clone()) * random;
+        let modifier = stab * attack.get_effectiveness(target.clone()) * random;
         damage = ((((2.0 * user.get_level() as f32 + 10.0) / 250.0) * user.get_current().
             get_stat(enums::Stats::Attack) as f32 /target.get_current().
             get_stat(enums::Stats::Defense) as f32 * attack.get_power().unwrap() as f32 + 2.0)
@@ -32,7 +32,7 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
 }
 
 //resolves ailment effects
-pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, effect_chance: u8,
+pub fn ailment(name: String, move_type: enums::Types, ailment: enums::Ailment, effect_chance: u8,
     mut target: PokemonToken) {
     let mut rng = thread_rng();
     let random = rng.gen_range(0, 101);
@@ -43,8 +43,8 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
         let spore = Regex::new(r"spore").unwrap();
         let tmp: &str = &name;
         //some sort of attacks did not work against grass types.
-        if (target.get_types().0 == enums::types::grass ||
-            target.get_types().1 == enums::types::grass) && (powder.is_match(tmp)
+        if (target.get_types().0 == enums::Types::Grass ||
+            target.get_types().1 == enums::Types::Grass) && (powder.is_match(tmp)
             || spore.is_match(tmp)) {
             println!("{} was not affected by {}", target.get_name(), name);
         } else {
@@ -56,10 +56,10 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
 
                 enums::Ailment::Paralysis => {
                     //electric type pokemon are immune to paralysis
-                    if target.get_non_volatile().0 == enums::Non_Volatile::Undefined {
-                        if !(target.get_types().0 == enums::types::electric) &&
-                        !(target.get_types().1 == enums::types::electric) {
-                            target.set_non_volatile(enums::Non_Volatile::Paralysis);
+                    if target.get_non_volatile().0 == enums::NonVolatile::Undefined {
+                        if !(target.get_types().0 == enums::Types::Electric) &&
+                        !(target.get_types().1 == enums::Types::Electric) {
+                            target.set_non_volatile(enums::NonVolatile::Paralysis);
                             target.get_current().set_stats(enums::Stats::Speed, target.get_base().
                                 get_stat(enums::Stats::Speed) / 2)
                         } else {
@@ -72,8 +72,8 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                 },
 
                 enums::Ailment::Sleep => {
-                    if target.get_non_volatile().0 == enums::Non_Volatile::Undefined {
-                        target.set_non_volatile(enums::Non_Volatile::Sleep)
+                    if target.get_non_volatile().0 == enums::NonVolatile::Undefined {
+                        target.set_non_volatile(enums::NonVolatile::Sleep)
                     } else {
                         println!("{} is already {}", target.get_name(),
                             enums::print_non_volatile(target.get_non_volatile().0));
@@ -83,73 +83,73 @@ pub fn ailment(name: String, move_type: enums::types, ailment: enums::Ailment, e
                 enums::Ailment::Freeze => {
                     //ice type pokemon are immune to freeze, but only if the used move is also
                     //from the type ice.
-                    if (target.get_types().0 == enums::types::ice || target.get_types().1 ==
-                    enums::types::ice) && move_type == enums::types::ice {
+                    if (target.get_types().0 == enums::Types::Ice || target.get_types().1 ==
+                    enums::Types::Ice) && move_type == enums::Types::Ice {
                         println!("{} could not be freezed", target.get_name());
                     } else {
-                        target.set_non_volatile(enums::Non_Volatile::Freeze);
+                        target.set_non_volatile(enums::NonVolatile::Freeze);
                     }
                 },
 
                 enums::Ailment::Burn => {
                     //Fire types can not be burned (seems logical).
-                    if target.get_types().0 == enums::types::fire || target.get_types().1 ==
-                    enums::types::fire {
+                    if target.get_types().0 == enums::Types::Fire || target.get_types().1 ==
+                    enums::Types::Fire {
                         println!("{} could not be burned", target.get_name());
                     } else {
-                        target.set_non_volatile(enums::Non_Volatile::Burn);
+                        target.set_non_volatile(enums::NonVolatile::Burn);
                     }
                 },
 
                 enums::Ailment::Poison => {
                     //Neither Poison nor steel pokemon can be poisoned in normal ways.
-                    if target.get_types().0 == enums::types::poison || target.get_types().0 ==
-                    enums::types::steel || target.get_types().1 == enums::types::poison ||
-                    target.get_types().1 == enums::types::steel {
+                    if target.get_types().0 == enums::Types::Poison || target.get_types().0 ==
+                    enums::Types::Steel || target.get_types().1 == enums::Types::Poison ||
+                    target.get_types().1 == enums::Types::Steel {
                         println!("{} could not be poisoned", target.get_name());
                     } else {
                         if name == String::from("toxic") {
-                            target.set_non_volatile(enums::Non_Volatile::Bad_Poison);
+                            target.set_non_volatile(enums::NonVolatile::BadPoison);
                         } else {
-                            target.set_non_volatile(enums::Non_Volatile::Poison);
+                            target.set_non_volatile(enums::NonVolatile::Poison);
                         }
                     }
                 },
 
-                enums::Ailment::Leech_Seed => {
+                enums::Ailment::LeechSeed => {
                     //Has no effect on grass type (even though given the flavor text leech seeds
                     //are a plant parasite...)
-                    if target.get_types().0 == enums::types::grass || target.get_types().1 ==
-                    enums::types::grass {
+                    if target.get_types().0 == enums::Types::Grass || target.get_types().1 ==
+                    enums::Types::Grass {
                         println!("{} was not affected by Leech Seed", target.get_name());
                     } else {
-                        target.add_end_flag(enums::End_Of_Turn::Leech_Seed);
+                        target.add_end_flag(enums::EndOfTurn::LeechSeed);
                     }
                 },
 
-                enums::Ailment::Perish_Song => {
+                enums::Ailment::PerishSong => {
                     //actually only one Attack, that kills all Pokemon after 4 rounds, including
                     //the user. Does not reset the counter if used again, therefore Pokemon, that
                     //are already under the effect of Perish Song are not influenced
-                    if target.get_end_of_turn_flags().contains_key(&enums::End_Of_Turn::Perish_Song) {
+                    if target.get_end_of_turn_flags().contains_key(&enums::EndOfTurn::PerishSong) {
                         println!("{} is already doomed", target.get_name());
                     } else {
-                        target.add_end_flag(enums::End_Of_Turn::Perish_Song);
+                        target.add_end_flag(enums::EndOfTurn::PerishSong);
                     }
                 },
 
                 enums::Ailment::Yawn => {
-                    if target.get_end_of_turn_flags().contains_key(&enums::End_Of_Turn::Yawn) ||
-                    target.get_non_volatile().0 == enums::Non_Volatile::Sleep {
+                    if target.get_end_of_turn_flags().contains_key(&enums::EndOfTurn::Yawn) ||
+                    target.get_non_volatile().0 == enums::NonVolatile::Sleep {
                         println!("{} was not affected by Yawn", target.get_name());
                     } else {
-                        target.add_end_flag(enums::End_Of_Turn::Yawn);
+                        target.add_end_flag(enums::EndOfTurn::Yawn);
                     }
                 },
 
                 enums::Ailment::Trap => {
-                    if !target.get_end_of_turn_flags().contains_key(&enums::End_Of_Turn::Trap) {
-                        target.add_end_flag(enums::End_Of_Turn::Trap);
+                    if !target.get_end_of_turn_flags().contains_key(&enums::EndOfTurn::Trap) {
+                        target.add_end_flag(enums::EndOfTurn::Trap);
                     }
                 }
 

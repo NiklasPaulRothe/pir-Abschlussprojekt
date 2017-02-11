@@ -1,6 +1,6 @@
 
 [package]
-name = "PokemonBattleArena"
+name = "pokemon_battle_arena"
 version = "0.1.0"
 authors = [
     "Artur Kaul",
