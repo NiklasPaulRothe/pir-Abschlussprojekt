@@ -34,6 +34,9 @@ struct App {
     pokedex: db::pokedex::Pokedex,
     pkmn_team: Vec<db::pokemon_token::PokemonToken>,
     sel_pkmn: (Option<db::pokemon_token::PokemonToken>, Option<usize>),
+    selected_idx: Option<usize>,
+    techs: Option<Vec<db::moves::Technique>>,
+    tech_names: Vec<String>,
 }
 
 impl App {
@@ -45,6 +48,9 @@ impl App {
             pokedex: db::pokedex::Pokedex::new(),
             pkmn_team: Vec::new(),
             sel_pkmn: (None, None),
+            selected_idx: None,
+            techs: None,
+            tech_names: Vec::new()
         }
     }
 
@@ -252,7 +258,7 @@ pub fn draw_window() {
                     .w_h(200.0, 650.0)
                     .mid_left_with_margin_on(ids.canvas, 25.0)
                     .scrollbar_width(15.0)
-                    .set(ids.s_list_pkmn, ui);
+                    .set(ids.slist_pkmn, ui);
 
                 // Instantiate the scrollbar for the list.
                 if let Some(s) = scrollbar { s.set(ui); }
@@ -304,7 +310,7 @@ pub fn draw_window() {
                 let (mut events, _) = widget::ListSelect::single(6, 650.0/6.0)
                     .w_h(200.0, 650.0)
                     .mid_right_with_margin_on(ids.canvas, 25.0)
-                    .set(ids.s_list_team, ui);
+                    .set(ids.slist_team, ui);
 
                 let mut team_names = Vec::with_capacity(6);
                 for pokemon in &app.pkmn_team {
@@ -350,12 +356,32 @@ pub fn draw_window() {
                     }
                 }
 
-                // ===================================
-                // = Description of selected Pokemon =
-                // ===================================
-                let stats = match app.sel_pkmn.0 {
+                // =========================================
+                // = Description/Moves of selected Pokemon =
+                // =========================================
+                let description = match app.sel_pkmn.0 {
                     None => "No Pokemon Selected".to_string(),
                     Some(ref pkmn) => {
+                        // === Moves ===
+                        if let None = app.techs {
+                            app.techs = Some(pkmn.get_moves(db::movedex::Movedex::new()).get_entries());
+                            app.tech_names = db::moves::Technique::get_name_vec(app.techs.clone().unwrap());
+                        }
+
+                        // Drop down list for the first attack
+                        for selected_idx in widget::DropDownList::new(&app.tech_names, app.selected_idx)
+                            .border(1.0)
+                            .color(conrod::color::LIGHT_GREY)
+                            .mid_bottom_with_margin_on(ids.canvas, 100.0)
+                            .w_h(BUTTON_W, BUTTON_H)
+                            .max_visible_items(3)
+                            .scrollbar_next_to()
+                            .set(ids.ddlist_att1, ui)
+                        {
+                            app.selected_idx = Some(selected_idx);
+                        }
+
+                        // === Description ===
                         let types = match pkmn.get_types() {
                             (type1, db::enums::types::undefined) => type1.to_string(),
                             (type1, type2) => [type1.to_string(), "/".to_string(), type2.to_string()].concat().to_string(),
@@ -374,13 +400,15 @@ pub fn draw_window() {
                     }
                 };
 
-                widget::Text::new(&stats)
+                // Text-Widget to display description
+                widget::Text::new(&description)
                     .color(app.label_color)
                     .middle_of(ids.canvas)
                     .align_text_middle()
                     .line_spacing(10.0)
                     .set(ids.text_sel_pkmn, ui);
 
+                // Button to add selected Pokemon to team
                 if widget::Button::new()
                     .border(1.0)
                     .color(app.bg_color)
@@ -402,6 +430,7 @@ pub fn draw_window() {
                     };
                 }
 
+                // Button to remove selected Pokemon from team
                 if widget::Button::new()
                     .border(1.0)
                     .color(app.bg_color)
@@ -421,6 +450,7 @@ pub fn draw_window() {
                     }
                 }
 
+                // Back-Button
                 if widget::Button::new()
                     .border(1.0)
                     .color(app.bg_color)
@@ -435,6 +465,7 @@ pub fn draw_window() {
                     app.screen = Screen::Play;
                 }
 
+                // Button to start the fight
                 if widget::Button::new()
                     .border(1.0)
                     .color(app.bg_color)
@@ -466,10 +497,10 @@ pub fn draw_window() {
 
 widget_ids! {
     struct Ids {
-        // *** canvas ***
+        // === canvas ===
         canvas,
 
-        // *** buttons ***
+        // === buttons ===
         button_play,
         button_options,
         button_exit,
@@ -480,11 +511,14 @@ widget_ids! {
         button_select,
         button_remove,
 
-        // *** selection_list ***
-        s_list_pkmn,
-        s_list_team,
+        // === selection_list ===
+        slist_pkmn,
+        slist_team,
 
-        // *** text ***
+        // === drop down list ===
+        ddlist_att1,
+
+        // === text ===
         text_sel_pkmn,
     }
 }

@@ -265,6 +265,17 @@ impl Technique {
         self.name.clone()
     }
 
+    // Takes a Vec<Technique> and returns a Vec<String> with the names of the techniques
+    pub fn get_name_vec(technique: Vec<Technique>) -> Vec<String> {
+        let mut output = Vec::new();
+
+        for entry in technique {
+            output.push(entry.get_name());
+        }
+
+        output
+    }
+
     pub fn get_type(&self) -> enums::types {
         let a_type: &str = &self.attack_type;
         match a_type {

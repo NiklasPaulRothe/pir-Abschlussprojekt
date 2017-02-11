@@ -1,3 +1,5 @@
+#![allow(dead_code, unused_variables, unused_imports, unused_mut, non_camel_case_types, unused_assignments)]
+
 #[macro_use] extern crate enum_primitive;
 #[macro_use] extern crate conrod;
 extern crate rustc_serialize;
