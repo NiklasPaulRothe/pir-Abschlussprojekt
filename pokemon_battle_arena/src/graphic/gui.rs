@@ -33,7 +33,7 @@ struct App {
     bg_color: conrod::Color,
     pokedex: db::pokedex::Pokedex,
     pkmn_team: Vec<db::pokemon_token::PokemonToken>,
-    sel_pkmn: Option<db::pokemon_token::PokemonToken>,
+    sel_pkmn: (Option<db::pokemon_token::PokemonToken>, Option<usize>),
 }
 
 impl App {
@@ -44,7 +44,7 @@ impl App {
             bg_color: conrod::color::WHITE,
             pokedex: db::pokedex::Pokedex::new(),
             pkmn_team: Vec::new(),
-            sel_pkmn: None,
+            sel_pkmn: (None, None),
         }
     }
 
@@ -285,10 +285,13 @@ pub fn draw_window() {
                         Event::Selection(selection) => {
                             println!("selected index (PokeDex): {:?}", selection);
 
-                            app.sel_pkmn = Some(
-                                db::pokemon_token::PokemonToken::from_model(
-                                    app.pokedex.pokemon_by_id(selection + 1).unwrap()
-                                )
+                            app.sel_pkmn = (
+                                Some(
+                                    db::pokemon_token::PokemonToken::from_model(
+                                        app.pokedex.pokemon_by_id(selection + 1).unwrap()
+                                    )
+                                ),
+                                None
                             );
                         }
                         _ => {},
@@ -340,8 +343,7 @@ pub fn draw_window() {
                         //  in the middle of the screen (with stats, etc)
                         Event::Selection(selection) => {
                             println!("selected index (Team): {:?}", selection);
-                            app.sel_pkmn = Some(app.pkmn_team[selection].clone());
-                            app.pkmn_team.remove(selection);
+                            app.sel_pkmn = (Some(app.pkmn_team[selection].clone()), Some(selection));
                         }
                         // Do nothing for every other event
                         _ => {},
@@ -351,7 +353,7 @@ pub fn draw_window() {
                 // ===================================
                 // = Description of selected Pokemon =
                 // ===================================
-                let stats = match app.sel_pkmn {
+                let stats = match app.sel_pkmn.0 {
                     None => "No Pokemon Selected".to_string(),
                     Some(ref pkmn) => {
                         let types = match pkmn.get_types() {
@@ -384,20 +386,39 @@ pub fn draw_window() {
                     .color(app.bg_color)
                     .label("Select")
                     .label_color(app.label_color)
-                    .mid_bottom_with_margin(35.0)
+                    .mid_bottom_with_margin(50.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_select, ui)
                     .was_clicked()
                 {
                     println!("Select");
 
-                    match app.sel_pkmn.clone() {
+                    match app.sel_pkmn.0.clone() {
                         Some(pkmn) => {
                             app.pkmn_team.push(pkmn.clone());
-                            app.sel_pkmn = None;
+                            app.sel_pkmn = (None, None);
                         }
                         None => println!("Error: No Pokemon selected"),
                     };
+                }
+
+                if widget::Button::new()
+                    .border(1.0)
+                    .color(app.bg_color)
+                    .label("Remove")
+                    .label_color(app.label_color)
+                    .down_from(ids.button_select, 0.0)
+                    .w_h(BUTTON_W, BUTTON_H)
+                    .set(ids.button_remove, ui)
+                    .was_clicked()
+                {
+                    println!("Remove");
+                    if let Some(i) = app.sel_pkmn.1 {
+                        app.pkmn_team.remove(i);
+                        app.sel_pkmn = (None, None);
+                    } else {
+                        println!("Error: No Pokemon at this position")
+                    }
                 }
 
                 if widget::Button::new()
@@ -457,6 +478,7 @@ widget_ids! {
         button_back,
         button_fight,
         button_select,
+        button_remove,
 
         // *** selection_list ***
         s_list_pkmn,
