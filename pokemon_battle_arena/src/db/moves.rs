@@ -7,6 +7,8 @@ use super::pokemon_model;
 use super::pokemon_token;
 use super::enums;
 use super::resolve;
+use super::movedex;
+use unique;
 use super::pokedex::Pokedex;
 use self::num::FromPrimitive;
 use self::rand::{Rng, thread_rng};
@@ -66,6 +68,10 @@ impl Technique {
             if self.hits(target.clone(), user.clone()) {
                 //match over the category provides smaller samples that must be dealt with.
                 match self.get_category() {
+
+                    enums::Move_Category::Unique => {
+                        unique::unique(self.get_name(), self.get_type(), self.get_ailment(), target);
+                    },
 
                     enums::Move_Category::Damage => {
                         let _ = resolve::deal_damage(self.clone(), user.clone(), target);
@@ -220,8 +226,6 @@ impl Technique {
                             println!("It has no effect on {}", target.get_name());
                         }
                     },
-
-                    enums::Move_Category::Unique => {},
                 };
             } else {
                 println!("{} missed {}", user.get_name(), target.get_name());

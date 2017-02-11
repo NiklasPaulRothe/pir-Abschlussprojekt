@@ -8,6 +8,7 @@ mod arena;
 mod db;
 mod graphic;
 mod player;
+mod unique;
 
 use time::get_time;
 use player::Player;
@@ -20,7 +21,10 @@ fn main() {
     println!("Hello and Welcome to the Pokemon Battle Arena");
     println!("");
     testing();
+    unique::test();
 }
+
+
 
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
