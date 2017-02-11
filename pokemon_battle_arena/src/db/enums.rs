@@ -3,8 +3,8 @@ extern crate rand;
 
 use self::rand::{Rng, thread_rng};
 
-///enum for the pokemon/attack types.
-///Can be assigned from i32 value.
+/// enum for the pokemon/attack types.
+/// Can be assigned from i32 value.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash)]
     pub enum Types {
@@ -30,8 +30,36 @@ enum_from_primitive! {
     }
 }
 
-///Enum for the Categories a move can have. They are used to get smaller samples of moves when
-///resolve their effects.
+impl ::std::fmt::Display for types {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        let x = match *self {
+            types::normal => "Normal",
+            types::fighting => "Fighting",
+            types::flying => "Flying",
+            types::poison => "Poison",
+            types::ground => "Ground",
+            types::rock => "Rock",
+            types::bug => "Bug",
+            types::ghost => "Ghost",
+            types::steel => "Steel",
+            types::fire => "Fire",
+            types::water => "Water",
+            types::grass => "Grass",
+            types::electric => "Electric",
+            types::psychic => "Psychic",
+            types::ice => "Ice",
+            types::dragon => "Dragon",
+            types::dark => "Dark",
+            types::fairy => "Fairy",
+            types::undefined => "Undefined",
+        };
+
+        write!(f, "{}", x)
+    }
+}
+
+/// Enum for the Categories a move can have. They are used to get smaller samples of moves when
+/// resolve their effects.
 enum_from_primitive! {
     #[derive(Debug, Clone, PartialEq)]
     pub enum MoveCategory {
@@ -52,7 +80,7 @@ enum_from_primitive! {
     }
 }
 
-///All ailments that are known and can be caused by one or more moves.
+/// All ailments that are known and can be caused by one or more moves.
 #[derive(Debug, Clone)]
 pub enum Ailment {
     Unknown,
@@ -77,7 +105,7 @@ pub enum Ailment {
     Ingrain,
 }
 
-///All the major status Changes that can not be caused at the same time.
+/// All the major status Changes that can not be caused at the same time.
 #[derive(Debug, Clone, PartialEq)]
 pub enum NonVolatile {
     Undefined,
@@ -89,7 +117,7 @@ pub enum NonVolatile {
     BadPoison,
 }
 
-///Flags that have a influence at the end of each turn.
+/// Flags that have a influence at the end of each turn.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EndOfTurn {
     //absorbs some HP at the End of every Turn
@@ -123,7 +151,7 @@ pub fn print_non_volatile(status: NonVolatile) -> String {
     }
 }
 
-///Enum for Genders
+/// Enum for Genders
 #[derive(Debug, Clone)]
 pub enum Gender {
     Male,
@@ -132,7 +160,7 @@ pub enum Gender {
 }
 
 
-///Makes it easier to acces the Stats directly
+/// Makes it easier to acces the Stats directly
 enum_from_primitive! {
     #[derive(Debug, Clone, PartialEq)]
     pub enum Stats {
@@ -148,7 +176,7 @@ enum_from_primitive! {
     }
 }
 
-///Weather enum for the arena.
+/// Weather enum for the arena.
 #[derive(Debug, Clone)]
 pub enum Weather {
     ClearSky,
@@ -164,8 +192,8 @@ pub enum Weather {
     AirCurrent,
 }
 
-///enum for the Damage Class of a attack.
-///Can be assigned from a i32 value.
+/// enum for the Damage Class of a attack.
+/// Can be assigned from a i32 value.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone)]
     pub enum DamageClass {
@@ -175,8 +203,8 @@ enum_from_primitive! {
     }
 }
 
-///Enum that contains the valid target(s) of a move.
-///Can be assigned from a i32 value.
+/// Enum that contains the valid target(s) of a move.
+/// Can be assigned from a i32 value.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone)]
     pub enum Target {
@@ -197,8 +225,8 @@ enum_from_primitive! {
     }
 }
 
-///All Flags that can be important for a move. Contains for example if a move is influenced by
-///another move or condition the pokemon or arena is in.
+/// All Flags that can be important for a move. Contains for example if a move is influenced by
+/// another move or condition the pokemon or arena is in.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone)]
     pub enum MoveFlags {
@@ -225,7 +253,7 @@ enum_from_primitive! {
     }
 }
 
-///More or less randomly provides a gender for a pokemon given the distribution for the species.
+/// More or less randomly provides a gender for a pokemon given the distribution for the species.
 pub fn get_gender(gender_rate: i8) -> Gender {
     let mut rng = thread_rng();
     let probability = rng.gen_range(0.0, 100.1);
@@ -234,34 +262,34 @@ pub fn get_gender(gender_rate: i8) -> Gender {
         0 => Gender::Male,
         1 => {
             if probability < 87.5 {
-            return Gender::Male
+                return Gender::Male
             }
-        Gender::Female
-        },
+            Gender::Female
+        }
         2 => {
             if probability < 75.0 {
-            return Gender::Male
+                return Gender::Male
             }
-        Gender::Female
-        },
+            Gender::Female
+        }
         4 => {
             if probability < 50.0 {
-            return Gender::Male
+                return Gender::Male
             }
-        Gender::Female
-        },
+            Gender::Female
+        }
         6 => {
             if probability < 25.0 {
-            return Gender::Male
+                return Gender::Male
             }
-        Gender::Female
-        },
+            Gender::Female
+        }
         7 => {
             if probability < 12.5 {
-            return Gender::Male
+                return Gender::Male
             }
-        Gender::Female
-        },
+            Gender::Female
+        }
         8 => Gender::Female,
         _ => Gender::Genderless,
     }

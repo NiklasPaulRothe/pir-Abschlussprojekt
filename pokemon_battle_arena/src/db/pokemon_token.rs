@@ -106,13 +106,17 @@ impl PokemonToken {
     pub fn get_end_of_turn_flags(&self) -> HashMap<enums::EndOfTurn, u8> {
         self.clone().end_of_turn_flags
     }
+
+    pub fn get_description(&self) -> String {
+        self.clone().description
+    }
+
     pub fn get_mega(&self) -> Option<PokemonToken> {
         if self.mega_evolution.is_some() {
             return Some(PokemonToken::from_model(self.mega_evolution.clone().unwrap()));
         }
         None
     }
-
 
     /// Getter function for move one. If the move is set, the function returns it, if not,
     /// it returns None
