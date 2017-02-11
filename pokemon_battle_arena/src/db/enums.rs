@@ -30,28 +30,28 @@ enum_from_primitive! {
     }
 }
 
-impl ::std::fmt::Display for types {
+impl ::std::fmt::Display for Types {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
         let x = match *self {
-            types::normal => "Normal",
-            types::fighting => "Fighting",
-            types::flying => "Flying",
-            types::poison => "Poison",
-            types::ground => "Ground",
-            types::rock => "Rock",
-            types::bug => "Bug",
-            types::ghost => "Ghost",
-            types::steel => "Steel",
-            types::fire => "Fire",
-            types::water => "Water",
-            types::grass => "Grass",
-            types::electric => "Electric",
-            types::psychic => "Psychic",
-            types::ice => "Ice",
-            types::dragon => "Dragon",
-            types::dark => "Dark",
-            types::fairy => "Fairy",
-            types::undefined => "Undefined",
+            Types::Normal => "Normal",
+            Types::Fighting => "Fighting",
+            Types::Flying => "Flying",
+            Types::Poison => "Poison",
+            Types::Ground => "Ground",
+            Types::Rock => "Rock",
+            Types::Bug => "Bug",
+            Types::Ghost => "Ghost",
+            Types::Steel => "Steel",
+            Types::Fire => "Fire",
+            Types::Water => "Water",
+            Types::Grass => "Grass",
+            Types::Electric => "Electric",
+            Types::Psychic => "Psychic",
+            Types::Ice => "Ice",
+            Types::Dragon => "Dragon",
+            Types::Dark => "Dark",
+            Types::Fairy => "Fairy",
+            Types::Undefined => "Undefined",
         };
 
         write!(f, "{}", x)

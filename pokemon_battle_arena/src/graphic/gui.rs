@@ -383,7 +383,7 @@ pub fn draw_window() {
 
                         // === Description ===
                         let types = match pkmn.get_types() {
-                            (type1, db::enums::types::undefined) => type1.to_string(),
+                            (type1, db::enums::Types::Undefined) => type1.to_string(),
                             (type1, type2) => [type1.to_string(), "/".to_string(), type2.to_string()].concat().to_string(),
                         };
 

@@ -272,8 +272,6 @@ impl Technique {
     pub fn get_name(&self) -> String {
         self.name.clone()
     }
-
-<<<<<<< HEAD
     // Takes a Vec<Technique> and returns a Vec<String> with the names of the techniques
     pub fn get_name_vec(technique: Vec<Technique>) -> Vec<String> {
         let mut output = Vec::new();
