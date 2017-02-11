@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #[macro_use] extern crate enum_primitive;
 #[macro_use] extern crate conrod;
 extern crate rustc_serialize;
@@ -10,11 +11,9 @@ mod graphic;
 mod player;
 mod unique;
 
-use time::get_time;
 use player::Player;
 use player::PlayerType;
 use arena::Arena;
-use db::enums;
 
 fn main() {
     println!("");
@@ -34,9 +33,9 @@ fn testing() {
     //         println!("{:?}", entry.get_name());
     //     }
     // }
-    // test_players();
-    // test_arena();
-    // graphic::gui::draw_window();
+    test_players();
+    test_arena();
+    graphic::gui::draw_window();
 }
 
 
@@ -63,10 +62,10 @@ fn test_players() {
 }
 
 fn test_arena() {
-    let mut human1 = Player::new_by_id(&[5, 3, 17], PlayerType::Human);
-    let mut human2 = Player::new_by_id(&[18, 19, 122], PlayerType::Human);
-    let mut arena = Arena::new(human1, human2,
-        db::enums::types::normal, db::enums::Weather::Clear_Sky);
+    let human1 = Player::new_by_id(&[5, 3, 17], PlayerType::Human);
+    let human2 = Player::new_by_id(&[18, 19, 122], PlayerType::Human);
+    let arena = Arena::new(human1, human2,
+        db::enums::Types::Normal, db::enums::Weather::ClearSky);
     println!("{}", arena.get_player_one().get_pokemon_count());
     println!("{}", arena.get_player_two().get_pokemon_count());
     println!("{:#?}", arena.get_player_one().get_pokemon_list());

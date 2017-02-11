@@ -22,7 +22,7 @@ pub struct Player {
     pokemon_list: Vec<PokemonToken>,
     pokemon_count: usize,
     current: usize,
-    next_move: Option<moves::Technique>, 
+    next_move: Option<moves::Technique>,
 }
 
 impl Player {
@@ -85,7 +85,7 @@ impl Player {
             &AttackSlot::Four =>  self.pokemon_list[self.current].clone().get_move_four().unwrap(),
         }
     }
-    /// Gets the next attack from the Player. Returns none if no Technique is selected 
+    /// Gets the next attack from the Player. Returns none if no Technique is selected
     pub fn get_next_move(&self) -> Option<moves::Technique> {
         self.next_move.clone()
     }
@@ -98,6 +98,7 @@ impl Player {
     pub fn set_current(&mut self, new: usize) {
         self.current = new;
     }
+    /// Sets a next move to the Player
     pub fn set_next_move(&mut self, next: Option<moves::Technique>) {
         self.next_move = next;
     }

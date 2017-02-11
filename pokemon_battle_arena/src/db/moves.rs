@@ -2,19 +2,18 @@ extern crate csv;
 extern crate num;
 extern crate rustc_serialize;
 extern crate rand;
-
-use super::pokemon_model;
 use super::pokemon_token;
 use super::enums;
 use super::resolve;
-use super::movedex;
-use unique;
-use super::pokedex::Pokedex;
 use self::num::FromPrimitive;
 use self::rand::{Rng, thread_rng};
 use std::collections::HashMap;
 use player::Player;
 use arena::Arena;
+
+use super::movedex;
+use unique;
+use super::pokedex::Pokedex;
 
 ///Struct that is a representation of a move a pokemon can learn. Contains everything that is
 ///needed to calculate it's impact given a user and a target Pokemon.
@@ -46,7 +45,7 @@ pub struct Technique {
     stat_chance: u8,
     description: String,
     stat: Option<i32>,
-    effectivity_map: Option<HashMap<enums::types, i8>>,
+    effectivity_map: Option<HashMap<enums::Types, i8>>,
     move_flags: Option<Vec<enums::MoveFlags>>,
     stat_change_rate: Option<i8>,
 }
@@ -69,21 +68,25 @@ impl Technique {
                 //match over the category provides smaller samples that must be dealt with.
                 match self.get_category() {
 
+<<<<<<< HEAD
                     enums::Move_Category::Unique => {
                         unique::unique(self.get_name(), self.get_type(), self.get_ailment(), target);
                     },
 
                     enums::Move_Category::Damage => {
+=======
+                    enums::MoveCategory::Damage => {
+>>>>>>> 6b9eebc96c0457951c0642d9af2b3ddb647d5cfd
                         let _ = resolve::deal_damage(self.clone(), user.clone(), target);
                     },
 
-                    enums::Move_Category::Ailment => {
+                    enums::MoveCategory::Ailment => {
                         resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(), 100, target);
                     },
 
-                    enums::Move_Category::Net_Good_Stats => {},
+                    enums::MoveCategory::NetGoodStats => {},
 
-                    enums::Move_Category::Heal => {
+                    enums::MoveCategory::Heal => {
                         //Heal moves will fail if the user has maximum HP
                         if !(user.get_current().get_stat(enums::Stats::Hp) ==
                             user.get_base().get_stat(enums::Stats::Hp)) {
@@ -94,7 +97,7 @@ impl Technique {
                             (self.get_name() == String::from("synthesis")) ||
                             (self.get_name() == String::from("morning-sun")) {
                                 match field.get_weather() {
-                                    enums::Weather::Clear_Sky => {
+                                    enums::Weather::ClearSky => {
                                         value = user.get_base().get_stat(enums::Stats::Hp) / 2;
                                     },
                                     enums::Weather::Sunlight => {
@@ -123,16 +126,16 @@ impl Technique {
                             //flying.
                             } else if self.get_name() == String::from("roost") {
                                 //TODO: find a way to change type of user for one round
-                                if user.get_types().1 != enums::types::undefined &&
-                                user.get_types().0 == enums::types::flying {
-                                    user.set_type(0, enums::types::undefined);
-                                    user.add_end_flag(enums::End_Of_Turn::Roost_Type_One);
-                                } else if user.get_types().1 == enums::types::flying {
-                                    user.set_type(1, enums::types::undefined);
-                                    user.add_end_flag(enums::End_Of_Turn::Roost_Type_Two);
-                                } else if user.get_types().0 == enums::types::flying {
-                                    user.set_type(0, enums::types::normal);
-                                    user.add_end_flag(enums::End_Of_Turn::Roost_Type_One)
+                                if user.get_types().1 != enums::Types::Undefined &&
+                                user.get_types().0 == enums::Types::Flying {
+                                    user.set_type(0, enums::Types::Undefined);
+                                    user.add_end_flag(enums::EndOfTurn::RoostTypeOne);
+                                } else if user.get_types().1 == enums::Types::Flying {
+                                    user.set_type(1, enums::Types::Undefined);
+                                    user.add_end_flag(enums::EndOfTurn::RoostTypeTwo);
+                                } else if user.get_types().0 == enums::Types::Flying {
+                                    user.set_type(0, enums::Types::Normal);
+                                    user.add_end_flag(enums::EndOfTurn::RoostTypeOne)
                                 }
                                 resolve::heal(target, 50);
                             } else {
@@ -145,7 +148,7 @@ impl Technique {
                         }
                     },
 
-                    enums::Move_Category::Damage_And_Ailment => {
+                    enums::MoveCategory::DamageAndAilment => {
                         resolve::deal_damage(self.clone(), user.clone(), target.clone());
                         resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(),
                             self.get_effect_chance(), target);
@@ -156,7 +159,7 @@ impl Technique {
                     //stats will be raised even when the target is already confused or can not be
                     //confused due to other reasons, but it will not get confused if the stats can
                     //not be raised anymore.
-                    enums::Move_Category::Swagger => {
+                    enums::MoveCategory::Swagger => {
                         if resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
                             target.clone()) {
                             resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(),
@@ -164,13 +167,13 @@ impl Technique {
                         }
                     },
 
-                    enums::Move_Category::Damage_And_Lower => {
+                    enums::MoveCategory::DamageAndLower => {
                         let _ = resolve::deal_damage(self.clone(), user.clone(), target.clone());
                         let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
                             target);
                     },
 
-                    enums::Move_Category::Damage_And_Raise => {
+                    enums::MoveCategory::DamageAndRaise => {
                         let _ = resolve::deal_damage(self.clone(), user.clone(), target.clone());
                         let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
                             target);
@@ -179,7 +182,7 @@ impl Technique {
                     //done apart from math for damage
                     //First deals damage and afterwards heals themselve for a percentage of the
                     //dealt damage.
-                    enums::Move_Category::Damage_And_Heal => {
+                    enums::MoveCategory::DamageAndHeal => {
                         //dream eater can only be used if the target is asleep
                         if self.get_name() == String::from("dream-eater")
                         && !target.is_asleep() {
@@ -200,7 +203,7 @@ impl Technique {
                     //K.O. Attacks that instantly let the target faint if hitting. Besides low
                     //accuracy every K.O. Attack has another requirement, that must be met for it
                     //to work.
-                    enums::Move_Category::Ohko => {
+                    enums::MoveCategory::Ohko => {
                         if ((self.get_name() == String::from("guillotine") ||
                             self.get_name() == String::from("sheer-cold")) &&
                         user.get_level() >= target.get_level()) ||
@@ -215,17 +218,22 @@ impl Technique {
                         }
                     },
 
-                    enums::Move_Category::Whole_Field_Effect => {},
+                    enums::MoveCategory::WholeFieldEffect => {},
 
-                    enums::Move_Category::Field_Effect => {},
+                    enums::MoveCategory::FieldEffect => {},
 
-                    enums::Move_Category::Force_Switch => {
+                    enums::MoveCategory::ForceSwitch => {
                         if target.get_level() <= user.get_level() {
                             resolve::switch_pokemon(defender.clone());
                         } else {
                             println!("It has no effect on {}", target.get_name());
                         }
                     },
+<<<<<<< HEAD
+=======
+
+                    enums::MoveCategory::Unique => {},
+>>>>>>> 6b9eebc96c0457951c0642d9af2b3ddb647d5cfd
                 };
             } else {
                 println!("{} missed {}", user.get_name(), target.get_name());
@@ -256,7 +264,7 @@ impl Technique {
             eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().0)
             .unwrap();
         }
-        if enemy.get_types().1 != enums::types::undefined
+        if enemy.get_types().1 != enums::Types::Undefined
         && self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().1) {
             eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().1)
             .unwrap();
@@ -278,29 +286,39 @@ impl Technique {
     pub fn get_name(&self) -> String {
         self.name.clone()
     }
+    // Takes a Vec<Technique> and returns a Vec<String> with the names of the techniques
+    pub fn get_name_vec(technique: Vec<Technique>) -> Vec<String> {
+        let mut output = Vec::new();
 
-    pub fn get_type(&self) -> enums::types {
+        for entry in technique {
+            output.push(entry.get_name());
+        }
+
+        output
+    }
+
+    pub fn get_type(&self) -> enums::Types {
         let a_type: &str = &self.attack_type;
         match a_type {
-            "normal" => enums::types::normal,
-            "fighting" => enums::types::fighting,
-            "flying" => enums::types::flying,
-            "poison" => enums::types::poison,
-            "ground" => enums::types::ground,
-            "rock" => enums::types::rock,
-            "bug" => enums::types::bug,
-            "ghost" => enums::types::ghost,
-            "steel" => enums::types::steel,
-            "fire" => enums::types::fire,
-            "water" => enums::types::water,
-            "grass" => enums::types::grass,
-            "electric" => enums::types::electric,
-            "psychic" => enums::types::psychic,
-            "ice" => enums::types::ice,
-            "dragon" => enums::types::dragon,
-            "dark" => enums::types::dark,
-            "fairy" => enums::types::fairy,
-            _ => enums::types::undefined,
+            "normal" => enums::Types::Normal,
+            "fighting" => enums::Types::Fighting,
+            "flying" => enums::Types::Flying,
+            "poison" => enums::Types::Poison,
+            "ground" => enums::Types::Ground,
+            "rock" => enums::Types::Rock,
+            "bug" => enums::Types::Bug,
+            "ghost" => enums::Types::Ghost,
+            "steel" => enums::Types::Steel,
+            "fire" => enums::Types::Fire,
+            "water" => enums::Types::Water,
+            "grass" => enums::Types::Grass,
+            "electric" => enums::Types::Electric,
+            "psychic" => enums::Types::Psychic,
+            "ice" => enums::Types::Ice,
+            "dragon" => enums::Types::Dragon,
+            "dark" => enums::Types::Dark,
+            "fairy" => enums::Types::Fairy,
+            _ => enums::Types::Undefined,
         }
     }
 
@@ -366,23 +384,23 @@ impl Technique {
         100
     }
 
-    pub fn get_category(&self) -> enums::Move_Category {
+    pub fn get_category(&self) -> enums::MoveCategory {
         let tmp: &str = &self.category;
         match tmp {
-            "damage" => enums::Move_Category::Damage,
-            "ailment" => enums::Move_Category::Ailment,
-            "net-good-stats" => enums::Move_Category::Net_Good_Stats,
-            "heal" => enums::Move_Category::Heal,
-            "damage+ailment" => enums::Move_Category::Damage_And_Ailment,
-            "swagger" => enums::Move_Category::Swagger,
-            "damage+lower" => enums::Move_Category::Damage_And_Lower,
-            "damage+raise" => enums::Move_Category::Damage_And_Raise,
-            "damage+heal" => enums::Move_Category::Damage_And_Heal,
-            "ohko" => enums::Move_Category::Ohko,
-            "whole-field-effect" => enums::Move_Category::Whole_Field_Effect,
-            "field-effect" => enums::Move_Category::Field_Effect,
-            "force-switch" => enums::Move_Category::Force_Switch,
-            "unique" => enums::Move_Category::Unique,
+            "damage" => enums::MoveCategory::Damage,
+            "ailment" => enums::MoveCategory::Ailment,
+            "net-good-stats" => enums::MoveCategory::NetGoodStats,
+            "heal" => enums::MoveCategory::Heal,
+            "damage+ailment" => enums::MoveCategory::DamageAndAilment,
+            "swagger" => enums::MoveCategory::Swagger,
+            "damage+lower" => enums::MoveCategory::DamageAndLower,
+            "damage+raise" => enums::MoveCategory::DamageAndRaise,
+            "damage+heal" => enums::MoveCategory::DamageAndHeal,
+            "ohko" => enums::MoveCategory::Ohko,
+            "whole-field-effect" => enums::MoveCategory::WholeFieldEffect,
+            "field-effect" => enums::MoveCategory::FieldEffect,
+            "force-switch" => enums::MoveCategory::ForceSwitch,
+            "unique" => enums::MoveCategory::Unique,
             _ => unreachable!(),
         }
     }
@@ -404,11 +422,11 @@ impl Technique {
             "torment" => enums::Ailment::Torment,
             "disable" => enums::Ailment::Disable,
             "yawn" => enums::Ailment::Yawn,
-            "heal-block" => enums::Ailment::Heal_Block,
-            "no-type-immunity" => enums::Ailment::No_Type_Immunity,
-            "leech-seed" => enums::Ailment::Leech_Seed,
+            "heal-block" => enums::Ailment::HealBlock,
+            "no-type-immunity" => enums::Ailment::NoTypeImmunity,
+            "leech-seed" => enums::Ailment::LeechSeed,
             "embargo" => enums::Ailment::Embargo,
-            "perish-song" => enums::Ailment::Perish_Song,
+            "perish-song" => enums::Ailment::PerishSong,
             "ingrain" => enums::Ailment::Ingrain,
             _ => unreachable!(),
         }
@@ -484,7 +502,7 @@ impl Technique {
         0
     }
 
-    pub fn get_effectivity_map(&self) -> HashMap<enums::types, i8> {
+    pub fn get_effectivity_map(&self) -> HashMap<enums::Types, i8> {
         self.clone().effectivity_map.unwrap()
     }
 
@@ -495,7 +513,7 @@ impl Technique {
         Vec::new()
     }
 
-    pub fn set_effectivity_map(&mut self, map: HashMap<enums::types, i8>) {
+    pub fn set_effectivity_map(&mut self, map: HashMap<enums::Types, i8>) {
         self.effectivity_map = Some(map);
     }
 

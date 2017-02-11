@@ -52,13 +52,13 @@ impl Stats {
                 enums::Stats::Speed, dv.get_dv(enums::Stats::Speed), level, nature.clone())
             },
             special_attack:{
-             stat_formula(model.get_stats().get_stat(enums::Stats::Special_Attack),
-                enums::Stats::Special_Attack, dv.get_dv(enums::Stats::Special_Attack),
+             stat_formula(model.get_stats().get_stat(enums::Stats::SpecialAttack),
+                enums::Stats::SpecialAttack, dv.get_dv(enums::Stats::SpecialAttack),
                 level, nature.clone())
             },
             special_defense:{
-             stat_formula(model.get_stats().get_stat(enums::Stats::Special_Defense),
-                enums::Stats::Special_Defense, dv.get_dv(enums::Stats::Special_Defense),
+             stat_formula(model.get_stats().get_stat(enums::Stats::SpecialDefense),
+                enums::Stats::SpecialDefense, dv.get_dv(enums::Stats::SpecialDefense),
                 level, nature)
             },
             accuracy: 100,
@@ -71,8 +71,8 @@ impl Stats {
             enums::Stats::Hp => self.hp,
             enums::Stats::Attack => self.attack,
             enums::Stats::Defense => self.defense,
-            enums::Stats::Special_Attack => self.special_attack,
-            enums::Stats::Special_Defense => self.special_defense,
+            enums::Stats::SpecialAttack => self.special_attack,
+            enums::Stats::SpecialDefense => self.special_defense,
             enums::Stats::Speed => self.speed,
             _=> 0,
         }
@@ -83,8 +83,8 @@ impl Stats {
             enums::Stats::Hp => self.hp = value,
             enums::Stats::Attack => self.attack = value,
             enums::Stats::Defense => self.defense = value,
-            enums::Stats::Special_Attack => self.special_attack = value,
-            enums::Stats::Special_Defense => self.special_defense = value,
+            enums::Stats::SpecialAttack => self.special_attack = value,
+            enums::Stats::SpecialDefense => self.special_defense = value,
             enums::Stats::Speed => self.speed = value,
             _=> {},
         }

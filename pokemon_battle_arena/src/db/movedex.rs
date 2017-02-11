@@ -90,7 +90,7 @@ impl Movedex {
                         200 => 1,
                         _ => unreachable!(),
                     };
-                    effective_hash.insert(enums::types::from_i32(entry.1).unwrap(), eff_id);
+                    effective_hash.insert(enums::Types::from_i32(entry.1).unwrap(), eff_id);
                     move_tmp.set_effectivity_map(effective_hash.clone());
                 }
 

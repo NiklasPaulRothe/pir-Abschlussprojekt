@@ -47,8 +47,8 @@ impl Dv {
             Stats::Hp => self.hp,
             Stats::Attack => self.attack,
             Stats::Defense => self.defense,
-            Stats::Special_Attack => self.special_attack,
-            Stats::Special_Defense => self.special_attack,
+            Stats::SpecialAttack => self.special_attack,
+            Stats::SpecialDefense => self.special_attack,
             Stats::Speed => self.speed,
             _ => 1,
         }
