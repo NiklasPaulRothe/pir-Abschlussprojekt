@@ -25,7 +25,7 @@ enum Screen {
 ///     bg_color:       background color
 ///     pokedex:        currently used pokedex
 ///     pkmn_team:      current team
-///     sel_pkmn:       currently selected pokemon
+///     sel_pkmn:       currently selected pokemon and its index in the team
 #[derive(Clone)]
 struct App {
     screen: Screen,
@@ -34,9 +34,10 @@ struct App {
     pokedex: db::pokedex::Pokedex,
     pkmn_team: Vec<db::pokemon_token::PokemonToken>,
     sel_pkmn: (Option<db::pokemon_token::PokemonToken>, Option<usize>),
-    selected_idx: Option<usize>,
+    movedex: db::movedex::Movedex,
     techs: Option<Vec<db::moves::Technique>>,
     tech_names: Vec<String>,
+    pkmn_moves: Vec<db::moves::Technique>,
 }
 
 impl App {
@@ -48,9 +49,10 @@ impl App {
             pokedex: db::pokedex::Pokedex::new(),
             pkmn_team: Vec::new(),
             sel_pkmn: (None, None),
-            selected_idx: None,
+            movedex: db::movedex::Movedex::new(),
             techs: None,
             tech_names: Vec::new(),
+            pkmn_moves: Vec::new(),
         }
     }
 
@@ -249,7 +251,7 @@ pub fn draw_window() {
                 // ===============================================================
                 let pokedex_entries = app.pokedex.get_entries();
                 let num_items = pokedex_entries.len();
-                let item_h = 32.0;
+                let item_h = 64.0;
 
                 let (mut events, scrollbar) = widget::ListSelect::single(num_items, item_h)
                     .scrollbar_next_to()
@@ -261,12 +263,6 @@ pub fn draw_window() {
                 // Instantiate the scrollbar for the list.
                 if let Some(s) = scrollbar { s.set(ui); }
 
-                // Create Vec with all the pokemon names to be displayed
-                let mut pkmn_names = Vec::new();
-                for pokemon in pokedex_entries {
-                    pkmn_names.push(pokemon.get_name());
-                }
-
                 // Handle the `ListSelect`s events.
                 while let Some(event) = events.next(ui, |i| {
                     ::std::collections::HashSet::<usize>::new().contains(&i)
@@ -276,30 +272,31 @@ pub fn draw_window() {
                     match event {
                         // For the `Item` events we instantiate the `List`'s items.
                         Event::Item(item) => {
-                            let label = &pkmn_names[item.i];
+                            let label = &pokedex_entries[item.i].get_name();
 
                             // each button with the respective pokemon name as label
                             let button = widget::Button::new()
-                                .border(0.0)
+                                .border(1.0)
+                                .border_color(conrod::color::WHITE)
                                 .color(conrod::color::LIGHT_GREY)
                                 .label(label)
                                 .label_color(app.label_color);
                             item.set(button, ui);
                         }
 
-                        // Add pokemon to team when button is pressed
+                        // Select Pokemon when button is pressed
                         Event::Selection(selection) => {
                             println!("selected index (PokeDex): {:?}", selection);
 
                             app.sel_pkmn =
-                                (
-                                    Some(
-                                        db::pokemon_token::PokemonToken::from_model(
-                                            app.pokedex.pokemon_by_id(selection + 1).unwrap()
-                                        )
-                                    ),
-                                    None
-                                );
+                                (Some(db::pokemon_token::PokemonToken::from_model(
+                                        app.pokedex.pokemon_by_id(selection + 1).unwrap()
+                                    )), None);
+                            app.techs = Some(app.sel_pkmn
+                                .clone()
+                                .0.unwrap()
+                                .get_moves(app.movedex.clone())
+                                    .get_entries());
                         }
                         _ => {}
                     }
@@ -313,12 +310,6 @@ pub fn draw_window() {
                     .mid_right_with_margin_on(ids.canvas, 25.0)
                     .set(ids.slist_team, ui);
 
-                let mut team_names = Vec::with_capacity(6);
-                for pokemon in &app.pkmn_team {
-                    team_names.push(pokemon.get_name());
-                }
-
-
                 // Handle the `ListSelect`s events.
                 while let Some(event) = events.next(ui, |i| {
                     ::std::collections::HashSet::<usize>::new().contains(&i)
@@ -330,39 +321,41 @@ pub fn draw_window() {
                         Event::Item(item) => {
                             // `label` is either the name of the pokemon (if available)
                             // or - (if not)
-                            let label = if &team_names.len() > &item.i {
-                                &team_names[item.i]
+                            let label = if &app.pkmn_team.len() > &item.i {
+                                app.pkmn_team.clone()[item.i].get_name()
                             } else {
-                                "-"
+                                "-".to_string()
                             };
 
                             // each list item is a button with `label` as label
                             let button = widget::Button::new()
-                                .border(0.0)
+                                .border(1.0)
+                                .border_color(conrod::color::WHITE)
                                 .color(conrod::color::LIGHT_GREY)
-                                .label(label)
+                                .label(&label)
                                 .label_color(app.label_color);
                             item.set(button, ui);
                         }
 
                         // Remove pokemon from team when button is pressed
-                        //
-                        // TODO:
-                        //  Change functionality such that the selected pokemon is displayed
-                        //  in the middle of the screen (with stats, etc)
                         Event::Selection(selection) => {
                             println!("selected index (Team): {:?}", selection);
                             app.sel_pkmn = (Some(app.pkmn_team[selection].clone()),
                                             Some(selection));
+                            app.techs = Some(app.sel_pkmn
+                                .clone()
+                                .0.unwrap()
+                                .get_moves(app.movedex.clone())
+                                    .get_entries());
                         }
                         // Do nothing for every other event
                         _ => {}
                     }
                 }
 
-                // =========================================
-                // = Description/Moves of selected Pokemon =
-                // =========================================
+                // ===================================
+                // = Description of selected Pokemon =
+                // ===================================
                 let description = match app.sel_pkmn.0 {
                     None => "".to_string(),
                     Some(ref pkmn) => {
@@ -389,9 +382,10 @@ pub fn draw_window() {
                     }
                 };
 
-                // Hintergrund für Beschreibungstext
+                // Background for description
                 widget::Canvas::new()
                     .color(conrod::color::LIGHT_GREY)
+                    .border(0.0)
                     .w_h((WIDTH as f64 / 3.0), (HEIGHT as f64 / 3.0))
                     .top_right_with_margins_on(ids.canvas, 35.0, WIDTH as f64 / 5.0)
                     .set(ids.bg_description, ui);
@@ -406,18 +400,113 @@ pub fn draw_window() {
                     .line_spacing(2.5)
                     .set(ids.text_sel_pkmn, ui);
 
-                // Platzhalter für Sprite
+                // ==================================
+                // = Sprite of the selected Pokemon =
+                // ==================================
+
+                // Background for Sprite
                 widget::Canvas::new()
                     .color(conrod::color::LIGHT_GREY)
+                    .border(0.0)
                     .w_h((WIDTH as f64 / 4.0), (HEIGHT as f64 / 3.0))
                     .top_left_with_margins_on(ids.canvas, 35.0, WIDTH as f64 / 5.0)
                     .set(ids.bg_sprite, ui);
 
+                // ====================
+                // = Attack Selection =
+                // ====================
+
+                // Background for attack selection
                 widget::Canvas::new()
                     .color(conrod::color::LIGHT_GREY)
-                    .w_h((7.0 * WIDTH as f64 / 12.0) + 22.0, (HEIGHT as f64 / 2.0) - 40.0)
+                    .border(0.0)
+                    .w_h(770.0, 320.0)
                     .mid_bottom_with_margin_on(ids.canvas, 100.0)
                     .set(ids.bg_att_sel, ui);
+
+                // Only show stuff when there is a Pokemon selected
+                if let Some(_) = app.sel_pkmn.clone().0 {
+                    let techniques = app.techs.clone().unwrap();
+                    let num_items = techniques.len();
+                    let item_h = 64.0;
+
+                    // List with all possible attacks for the selected Pokemon
+                    let (mut events, scrollbar) =
+                        widget::ListSelect::single(num_items, item_h)
+                        .scrollbar_next_to()
+                        .w_h(200.0, 320.0)
+                        .middle_of(ids.canvas)
+                        .scrollbar_width(15.0)
+                        .set(ids.slist_att, ui);
+
+                    // Instantiate the scrollbar for the list.
+                    if let Some(s) = scrollbar { s.set(ui); }
+
+                    // Handle the `ListSelect`s events.
+                    while let Some(event) = events.next(ui, |i| {
+                        ::std::collections::HashSet::<usize>::new().contains(&i)}) {
+                        use conrod::widget::list_select::Event;
+
+                        match event {
+                            // For the `Item` events we instantiate the `List`'s items.
+                            Event::Item(item) => {
+                                let label = &techniques[item.i].get_name();
+
+                                // each button with the respective attack name as label
+                                let button = widget::Button::new()
+                                    .border(1.0)
+                                    .border_color(conrod::color::LIGHT_GREY)
+                                    .color(conrod::color::WHITE)
+                                    .label(label)
+                                    .label_color(app.label_color);
+                                item.set(button, ui);
+                            }
+
+                            // Add attack to list when pressed
+                            Event::Selection(selection) => {
+                                println!("selected index (Attack): {:?}", selection);
+                            }
+                            _ => {}
+                        }
+                    }
+
+                    // Add buttons for attacks
+                    let _ = widget::Button::new()
+                    .border(1.0)
+                    .color(app.bg_color)
+                    .label("-")
+                    .label_color(app.label_color)
+                    .right_from(ids.slist_att, 5.0)
+                    .w_h(160.0, 160.0)
+                    .set(ids.button_att1, ui);
+
+                    let _ = widget::Button::new()
+                    .border(1.0)
+                    .color(app.bg_color)
+                    .label("-")
+                    .label_color(app.label_color)
+                    .right_from(ids.button_att1, 0.0)
+                    .w_h(160.0, 160.0)
+                    .set(ids.button_att2, ui);
+
+                    let _ = widget::Button::new()
+                    .border(1.0)
+                    .color(app.bg_color)
+                    .label("-")
+                    .label_color(app.label_color)
+                    .down_from(ids.button_att1, 0.0)
+                    .w_h(160.0, 160.0)
+                    .set(ids.button_att3, ui);
+
+                    let _ = widget::Button::new()
+                    .border(1.0)
+                    .color(app.bg_color)
+                    .label("-")
+                    .label_color(app.label_color)
+                    .right_from(ids.button_att3, 0.0)
+                    .w_h(160.0, 160.0)
+                    .set(ids.button_att4, ui);
+                }
 
                 // Button to add selected Pokemon to team
                 if widget::Button::new()
@@ -425,7 +514,7 @@ pub fn draw_window() {
                     .color(app.bg_color)
                     .label("Select")
                     .label_color(app.label_color)
-                    .mid_bottom_with_margin_on(ids.canvas, 50.0)
+                    .left_from(ids.button_fight, 75.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_select, ui)
                     .was_clicked()
@@ -436,6 +525,7 @@ pub fn draw_window() {
                         Some(pkmn) => {
                             app.pkmn_team.push(pkmn.clone());
                             app.sel_pkmn = (None, None);
+                            app.techs = None;
                         }
                         None => println!("Error: No Pokemon selected"),
                     };
@@ -447,7 +537,7 @@ pub fn draw_window() {
                     .color(app.bg_color)
                     .label("Remove")
                     .label_color(app.label_color)
-                    .down_from(ids.button_select, 0.0)
+                    .right_from(ids.button_back, 75.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_remove, ui)
                     .was_clicked()
@@ -456,6 +546,7 @@ pub fn draw_window() {
                     if let Some(i) = app.sel_pkmn.1 {
                         app.pkmn_team.remove(i);
                         app.sel_pkmn = (None, None);
+                        app.techs = None;
                     } else {
                         println!("Error: No Pokemon at this position")
                     }
@@ -467,7 +558,7 @@ pub fn draw_window() {
                     .color(app.bg_color)
                     .label("Back")
                     .label_color(app.label_color)
-                    .bottom_left_with_margins_on(ids.canvas, 35.0, 250.0)
+                    .bottom_left_with_margins_on(ids.canvas, 35.0, 255.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_back, ui)
                     .was_clicked()
@@ -482,7 +573,7 @@ pub fn draw_window() {
                     .color(app.bg_color)
                     .label("Fight")
                     .label_color(app.label_color)
-                    .bottom_right_with_margins_on(ids.canvas, 35.0, 250.0)
+                    .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_fight, ui)
                     .was_clicked()
@@ -528,13 +619,15 @@ widget_ids! {
         button_fight,
         button_select,
         button_remove,
+        button_att1,
+        button_att2,
+        button_att3,
+        button_att4,
 
         // === selection_list ===
         slist_pkmn,
         slist_team,
-
-        // === drop down list ===
-        ddlist_att1,
+        slist_att,
 
         // === text ===
         text_sel_pkmn,
