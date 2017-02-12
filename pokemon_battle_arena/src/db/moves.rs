@@ -51,7 +51,7 @@ impl Technique {
     ///Matches over the category of a move and calls a specific method in resolve.rs for this
     ///category. All calculation is done inside the method, therefore no return is needed.
     pub fn resolve(&self, mut user: pokemon_token::PokemonToken,
-        mut targets: Vec<pokemon_token::PokemonToken>, attacker: Player, defender: Player, field: Arena) {
+        mut targets: Vec<pokemon_token::PokemonToken>, attacker: Player, mut defender: Player, field: Arena) {
         //if no target is provided push user as target, so that the loop afterwards works, also
         //attacks that have no target usually affect the field or the user.
         if targets.is_empty() {
@@ -59,18 +59,18 @@ impl Technique {
         }
 
         //for loop that calls the resolve methods for every choosen target.
-        for target in targets.clone() {
+        for i in 0..(targets.len() - 1) {
             //first call the hits method to sort out missing moves.
-            if self.hits(&target, &user) {
+            if self.hits(&targets[i], &user) {
                 //match over the category provides smaller samples that must be dealt with.
                 match self.get_category() {
 
                     enums::MoveCategory::Damage => {
-                        resolve::deal_damage(self.clone(), user.clone(), target);
+                        resolve::deal_damage(&self, &mut user, &mut targets[i]);
                     },
 
                     enums::MoveCategory::Ailment => {
-                        resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(), 100, target);
+                        resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(), 100, &mut targets[i]);
                     },
 
                     enums::MoveCategory::NetGoodStats => {},
@@ -103,14 +103,14 @@ impl Technique {
                                         }
                                     }
                                 };
-                                resolve::heal(target, value);
+                                resolve::heal(&mut targets[i], value);
                             } else if self.get_name() == String::from("heal-pulse") {
-                                resolve::heal(target, 50);
+                                resolve::heal(&mut targets[i], 50);
                                 //the use of swallow is bound to a former use of stockpile
                             } else if self.get_name() == String::from("swallow") {
                                 //TODO: find a way to get a percentage according to the use of
                                 //stockpile in the rounds before
-                                resolve::heal(target, 25);
+                                resolve::heal(&mut targets[i], 25);
                             //besides healing roost changes the type of pokemon with type
                             //flying.
                             } else if self.get_name() == String::from("roost") {
@@ -126,9 +126,9 @@ impl Technique {
                                     user.set_type(0, enums::Types::Normal);
                                     user.add_end_flag(enums::EndOfTurn::RoostTypeOne)
                                 }
-                                resolve::heal(target, 50);
+                                resolve::heal(&mut targets[i], 50);
                             } else {
-                                resolve::heal(user.clone(), 50);
+                                resolve::heal(&mut user, 50);
                             }
 
 
@@ -138,9 +138,9 @@ impl Technique {
                     },
 
                     enums::MoveCategory::DamageAndAilment => {
-                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                        resolve::deal_damage(&self, &mut user, &mut targets[i]);
                         resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(),
-                            self.get_effect_chance(), target);
+                            self.get_effect_chance(), &mut targets[i]);
                     },
 
                     //apart from the Math done
@@ -150,20 +150,20 @@ impl Technique {
                     //not be raised anymore.
                     enums::MoveCategory::Swagger => {
                         if resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                            target.clone()) {
+                            &mut targets[i]) {
                             resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(),
-                             100, target);
+                             100, &mut targets[i]);
                         }
                     },
 
                     enums::MoveCategory::DamageAndLower => {
-                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                        resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), target);
+                        resolve::deal_damage(&self, &mut user, &mut targets[i]);
+                        resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), &mut targets[i]);
                     },
 
                     enums::MoveCategory::DamageAndRaise => {
-                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                        resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), target);
+                        resolve::deal_damage(&self, &mut user, &mut targets[i]);
+                        resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), &mut targets[i]);
                     },
 
                     //done apart from math for damage
@@ -172,17 +172,17 @@ impl Technique {
                     enums::MoveCategory::DamageAndHeal => {
                         //dream eater can only be used if the target is asleep
                         if self.get_name() == String::from("dream-eater")
-                        && !target.is_asleep() {
+                        && !targets[i].is_asleep() {
                             println!("Dream Eater failed");
                         } else {
-                            let mut value = resolve::deal_damage(self.clone(), user.clone(),
-                                target.clone());
+                            let mut value = resolve::deal_damage(&self, &mut user,
+                                &mut targets[i]);
                             match self.get_drain_percentage() {
                                 50 => value = value / 2,
                                 75 => value = (value / 4) * 3,
                                 _ => unreachable!(),
                             }
-                            resolve::heal(user.clone(), value);
+                            resolve::heal(&mut user, value);
                         }
                     },
 
@@ -193,14 +193,14 @@ impl Technique {
                     enums::MoveCategory::Ohko => {
                         if ((self.get_name() == String::from("guillotine") ||
                             self.get_name() == String::from("sheer-cold")) &&
-                        user.get_level() >= target.get_level()) ||
+                        user.get_level() >= targets[i].get_level()) ||
                         ((self.get_name() == String::from("horn-drill") ||
                         self.get_name() == String::from("fissure")) &&
                         user.get_current().get_stat(enums::Stats::Speed)
-                        >= target.get_current().get_stat(enums::Stats::Speed))  {
-                            resolve::ko_attack(target);
+                        >= targets[i].get_current().get_stat(enums::Stats::Speed))  {
+                            resolve::ko_attack(&mut targets[i]);
                         } else {
-                            println!("{} was not affected by {}", target.get_name(),
+                            println!("{} was not affected by {}", targets[i].get_name(),
                                 self.get_name());
                         }
                     },
@@ -210,17 +210,17 @@ impl Technique {
                     enums::MoveCategory::FieldEffect => {},
 
                     enums::MoveCategory::ForceSwitch => {
-                        if target.get_level() <= user.get_level() {
-                            resolve::switch_pokemon(defender.clone());
+                        if targets[i].get_level() <= user.get_level() {
+                            resolve::switch_pokemon(&mut defender);
                         } else {
-                            println!("It has no effect on {}", target.get_name());
+                            println!("It has no effect on {}", targets[i].get_name());
                         }
                     },
 
                     enums::MoveCategory::Unique => {},
                 };
             } else {
-                println!("{} missed {}", user.get_name(), target.get_name());
+                println!("{} missed {}", user.get_name(), targets[i].get_name());
             }
         }
     }

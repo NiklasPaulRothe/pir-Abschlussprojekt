@@ -9,7 +9,7 @@ use self::regex::Regex;
 use player::Player;
 
 ///Resolves moves that simply deals damage to the opponent.
-pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) -> u16 {
+pub fn deal_damage(attack: &Technique, user: &mut PokemonToken, target: &mut PokemonToken) -> u16 {
     //TODO: Methode die matcht zwischen Attacken die direkt verrechnet werden können und denen,
     //die variable Power haben. Hier muss eine Möglichkeit gefunden werden die Power möglichst
     //effizient für alle Attacken zu berechnen.
@@ -33,7 +33,7 @@ pub fn deal_damage(attack: Technique, user: PokemonToken, target: PokemonToken) 
 
 //resolves ailment effects
 pub fn ailment(name: String, move_type: enums::Types, ailment: enums::Ailment, effect_chance: u8,
-    mut target: PokemonToken) {
+    target: &mut PokemonToken) {
     let mut rng = thread_rng();
     let random = rng.gen_range(0, 101);
     //only works if the effect chance of the move is met.
@@ -162,13 +162,13 @@ pub fn ailment(name: String, move_type: enums::Types, ailment: enums::Ailment, e
 //TODO: Methode implementieren, die errechnet wie viel ein Stage für das entsprechende Pokemon ist
 //und den Stat entsprechend verringert/erhöht, wenn Stage 6/-6 noch nicht erreicht ist. Gibt einen
 //bool zurück der anzeigt, ob der Stat verändert wurde oder nicht.
-pub fn change_stats(stages: i8, stat: enums::Stats, target: PokemonToken) -> bool {
+pub fn change_stats(stages: i8, stat: enums::Stats, target: &mut PokemonToken) -> bool {
     true
 }
 
 //heals the targets HP by the provided value, or, if this would raise the HP above the base stat,
 //to their base HP.
-pub fn heal(target: PokemonToken, value: u16) {
+pub fn heal(target: &mut PokemonToken, value: u16) {
     if value + target.get_current().get_stat(enums::Stats::Hp) >= target.get_base().
     get_stat(enums::Stats::Hp) {
         target.get_current().set_stats(enums::Stats::Hp, target.get_base().
@@ -180,7 +180,7 @@ pub fn heal(target: PokemonToken, value: u16) {
 }
 
 //switches the Pokemon of the target Player
-pub fn switch_pokemon (mut target: Player){
+pub fn switch_pokemon (target: &mut Player){
     let alive = target.get_alive_count();
     if alive > 1 {
         let mut rng = thread_rng();
@@ -198,6 +198,6 @@ pub fn switch_pokemon (mut target: Player){
 }
 
 //simply sets the HP of the target to 0 (Thats what K.O. means I suppose.)
-pub fn ko_attack (target: PokemonToken) {
+pub fn ko_attack (target: &mut PokemonToken) {
     target.get_current().set_stats(enums::Stats::Hp, 0);
 }
