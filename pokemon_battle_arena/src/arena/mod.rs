@@ -4,17 +4,17 @@ pub mod to_ui;
 use db::enums;
 use player::Player;
 
-pub struct Arena {
+pub struct Arena<'a> {
     effect: enums::Types,
     weather: enums::Weather,
-    player_1: Player,
-    player_2: Player,
+    player_1: &'a mut Player,
+    player_2: &'a mut Player,
 }
 
-impl Arena {
+impl<'a> Arena<'a> {
     /// Creates a new arena with a list of players for both teams, the default effect and the
     /// default weather
-    pub fn new(i_player_1: Player, i_player_2: Player, i_effect: enums::Types,
+    pub fn new(i_player_1: &'a mut Player, i_player_2: &'a mut Player, i_effect: enums::Types,
         i_weather: enums::Weather) -> Self {
         Arena {
             effect: i_effect,
@@ -39,13 +39,13 @@ impl Arena {
     }
     /// Returns a player one
     #[allow(dead_code)]
-    pub fn get_player_one(&self) -> Player {
-        self.player_1.clone()
+    pub fn get_player_one(&mut self) -> &mut Player {
+        self.player_1
     }
     /// Returns a player two
     #[allow(dead_code)]
-    pub fn get_player_two(&self) -> Player {
-        self.player_2.clone()
+    pub fn get_player_two(&mut self) -> &mut Player {
+        self.player_2
     }
 
     //

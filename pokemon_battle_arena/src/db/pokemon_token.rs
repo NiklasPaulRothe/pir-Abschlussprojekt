@@ -97,8 +97,8 @@ impl PokemonToken {
     pub fn get_dv(&self) -> determinant_values::Dv {
         self.clone().dv
     }
-    pub fn get_current(&self) -> stats::Stats {
-        self.current_stats.clone()
+    pub fn get_current(&mut self) -> &mut stats::Stats {
+        &mut self.current_stats
     }
     pub fn get_base(&self) -> stats::Stats {
         self.base_stats.clone()

@@ -28,6 +28,10 @@ pub fn deal_damage(attack: &Technique, user: &mut PokemonToken, target: &mut Pok
             get_stat(enums::Stats::Defense) as f32 * attack.get_power().unwrap() as f32 + 2.0)
             * modifier) as u16;
     }
+    let current = target.get_current().get_stat(enums::Stats::Hp);
+    target.get_current().set_stats(enums::Stats::Hp, current - damage);
+    println!("Damage: {}", damage);
+    println!("HP in resolve: {}", target.get_current().get_stat(enums::Stats::Hp));
     damage
 }
 
@@ -60,7 +64,8 @@ pub fn ailment(name: String, move_type: enums::Types, ailment: enums::Ailment, e
                         if !(target.get_types().0 == enums::Types::Electric) &&
                         !(target.get_types().1 == enums::Types::Electric) {
                             target.set_non_volatile(enums::NonVolatile::Paralysis);
-                            target.get_current().set_stats(enums::Stats::Speed, target.get_base().
+                            let base = target.get_base().clone();
+                            target.get_current().set_stats(enums::Stats::Speed, base.
                                 get_stat(enums::Stats::Speed) / 2)
                         } else {
                             println!("{} was not affected by {}", target.get_name(), name);
@@ -171,10 +176,12 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: &mut PokemonToken) -
 pub fn heal(target: &mut PokemonToken, value: u16) {
     if value + target.get_current().get_stat(enums::Stats::Hp) >= target.get_base().
     get_stat(enums::Stats::Hp) {
-        target.get_current().set_stats(enums::Stats::Hp, target.get_base().
+        let base = target.get_base().clone();
+        target.get_current().set_stats(enums::Stats::Hp, base.
             get_stat(enums::Stats::Hp));
     } else {
-        target.get_current().set_stats(enums::Stats::Hp, (target.get_current().
+        let current = target.get_current().clone();
+        target.get_current().set_stats(enums::Stats::Hp, (current.
             get_stat(enums::Stats::Hp) + value));
     }
 }

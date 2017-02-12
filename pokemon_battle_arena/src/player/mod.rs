@@ -10,13 +10,13 @@ use db::{enums, moves};
 
 /// The Player Trait must be implemented by every sort of human players or ai´s
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum PlayerType {
     Human,
     SimpleAi,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Player {
     player: PlayerType,
     pokemon_list: Vec<PokemonToken>,
@@ -50,8 +50,8 @@ impl Player {
     // Getter Methods
     //
     /// Returns the list of pokemon choosen by the player
-    pub fn get_pokemon_list(&self) -> &Vec<PokemonToken> {
-        &self.pokemon_list
+    pub fn get_pokemon_list(&mut self) -> &mut Vec<PokemonToken> {
+        &mut self.pokemon_list
     }
     /// Returns the currently fighting pokemon
     pub fn get_current(&self) -> usize {
@@ -62,18 +62,19 @@ impl Player {
         self.pokemon_count
     }
     /// Returns the amount of pokemon with atleast one hp
-    pub fn get_alive_count(&self) -> usize {
-        self.pokemon_list.iter().filter(|x| x.get_current().get_stat(enums::Stats::Hp) != 0)
-            .count()
+    pub fn get_alive_count(&mut self) -> usize {
+        // self.pokemon_list.iter().filter(|x| x.get_current().get_stat(enums::Stats::Hp) != 0)
+        //     .count()
+        3
     }
     /// Returns a Vec with the id´s from the pokemon which are alive
     pub fn get_alive_list(&self) -> Vec<usize> {
         let mut vec = Vec::new();
-        for i in 0..self.pokemon_list.len() {
-            if self.pokemon_list[i].get_current().get_stat(enums::Stats::Hp) != 0 {
-                vec.push(i);
-            }
-        }
+        // for i in 0..self.pokemon_list.len() {
+        //     if self.get_pokemon_list()[i].get_current().get_stat(enums::Stats::Hp) != 0 {
+        //         vec.push(i);
+        //     }
+        // }
         vec
     }
     /// Gets a attack saved in an attackslot
