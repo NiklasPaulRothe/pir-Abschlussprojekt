@@ -231,6 +231,8 @@ impl Technique {
 
     pub fn hits(&self, user: pokemon_token::PokemonToken, target: pokemon_token::PokemonToken)
         -> bool {
+            //TODO: As soon as flags for semi invulnerability are added, they have to be taken into
+            //account for hit calculation.
         let mut probability = 100;
         if self.accuracy.is_some() {
             probability = self.accuracy.unwrap() * (user.get_current().get_stat(enums::Stats::Accuracy) /
