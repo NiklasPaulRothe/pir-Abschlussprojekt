@@ -36,7 +36,6 @@ struct App {
     sel_pkmn: (Option<db::pokemon_token::PokemonToken>, Option<usize>),
     movedex: db::movedex::Movedex,
     techs: Option<Vec<db::moves::Technique>>,
-    tech_names: Vec<String>,
     pkmn_moves: Vec<db::moves::Technique>,
 }
 
@@ -51,7 +50,6 @@ impl App {
             sel_pkmn: (None, None),
             movedex: db::movedex::Movedex::new(),
             techs: None,
-            tech_names: Vec::new(),
             pkmn_moves: Vec::new(),
         }
     }
@@ -297,6 +295,7 @@ pub fn draw_window() {
                                 .0.unwrap()
                                 .get_moves(app.movedex.clone())
                                     .get_entries());
+                            app.pkmn_moves = Vec::new();
                         }
                         _ => {}
                     }
@@ -324,7 +323,7 @@ pub fn draw_window() {
                             let label = if &app.pkmn_team.len() > &item.i {
                                 app.pkmn_team.clone()[item.i].get_name()
                             } else {
-                                "-".to_string()
+                                "".to_string()
                             };
 
                             // each list item is a button with `label` as label
@@ -337,7 +336,6 @@ pub fn draw_window() {
                             item.set(button, ui);
                         }
 
-                        // Remove pokemon from team when button is pressed
                         Event::Selection(selection) => {
                             println!("selected index (Team): {:?}", selection);
                             app.sel_pkmn = (Some(app.pkmn_team[selection].clone()),
@@ -347,6 +345,7 @@ pub fn draw_window() {
                                 .0.unwrap()
                                 .get_moves(app.movedex.clone())
                                     .get_entries());
+                            app.pkmn_moves = Vec::new();
                         }
                         // Do nothing for every other event
                         _ => {}
@@ -435,7 +434,9 @@ pub fn draw_window() {
                         widget::ListSelect::single(num_items, item_h)
                         .scrollbar_next_to()
                         .w_h(200.0, 320.0)
-                        .middle_of(ids.canvas)
+                        .mid_left_with_margin_on(ids.bg_att_sel, 0.0)
+                        // .x_y(-285.0, 100.0)
+                        // .middle_of(ids.bg_att_sel)
                         .scrollbar_width(15.0)
                         .set(ids.slist_att, ui);
 
@@ -465,47 +466,94 @@ pub fn draw_window() {
                             // Add attack to list when pressed
                             Event::Selection(selection) => {
                                 println!("selected index (Attack): {:?}", selection);
+
+                                if app.pkmn_moves.len() < 4 {
+                                    app.pkmn_moves.push(techniques[selection].clone())
+                                } else {
+                                    println!("Error: Pokemon can only have 4 moves");
+                                }
+
+                                println!("{:?}", db::moves::Technique::get_name_vec(app.pkmn_moves.clone()));
                             }
                             _ => {}
                         }
                     }
 
                     // Add buttons for attacks
-                    let _ = widget::Button::new()
-                    .border(1.0)
-                    .color(app.bg_color)
-                    .label("-")
-                    .label_color(app.label_color)
-                    .right_from(ids.slist_att, 5.0)
-                    .w_h(160.0, 160.0)
-                    .set(ids.button_att1, ui);
 
-                    let _ = widget::Button::new()
-                    .border(1.0)
-                    .color(app.bg_color)
-                    .label("-")
-                    .label_color(app.label_color)
-                    .right_from(ids.button_att1, 0.0)
-                    .w_h(160.0, 160.0)
-                    .set(ids.button_att2, ui);
+                    let label1 = if app.pkmn_moves.len() > 0 {
+                        app.pkmn_moves[0].get_name()
+                    } else { "".to_string() };
+                    let label2 = if app.pkmn_moves.len() > 1 {
+                        app.pkmn_moves[1].get_name()
+                    } else { "".to_string() };
+                    let label3 = if app.pkmn_moves.len() > 2 {
+                        app.pkmn_moves[2].get_name()
+                    } else { "".to_string() };
+                    let label4 = if app.pkmn_moves.len() > 3 {
+                        app.pkmn_moves[3].get_name()
+                    } else { "".to_string() };
 
-                    let _ = widget::Button::new()
-                    .border(1.0)
-                    .color(app.bg_color)
-                    .label("-")
-                    .label_color(app.label_color)
-                    .down_from(ids.button_att1, 0.0)
-                    .w_h(160.0, 160.0)
-                    .set(ids.button_att3, ui);
+                    if widget::Button::new()
+                        .border(4.0)
+                        .border_color(conrod::color::LIGHT_GREY)
+                        .color(app.bg_color)
+                        .label(&label1)
+                        .label_color(app.label_color)
+                        .left_from(ids.button_att2, 0.0)
+                        .w_h(285.0, 160.0)
+                        .set(ids.button_att1, ui)
+                        .was_clicked()
+                    {
+                        println!("Att Button 1");
+                        app.pkmn_moves.remove(0);
+                    }
 
-                    let _ = widget::Button::new()
-                    .border(1.0)
-                    .color(app.bg_color)
-                    .label("-")
-                    .label_color(app.label_color)
-                    .right_from(ids.button_att3, 0.0)
-                    .w_h(160.0, 160.0)
-                    .set(ids.button_att4, ui);
+
+                    if widget::Button::new()
+                        .border(4.0)
+                        .border_color(conrod::color::LIGHT_GREY)
+                        .color(app.bg_color)
+                        .label(&label2)
+                        .label_color(app.label_color)
+                        .top_right_with_margin_on(ids.bg_att_sel, 0.0)
+                        .w_h(285.0, 160.0)
+                        .set(ids.button_att2, ui)
+                        .was_clicked()
+                    {
+                        println!("Att Button 2");
+                        app.pkmn_moves.remove(1);
+                    }
+
+                    if widget::Button::new()
+                        .border(4.0)
+                        .border_color(conrod::color::LIGHT_GREY)
+                        .color(app.bg_color)
+                        .label(&label3)
+                        .label_color(app.label_color)
+                        .down_from(ids.button_att1, 0.0)
+                        .w_h(285.0, 160.0)
+                        .set(ids.button_att3, ui)
+                        .was_clicked()
+                    {
+                        println!("Att Button 3");
+                        app.pkmn_moves.remove(2);
+                    }
+
+                    if widget::Button::new()
+                        .border(4.0)
+                        .border_color(conrod::color::LIGHT_GREY)
+                        .color(app.bg_color)
+                        .label(&label4)
+                        .label_color(app.label_color)
+                        .right_from(ids.button_att3, 0.0)
+                        .w_h(285.0, 160.0)
+                        .set(ids.button_att4, ui)
+                        .was_clicked()
+                    {
+                        println!("Att Button 4");
+                        app.pkmn_moves.remove(3);
+                    }
                 }
 
                 // Button to add selected Pokemon to team
@@ -525,7 +573,6 @@ pub fn draw_window() {
                         Some(pkmn) => {
                             app.pkmn_team.push(pkmn.clone());
                             app.sel_pkmn = (None, None);
-                            app.techs = None;
                         }
                         None => println!("Error: No Pokemon selected"),
                     };
@@ -546,7 +593,6 @@ pub fn draw_window() {
                     if let Some(i) = app.sel_pkmn.1 {
                         app.pkmn_team.remove(i);
                         app.sel_pkmn = (None, None);
-                        app.techs = None;
                     } else {
                         println!("Error: No Pokemon at this position")
                     }
@@ -609,6 +655,14 @@ widget_ids! {
         bg_sprite,
         bg_att_sel,
 
+        // === selection_list ===
+        slist_pkmn,
+        slist_team,
+        slist_att,
+
+        // === text ===
+        text_sel_pkmn,
+
         // === buttons ===
         button_play,
         button_options,
@@ -623,13 +677,5 @@ widget_ids! {
         button_att2,
         button_att3,
         button_att4,
-
-        // === selection_list ===
-        slist_pkmn,
-        slist_team,
-        slist_att,
-
-        // === text ===
-        text_sel_pkmn,
     }
 }
