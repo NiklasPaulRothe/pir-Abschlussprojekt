@@ -10,7 +10,7 @@ use super::moves;
 
 use std::collections::HashMap;
 
-///Represents a single Token of a Pokemon with individual values for this token.
+/// Represents a single Token of a Pokemon with individual values for this token.
 #[derive(Debug, Clone)]
 pub struct PokemonToken {
     pokedex_id: usize,
@@ -37,7 +37,7 @@ pub struct PokemonToken {
 
 
 impl PokemonToken {
-    ///Provides a Pokemon Token from a given model.
+    /// Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
         let level = 50;
         let dv = determinant_values::Dv::get_dvs();
@@ -91,7 +91,7 @@ impl PokemonToken {
     pub fn get_nature(&self) -> natures::Nature {
         self.clone().nature
     }
-    pub fn get_non_volatile(&self) ->(enums::NonVolatile, u8) {
+    pub fn get_non_volatile(&self) -> (enums::NonVolatile, u8) {
         self.clone().non_volatile_status
     }
     pub fn get_dv(&self) -> determinant_values::Dv {

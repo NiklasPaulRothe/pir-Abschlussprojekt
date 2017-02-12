@@ -111,7 +111,7 @@ fn test_arena() {
     println!("HP2 vorher: {}", arena.get_player_two().get_pokemon_list()[0].get_current()
         .get_stat(db::enums::Stats::Hp));
 
-    attack.resolve(&mut arena);
+    attack.resolve(&mut arena, 2);
     println!("HP1 nachher: {}", arena.get_player_one().get_pokemon_list()[0].get_current()
         .get_stat(db::enums::Stats::Hp));
     println!("HP2 nachher: {}", arena.get_player_two().get_pokemon_list()[0].get_current()
