@@ -29,9 +29,9 @@ fn testing() {
     //         println!("{:?}", entry.get_name());
     //     }
     // }
-    test_players();
-    test_arena();
-    graphic::gui::draw_window();
+    // test_players();
+    // test_arena();
+    // graphic::gui::draw_window();
 }
 
 

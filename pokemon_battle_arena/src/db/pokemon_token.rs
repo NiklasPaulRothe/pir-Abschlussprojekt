@@ -40,7 +40,7 @@ impl PokemonToken {
     ///Provides a Pokemon Token from a given model.
     pub fn from_model(model: pokemon_model::PokemonModel) -> PokemonToken {
         let level = 50;
-        let dv = determinant_values::Dv::get_dvs(model.clone());
+        let dv = determinant_values::Dv::get_dvs();
         let nature = natures::Nature::get_random_nature();
         let stats = stats::Stats::calculate_stats(model.clone(), dv.clone(), nature.clone(), level);
 

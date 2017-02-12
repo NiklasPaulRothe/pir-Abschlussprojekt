@@ -1,7 +1,6 @@
 extern crate rand;
 
 use self::rand::{Rng, thread_rng};
-use super::pokemon_model;
 use super::enums::Stats;
 
 ///Struct for the Determinant values of a Pokemon. Can have values between 0 and 31 and are
@@ -19,7 +18,7 @@ pub struct Dv {
 impl Dv {
     ///Randomly provides 6 values between 0 and 31. For legendary Pokemon 3 random stats are set to
     ///31 automatically. Legendaries currently unimplemented.
-    pub fn get_dvs(poke: pokemon_model::PokemonModel) -> Dv {
+    pub fn get_dvs() -> Dv {
         let mut rng = thread_rng();
         let mut sample = Vec::new();
         let count = 0;

@@ -61,12 +61,12 @@ impl Technique {
         //for loop that calls the resolve methods for every choosen target.
         for target in targets.clone() {
             //first call the hits method to sort out missing moves.
-            if self.hits(target.clone(), user.clone()) {
+            if self.hits(&target, &user) {
                 //match over the category provides smaller samples that must be dealt with.
                 match self.get_category() {
 
                     enums::MoveCategory::Damage => {
-                        let _ = resolve::deal_damage(self.clone(), user.clone(), target);
+                        resolve::deal_damage(self.clone(), user.clone(), target);
                     },
 
                     enums::MoveCategory::Ailment => {
@@ -79,7 +79,7 @@ impl Technique {
                         //Heal moves will fail if the user has maximum HP
                         if !(user.get_current().get_stat(enums::Stats::Hp) ==
                             user.get_base().get_stat(enums::Stats::Hp)) {
-                            let mut value = 0;
+                            let value: u16;
                             //Deal with moves that heal different amounts of HP for different
                             //weather conditions.
                             if (self.get_name() == String::from("moonlight")) ||
@@ -157,15 +157,13 @@ impl Technique {
                     },
 
                     enums::MoveCategory::DamageAndLower => {
-                        let _ = resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                        let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                            target);
+                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                        resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), target);
                     },
 
                     enums::MoveCategory::DamageAndRaise => {
-                        let _ = resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                        let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                            target);
+                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
+                        resolve::change_stats(self.get_stat_change_rate(), self.get_stat(), target);
                     },
 
                     //done apart from math for damage
@@ -227,7 +225,7 @@ impl Technique {
         }
     }
 
-    pub fn hits(&self, user: pokemon_token::PokemonToken, target: pokemon_token::PokemonToken)
+    pub fn hits(&self, user: &pokemon_token::PokemonToken, target: &pokemon_token::PokemonToken)
         -> bool {
             //TODO: As soon as flags for semi invulnerability are added, they have to be taken into
             //account for hit calculation.
