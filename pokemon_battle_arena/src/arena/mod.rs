@@ -3,10 +3,9 @@ pub mod to_ui;
 
 use db::enums;
 use player::Player;
-use std::borrow::BorrowMut;
 
 pub struct Arena {
-    effect: enums::types,
+    effect: enums::Types,
     weather: enums::Weather,
     player_1: Player,
     player_2: Player,
@@ -15,7 +14,7 @@ pub struct Arena {
 impl Arena {
     /// Creates a new arena with a list of players for both teams, the default effect and the
     /// default weather
-    pub fn new(i_player_1: Player, i_player_2: Player, i_effect: enums::types,
+    pub fn new(i_player_1: Player, i_player_2: Player, i_effect: enums::Types,
         i_weather: enums::Weather) -> Self {
         Arena {
             effect: i_effect,
@@ -29,18 +28,22 @@ impl Arena {
     // Getter Methods
     //
     /// Gets the type of the arena
-    pub fn get_effect(&self) -> enums::types {
+    #[allow(dead_code)]
+    pub fn get_effect(&self) -> enums::Types {
         self.effect.clone()
     }
     /// Gets the actual weather of the arena
+    #[allow(dead_code)]
     pub fn get_weather(&self) -> enums::Weather {
         self.weather.clone()
     }
     /// Returns a player one
+    #[allow(dead_code)]
     pub fn get_player_one(&self) -> Player {
         self.player_1.clone()
     }
     /// Returns a player two
+    #[allow(dead_code)]
     pub fn get_player_two(&self) -> Player {
         self.player_2.clone()
     }
@@ -49,10 +52,12 @@ impl Arena {
     // Setter Methods
     //
     /// Sets the effect of the arena
-    pub fn set_effect(&mut self, new: enums::types) {
+    #[allow(dead_code)]
+    pub fn set_effect(&mut self, new: enums::Types) {
         self.effect = new;
     }
     /// Sets the weather in the arena
+    #[allow(dead_code)]
     pub fn set_weather(&mut self, new: enums::Weather) {
         self.weather = new;
     }

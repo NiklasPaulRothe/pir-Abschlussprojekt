@@ -1,7 +1,6 @@
 extern crate csv;
 extern crate rand;
 
-use super::pokemon_model;
 use super::enums;
 use self::rand::{Rng, thread_rng};
 use enum_primitive::FromPrimitive;

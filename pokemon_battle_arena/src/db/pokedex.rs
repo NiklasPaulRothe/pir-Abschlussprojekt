@@ -4,10 +4,8 @@ extern crate regex;
 
 use std::collections::HashMap;
 use self::regex::Regex;
-use enum_primitive::FromPrimitive;
 
 use super::pokemon_model::PokemonModel;
-use super::stats;
 use super::enums;
 
 ///Pokedex struct that is used to get an overview over the possible Pokemon. Besides the entries
@@ -35,7 +33,7 @@ impl Pokedex {
         None
     }
 
-    pub fn type_filter(&self, types: Vec<enums::types>) -> Pokedex {
+    pub fn type_filter(&self, types: Vec<enums::Types>) -> Pokedex {
         let mut new_dex = Pokedex {
             entries: Vec::new(),
             complete: false,
