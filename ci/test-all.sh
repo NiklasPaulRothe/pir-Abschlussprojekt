@@ -9,10 +9,10 @@ export RUSTFLAGS="--deny warnings"
 
 # Build the main crate which depends on all others
 echo ""
-echo "=== Building Plantex ==============="
+echo "=== Building PokemonBattleArena ==============="
 cargo build
 
-for crate in base client server plantex; do
+for crate in pokemon_battle_arena; do
     echo ""
     echo "=== Testing $crate... =============="
     cargo test -p $crate

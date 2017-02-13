@@ -9,7 +9,7 @@
 
 # config
 COLS=100
-FOLDER="base client plantex plantex-server server"
+FOLDER="pokemon_battle_arena"
 FILES='.+\.\(rs\|vert\|tesc\|tese\|geom\|frag\|comp\)'
 
 
