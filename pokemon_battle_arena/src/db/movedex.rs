@@ -6,10 +6,10 @@ use std::collections::HashMap;
 use enum_primitive::FromPrimitive;
 
 
-///Manages the list of moves that are available. Contains a bool that is true whenever all available
-///moves are inside the entries to make an easier search possible.
-///By now the whole movedex contains 617 moves, which are nearly all moves from the main game
-///series. 4 Moves are missing due to missing data in the used database.
+/// Manages the list of moves that are available. Contains a bool that is true whenever all available
+/// moves are inside the entries to make an easier search possible.
+/// By now the whole movedex contains 617 moves, which are nearly all moves from the main game
+/// series. 4 Moves are missing due to missing data in the used database.
 #[derive(Debug, Clone)]
 pub struct Movedex {
     entries: Vec<Technique>,

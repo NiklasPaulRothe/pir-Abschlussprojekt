@@ -500,22 +500,22 @@ pub fn draw_window() {
                     // Add buttons for attacks
 
                     let label1 = if app.pkmn_moves.len() > 0 {
-                        app.pkmn_moves[0].get_name()
+                        app.pkmn_moves[0].get_name().to_string()
                     } else {
                         "".to_string()
                     };
                     let label2 = if app.pkmn_moves.len() > 1 {
-                        app.pkmn_moves[1].get_name()
+                        app.pkmn_moves[1].get_name().to_string()
                     } else {
                         "".to_string()
                     };
                     let label3 = if app.pkmn_moves.len() > 2 {
-                        app.pkmn_moves[2].get_name()
+                        app.pkmn_moves[2].get_name().to_string()
                     } else {
                         "".to_string()
                     };
                     let label4 = if app.pkmn_moves.len() > 3 {
-                        app.pkmn_moves[3].get_name()
+                        app.pkmn_moves[3].get_name().to_string()
                     } else {
                         "".to_string()
                     };
