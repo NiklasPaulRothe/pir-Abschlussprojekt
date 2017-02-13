@@ -282,14 +282,16 @@ pub fn draw_window() {
                             println!("selected index (PokeDex): {:?}", selection);
 
                             app.sel_pkmn =
-                                (Some(db::pokemon_token::PokemonToken::from_model(
-                                        app.pokedex.pokemon_by_id(selection + 1).unwrap()
-                                    )), None);
+                                (Some(db::pokemon_token::PokemonToken::from_model(app.pokedex
+                                     .pokemon_by_id(selection + 1)
+                                     .unwrap())),
+                                 None);
                             app.techs = Some(app.sel_pkmn
                                 .clone()
-                                .0.unwrap()
+                                .0
+                                .unwrap()
                                 .get_moves(app.movedex.clone())
-                                    .get_entries());
+                                .get_entries());
                             app.pkmn_moves = Vec::new();
                         }
                         _ => {}
@@ -338,9 +340,10 @@ pub fn draw_window() {
                                                 Some(selection));
                                 app.techs = Some(app.sel_pkmn
                                     .clone()
-                                    .0.unwrap()
+                                    .0
+                                    .unwrap()
                                     .get_moves(app.movedex.clone())
-                                        .get_entries());
+                                    .get_entries());
                                 app.pkmn_moves = Vec::new();
 
                                 if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_one() {
@@ -349,7 +352,11 @@ pub fn draw_window() {
                                 if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_two() {
                                     app.pkmn_moves.push(att);
                                 }
-                                if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_three(){
+                                if let Some(att) = app.sel_pkmn
+                                    .clone()
+                                    .0
+                                    .unwrap()
+                                    .get_move_three() {
                                     app.pkmn_moves.push(att);
                                 }
                                 if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_four() {
@@ -380,16 +387,15 @@ pub fn draw_window() {
                             }
                         };
 
-                        [
-                            "#",
-                            &pkmn.get_id().to_string(),
-                            " ",
-                            &pkmn.get_name(),
-                            "\n\nType: ",
-                            &types,
-                            "\n\n",
-                            &pkmn.get_description()
-                        ].concat()
+                        ["#",
+                         &pkmn.get_id().to_string(),
+                         " ",
+                         &pkmn.get_name(),
+                         "\n\nType: ",
+                         &types,
+                         "\n\n",
+                         &pkmn.get_description()]
+                            .concat()
                     }
                 };
 
@@ -442,8 +448,7 @@ pub fn draw_window() {
                     let item_h = 64.0;
 
                     // List with all possible attacks for the selected Pokemon
-                    let (mut events, scrollbar) =
-                        widget::ListSelect::single(num_items, item_h)
+                    let (mut events, scrollbar) = widget::ListSelect::single(num_items, item_h)
                         .scrollbar_next_to()
                         .w_h(200.0, 320.0)
                         .mid_left_with_margin_on(ids.bg_att_sel, 0.0)
@@ -453,11 +458,14 @@ pub fn draw_window() {
                         .set(ids.slist_att, ui);
 
                     // Instantiate the scrollbar for the list.
-                    if let Some(s) = scrollbar { s.set(ui); }
+                    if let Some(s) = scrollbar {
+                        s.set(ui);
+                    }
 
                     // Handle the `ListSelect`s events.
                     while let Some(event) = events.next(ui, |i| {
-                        ::std::collections::HashSet::<usize>::new().contains(&i)}) {
+                        ::std::collections::HashSet::<usize>::new().contains(&i)
+                    }) {
                         use conrod::widget::list_select::Event;
 
                         match event {
@@ -493,16 +501,24 @@ pub fn draw_window() {
 
                     let label1 = if app.pkmn_moves.len() > 0 {
                         app.pkmn_moves[0].get_name()
-                    } else { "".to_string() };
+                    } else {
+                        "".to_string()
+                    };
                     let label2 = if app.pkmn_moves.len() > 1 {
                         app.pkmn_moves[1].get_name()
-                    } else { "".to_string() };
+                    } else {
+                        "".to_string()
+                    };
                     let label3 = if app.pkmn_moves.len() > 2 {
                         app.pkmn_moves[2].get_name()
-                    } else { "".to_string() };
+                    } else {
+                        "".to_string()
+                    };
                     let label4 = if app.pkmn_moves.len() > 3 {
                         app.pkmn_moves[3].get_name()
-                    } else { "".to_string() };
+                    } else {
+                        "".to_string()
+                    };
 
                     if widget::Button::new()
                         .border(4.0)
@@ -513,8 +529,7 @@ pub fn draw_window() {
                         .left_from(ids.button_att2, 0.0)
                         .w_h(285.0, 160.0)
                         .set(ids.button_att1, ui)
-                        .was_clicked()
-                    {
+                        .was_clicked() {
                         println!("Att Button 1");
                         if app.pkmn_moves.len() > 0 {
                             app.pkmn_moves.remove(0);
@@ -531,8 +546,7 @@ pub fn draw_window() {
                         .top_right_with_margin_on(ids.bg_att_sel, 0.0)
                         .w_h(285.0, 160.0)
                         .set(ids.button_att2, ui)
-                        .was_clicked()
-                    {
+                        .was_clicked() {
                         println!("Att Button 2");
                         if app.pkmn_moves.len() > 1 {
                             app.pkmn_moves.remove(1);
@@ -548,8 +562,7 @@ pub fn draw_window() {
                         .down_from(ids.button_att1, 0.0)
                         .w_h(285.0, 160.0)
                         .set(ids.button_att3, ui)
-                        .was_clicked()
-                    {
+                        .was_clicked() {
                         println!("Att Button 3");
                         if app.pkmn_moves.len() > 2 {
                             app.pkmn_moves.remove(2);
@@ -565,8 +578,7 @@ pub fn draw_window() {
                         .right_from(ids.button_att3, 0.0)
                         .w_h(285.0, 160.0)
                         .set(ids.button_att4, ui)
-                        .was_clicked()
-                    {
+                        .was_clicked() {
                         println!("Att Button 4");
                         if app.pkmn_moves.len() > 3 {
                             app.pkmn_moves.remove(3);
@@ -652,19 +664,18 @@ pub fn draw_window() {
             }
         });
 
-        window.draw_2d(&event, |c, g| {
-            if let Some(primitives) = ui.draw_if_changed() {
-                fn texture_from_image<T>(img: &T) -> &T {
-                    img
-                };
-                piston::window::draw(c,
-                                     g,
-                                     primitives,
-                                     &mut text_texture_cache,
-                                     &image_map,
-                                     texture_from_image);
-            }
-        });
+        window.draw_2d(&event,
+                       |c, g| if let Some(primitives) = ui.draw_if_changed() {
+                           fn texture_from_image<T>(img: &T) -> &T {
+                               img
+                           };
+                           piston::window::draw(c,
+                                                g,
+                                                primitives,
+                                                &mut text_texture_cache,
+                                                &image_map,
+                                                texture_from_image);
+                       });
     }
 }
 
