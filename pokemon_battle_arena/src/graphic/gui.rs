@@ -338,14 +338,32 @@ pub fn draw_window() {
 
                         Event::Selection(selection) => {
                             println!("selected index (Team): {:?}", selection);
-                            app.sel_pkmn = (Some(app.pkmn_team[selection].clone()),
-                                            Some(selection));
-                            app.techs = Some(app.sel_pkmn
-                                .clone()
-                                .0.unwrap()
-                                .get_moves(app.movedex.clone())
-                                    .get_entries());
-                            app.pkmn_moves = Vec::new();
+                            if selection < app.pkmn_team.len() {
+                                app.sel_pkmn = (Some(app.pkmn_team[selection].clone()),
+                                                Some(selection));
+                                app.techs = Some(app.sel_pkmn
+                                    .clone()
+                                    .0.unwrap()
+                                    .get_moves(app.movedex.clone())
+                                        .get_entries());
+                                app.pkmn_moves = Vec::new();
+
+                                if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_one() {
+                                    app.pkmn_moves.push(att);
+                                }
+                                if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_two() {
+                                    app.pkmn_moves.push(att);
+                                }
+                                if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_three() {
+                                    app.pkmn_moves.push(att);
+                                }
+                                if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_four() {
+                                    app.pkmn_moves.push(att);
+                                }
+                            } else {
+                                println!("Error: No Pokemon here");
+                            }
+
                         }
                         // Do nothing for every other event
                         _ => {}
@@ -569,12 +587,19 @@ pub fn draw_window() {
                 {
                     println!("Select");
 
-                    match app.sel_pkmn.0.clone() {
-                        Some(pkmn) => {
+                    match app.sel_pkmn.clone() {
+                        (Some(mut pkmn), None) => {
+                            pkmn.set_moves(app.pkmn_moves.clone());
                             app.pkmn_team.push(pkmn.clone());
                             app.sel_pkmn = (None, None);
                         }
-                        None => println!("Error: No Pokemon selected"),
+                        (Some(mut pkmn), Some(index)) => {
+                            pkmn.set_moves(app.pkmn_moves.clone());
+                            app.pkmn_team.remove(index);
+                            app.pkmn_team.insert(index, pkmn.clone());
+                            app.sel_pkmn = (None, None);
+                        }
+                        _ => println!("Error: No Pokemon selected"),
                     };
                 }
 
