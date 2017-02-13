@@ -524,7 +524,9 @@ pub fn draw_window() {
                         .was_clicked()
                     {
                         println!("Att Button 1");
-                        app.pkmn_moves.remove(0);
+                        if app.pkmn_moves.len() > 0 {
+                            app.pkmn_moves.remove(0);    
+                        } 
                     }
 
 
@@ -540,7 +542,9 @@ pub fn draw_window() {
                         .was_clicked()
                     {
                         println!("Att Button 2");
-                        app.pkmn_moves.remove(1);
+                        if app.pkmn_moves.len() > 1 {
+                            app.pkmn_moves.remove(1);    
+                        }
                     }
 
                     if widget::Button::new()
@@ -555,7 +559,9 @@ pub fn draw_window() {
                         .was_clicked()
                     {
                         println!("Att Button 3");
-                        app.pkmn_moves.remove(2);
+                        if app.pkmn_moves.len() > 2 {
+                            app.pkmn_moves.remove(2);    
+                        }
                     }
 
                     if widget::Button::new()
@@ -570,7 +576,9 @@ pub fn draw_window() {
                         .was_clicked()
                     {
                         println!("Att Button 4");
-                        app.pkmn_moves.remove(3);
+                        if app.pkmn_moves.len() > 3 {
+                            app.pkmn_moves.remove(3);    
+                        }
                     }
                 }
 
