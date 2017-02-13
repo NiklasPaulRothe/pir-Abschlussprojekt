@@ -28,13 +28,13 @@ fn main() {
 fn testing() {
     // println!("Testing:");
     // for entry in db::movedex::Movedex::new().get_entries() {
-    //     if entry.get_category() == enums::MoveCategory::FieldEffect {
+    //     if entry.get_category() == enums::MoveCategory::Damage {
     //         println!("{:?}", entry.get_name());
     //     }
     // }
     // test_players();
-    // test_arena();
-    graphic::gui::draw_window();
+    test_arena();
+    // graphic::gui::draw_window();
 }
 
 
@@ -72,7 +72,7 @@ fn test_arena() {
     println!("Player Two: {:#?}", arena.get_player_two());
     // Attacke erstellen und "Kampf"
     let movedex = db::movedex::Movedex::new();
-    let attack = movedex.move_by_id(151).unwrap();
+    let attack = movedex.move_by_id(3).unwrap();
     println!("Attack: {}", attack.get_name());
 
     println!("HP1 vorher: {}",

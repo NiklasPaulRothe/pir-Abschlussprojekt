@@ -65,7 +65,17 @@ impl Technique {
 
                 enums::MoveCategory::Damage => {
                     let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                    let mut frequency = 1;
+                    if self.min_hits.is_some() {
+                        let mut rng = thread_rng();
+                        frequency = rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
+                    }
+                    for _ in 0..frequency {
+                        resolve::deal_damage(&self,
+                                             &mut user_clone,
+                                             &mut target,
+                                             &mut defender_clone);
+                    }
                 }
 
                 enums::MoveCategory::Ailment => {
@@ -324,10 +334,9 @@ impl Technique {
            target.get_resolve_flags().contains_key(&enums::Resolve::Protect) {
             return false;
         }
-        if !(self.get_name() == "mat-block" && player.get_switched()) {
+        if self.get_name() == "mat-block" && !player.get_switched() {
             return false;
         }
-
         if player.get_flags().contains_key(&enums::PlayerFlag::MatBlock) &&
            !self.get_flags().contains(&enums::MoveFlags::Protect) {
             return false;
