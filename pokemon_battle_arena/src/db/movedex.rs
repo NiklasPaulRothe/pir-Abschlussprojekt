@@ -5,8 +5,8 @@ use super::enums;
 use std::collections::HashMap;
 use enum_primitive::FromPrimitive;
 
-/// Manages the list of moves that are available. Contains a bool that is true whenever all available
-/// moves are inside the entries to make an easier search possible.
+/// Manages the list of moves that are available. Contains a bool that is true whenever all
+/// available moves are inside the entries to make an easier search possible.
 /// By now the whole movedex contains 617 moves, which are nearly all moves from the main game
 /// series. 4 Moves are missing due to missing data in the used database.
 #[derive(Debug)]
@@ -34,7 +34,8 @@ impl Movedex {
         None
     }
 
-    /// Returns a list of all learnable moves by level for a specific pokemon with a specific level.
+    /// Returns a list of all learnable moves by level for a specific pokemon with a specific
+    /// level.
     pub fn for_token(&self, level: u16, id: usize) -> Movedex {
         let mut new_dex = Vec::new();
         let mut move_db = csv::Reader::from_file("./src/db/tables/pokemon_moves.csv").unwrap();
@@ -69,8 +70,8 @@ impl Movedex {
         self.complete
     }
 
-    /// Creates a complete Movedex from the type_efficacy, moves_whole and move_flag_map databases in
-    /// the table folder.
+    /// Creates a complete Movedex from the type_efficacy, moves_whole and move_flag_map databases
+    /// in the table folder.
     pub fn new() -> Movedex {
         // In the first step creates a vec with the effectivities for every type.
         let mut effectivity = Vec::new();
