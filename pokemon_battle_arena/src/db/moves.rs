@@ -13,6 +13,7 @@ use self::regex::Regex;
 use std::collections::HashMap;
 use std::cmp::Ordering;
 use arena::Arena;
+use player::Player;
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.
@@ -265,9 +266,12 @@ impl Technique {
                 enums::MoveCategory::WholeFieldEffect => {}
 
                 enums::MoveCategory::FieldEffect => {
-                    // match self.get_name() {
-
-                    // }
+                    let target_side = Regex::new(r"opposing").unwrap();
+                    if target_side.is_match(&self.effect_long) {
+                        resolve::opponent_field(self, get_defender(flag, arena));
+                    } else {
+                        resolve::user_field();
+                    }
                 }
 
                 enums::MoveCategory::ForceSwitch => {
@@ -365,15 +369,15 @@ impl Technique {
         self.attack_id
     }
     /// Gets the name of the attack
-    pub fn get_name(&self) -> String {
-        self.name.clone()
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
     // Takes a Vec<Technique> and returns a Vec<String> with the names of the techniques
     pub fn get_name_vec(technique: Vec<Technique>) -> Vec<String> {
         let mut output = Vec::new();
 
         for entry in technique {
-            output.push(entry.get_name());
+            output.push(String::from(entry.get_name()));
         }
 
         output
@@ -650,5 +654,19 @@ fn get_user<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::Poke
             let current = arena.get_player_two().get_current();
             &mut arena.get_player_two().get_pokemon_list()[current]
         }
+    }
+}
+
+fn get_attacker<'a>(target: u8, arena: &'a mut Arena) -> &'a mut Player {
+    match target {
+        1 => arena.get_player_one(),
+        _ => arena.get_player_two(),
+    }
+}
+
+fn get_defender<'a>(target: u8, arena: &'a mut Arena) -> &'a mut Player {
+    match target {
+        1 => arena.get_player_two(),
+        _ => arena.get_player_one(),
     }
 }

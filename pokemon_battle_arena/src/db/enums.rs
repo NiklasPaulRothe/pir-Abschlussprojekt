@@ -173,7 +173,16 @@ pub enum Choose {
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub enum PlayerFlag {
-
+    // lowers speed of Pokemon that are switched in.
+    StickyWeb,
+    // deals Damage to Pokemon that are switched in.
+    StealthRock,
+    // poisons Pokemon that are switched in.
+    ToxicSpikes,
+    // prevents opponents from landing criticla hits.
+    LuckyChant,
+    // deals Damage to Pokemon that are switched in.
+    Spikes,
 }
 
 /// Enum for Genders

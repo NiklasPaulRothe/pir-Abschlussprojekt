@@ -45,7 +45,7 @@ pub fn deal_damage(attack: &Technique, user: &mut PokemonToken, target: &mut Pok
 }
 
 // Resolves ailment effects
-pub fn ailment(name: String,
+pub fn ailment(name: &str,
                move_type: enums::Types,
                ailment: enums::Ailment,
                effect_chance: u8,
@@ -130,7 +130,7 @@ pub fn ailment(name: String,
                        target.get_types().1 == enums::Types::Steel {
                         println!("{} could not be poisoned", target.get_name());
                     } else {
-                        if name == String::from("toxic") {
+                        if name == "toxic" {
                             target.set_non_volatile(enums::NonVolatile::BadPoison);
                         } else {
                             target.set_non_volatile(enums::NonVolatile::Poison);
@@ -421,3 +421,16 @@ pub fn switch_pokemon(target: &mut Player) {
 pub fn ko_attack(target: &mut PokemonToken) {
     target.get_current().set_stats(enums::Stats::Hp, 0);
 }
+
+pub fn opponent_field(attack: &Technique, player: &mut Player) {
+    match attack.get_name() {
+        "sticky-web" => player.add_flag(enums::PlayerFlag::StickyWeb),
+        "stealth-rock" => player.add_flag(enums::PlayerFlag::StealthRock),
+        "toxic-spikes" => player.add_flag(enums::PlayerFlag::ToxicSpikes),
+        "lucky-chant" => player.add_flag(enums::PlayerFlag::LuckyChant),
+        "spikes" => player.add_flag(enums::PlayerFlag::Spikes),
+        _ => {}
+    }
+}
+
+pub fn user_field() {}
