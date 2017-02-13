@@ -2,12 +2,14 @@ extern crate csv;
 extern crate num;
 extern crate rustc_serialize;
 extern crate rand;
+extern crate regex;
 
 use super::pokemon_token;
 use super::enums;
 use super::resolve;
 use self::num::FromPrimitive;
 use self::rand::{Rng, thread_rng};
+use self::regex::Regex;
 use std::collections::HashMap;
 use std::cmp::Ordering;
 use arena::Arena;
@@ -80,7 +82,44 @@ impl Technique {
                                      &mut target);
                 }
 
-                enums::MoveCategory::NetGoodStats => {}
+                enums::MoveCategory::NetGoodStats => {
+                    let mut target = get_user(flag, arena);
+                    if Regex::new(r"attack").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Attack,
+                                              &mut target);
+                    }
+                    if Regex::new(r"defense").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Defense,
+                                              &mut target);
+                    }
+                    if Regex::new(r"special-attack").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::SpecialAttack,
+                                              &mut target);
+                    }
+                    if Regex::new(r"special-defense").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::SpecialDefense,
+                                              &mut target);
+                    }
+                    if Regex::new(r"speed").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Speed,
+                                              &mut target);
+                    }
+                    if Regex::new(r"accuracy").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Accuracy,
+                                              &mut target);
+                    }
+                    if Regex::new(r"evasion").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Evasion,
+                                              &mut target);
+                    }
+                }
 
                 enums::MoveCategory::Heal => {
                     let weather = arena.get_weather().clone();

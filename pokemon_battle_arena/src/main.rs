@@ -106,7 +106,7 @@ fn test_arena() {
     println!("Player Two: {:#?}", arena.get_player_two());
     // Attacke erstellen und "Kampf"
     let movedex = db::movedex::Movedex::new();
-    let attack = movedex.move_by_id(195).unwrap();
+    let attack = movedex.move_by_id(151).unwrap();
     println!("Attack: {}", attack.get_name());
 
     println!("HP1 vorher: {}",
@@ -127,7 +127,7 @@ fn test_arena() {
              arena.get_player_two().get_pokemon_list()[0]
                  .get_current()
                  .get_stat(&db::enums::Stats::Hp));
-    println!("Player Two: {:#?}", arena.get_player_two());
+    println!("Player One: {:#?}", arena.get_player_one());
 
     // use std::cell::RefCell;
     // use std::rc::Rc;

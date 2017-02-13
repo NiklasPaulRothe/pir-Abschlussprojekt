@@ -235,7 +235,8 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: &mut PokemonToken) -
             }
         }
     };
-    if !stage <= -6 || !stage >= 6 {
+    println!("{:?}", stage);
+    if !(stage <= -6 && stage >= 6) {
         let mut new_stage = stage + stages;
         if new_stage > 6 {
             new_stage = 6;
