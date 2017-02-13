@@ -66,9 +66,9 @@ pub fn ailment(name: String,
             println!("{} was not affected by {}", target.get_name(), name);
         } else {
             // Categorize the moves by the ailment they cause. Ailments usually automatically fail
-            // if the target already was hit by a move that caused the same ailment and still suffer
-            // from it's effect. Non volatile Ailments even fail if the target is under the effect
-            // of one of these kind.
+            // if the target already was hit by a move that caused the same ailment and still
+            // suffer from it's effect. Non volatile Ailments even fail if the target is under the
+            // effect of one of these kind.
             match ailment {
 
                 enums::Ailment::Paralysis => {
@@ -202,8 +202,8 @@ pub fn ailment(name: String,
                     }
                 }
 
-                // Unimplemented for now. Would prevent the Player from using Items on a Pokemon, but
-                // as far as there are no items it has no effect.
+                // Unimplemented for now. Would prevent the Player from using Items on a Pokemon,
+                // but as far as there are no items it has no effect.
                 enums::Ailment::Embargo => {}
 
                 enums::Ailment::Torment => {
