@@ -30,6 +30,8 @@ pub struct PokemonToken {
     dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
+    resolve_flags: HashMap<enums::Resolve, u8>,
+    fight_flags: HashMap<enums::Fighting, u8>,
     end_of_turn_flags: HashMap<enums::EndOfTurn, u8>,
     description: String,
     mega_evolution: Option<pokemon_model::PokemonModel>,
@@ -62,6 +64,8 @@ impl PokemonToken {
             dv: dv,
             base_stats: stats.clone(),
             current_stats: stats,
+            resolve_flags: HashMap::new(),
+            fight_flags: HashMap::new(),
             end_of_turn_flags: HashMap::new(),
             description: model.get_description(),
             mega_evolution: model.get_mega(),
@@ -103,6 +107,15 @@ impl PokemonToken {
     pub fn get_base(&self) -> stats::Stats {
         self.base_stats.clone()
     }
+
+    pub fn get_resolve_flags(&self) -> &HashMap<enums::Resolve, u8> {
+        &self.resolve_flags
+    }
+
+    pub fn get_fight_flags(&self) -> &HashMap<enums::Fighting, u8> {
+        &self.fight_flags
+    }
+
     pub fn get_end_of_turn_flags(&self) -> HashMap<enums::EndOfTurn, u8> {
         self.clone().end_of_turn_flags
     }
@@ -154,9 +167,19 @@ impl PokemonToken {
     pub fn set_non_volatile(&mut self, status: enums::NonVolatile) {
         self.non_volatile_status = (status, 0);
     }
+
+    pub fn add_resolve_flag(&mut self, flag: enums::Resolve) {
+        self.resolve_flags.insert(flag, 0);
+    }
+
+    pub fn add_fight_flag(&mut self, flag: enums::Fighting) {
+        self.fight_flags.insert(flag, 0);
+    }
+
     pub fn add_end_flag(&mut self, flag: enums::EndOfTurn) {
         self.end_of_turn_flags.insert(flag, 0);
     }
+
     pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {
         self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
         if moves.len() >= 1 {
@@ -169,6 +192,7 @@ impl PokemonToken {
             self.move_four = Some((moves[3].clone(), moves[3].get_power_points().unwrap()));
         }
     }
+
     pub fn set_type(&mut self, position: u8, change: enums::Types) {
         match position {
             0 => self.type_one = change,
@@ -176,6 +200,7 @@ impl PokemonToken {
             _ => unreachable!(),
         }
     }
+
     pub fn decrement_ap(&mut self) {
         unimplemented!();
     }

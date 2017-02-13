@@ -139,6 +139,17 @@ pub enum EndOfTurn {
     Trap,
 }
 
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+pub enum Fighting {
+    Confusion,
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+pub enum Resolve {
+    NoTypeImmunity,
+    HealBlock,
+}
+
 /// Print method for non volatile status changes.
 pub fn print_non_volatile(status: NonVolatile) -> String {
     match status {
@@ -195,7 +206,7 @@ pub enum Weather {
 /// enum for the Damage Class of a attack.
 /// Can be assigned from a i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone)]
+    #[derive(Debug, RustcDecodable, Clone, PartialEq)]
     pub enum DamageClass {
         Physical = 1,
         Special = 2,
@@ -292,5 +303,19 @@ pub fn get_gender(gender_rate: i8) -> Gender {
         }
         8 => Gender::Female,
         _ => Gender::Genderless,
+    }
+}
+
+pub fn stat_to_string(stat: Stats) -> &'static str {
+    match stat {
+        Stats::Hp => "hp",
+        Stats::Attack => "attack",
+        Stats::Defense => "defense",
+        Stats::SpecialAttack => "special attack",
+        Stats::SpecialDefense => "special defense",
+        Stats::Speed => "speed",
+        Stats::Accuracy => "accuracy",
+        Stats::Evasion => "evasion",
+        _ => "",
     }
 }

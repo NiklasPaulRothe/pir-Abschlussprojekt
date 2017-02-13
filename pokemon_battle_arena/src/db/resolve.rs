@@ -19,12 +19,21 @@ pub fn deal_damage(attack: &Technique, user: &mut PokemonToken, target: &mut Pok
     if attack.get_type() == user.get_types().0 || attack.get_type() == user.get_types().1 {
         stab = 1.5;
     }
+    let attack_stat: enums::Stats;
+    let defense_stat: enums::Stats;
+    if attack.get_damage_class() == enums::DamageClass::Physical {
+        attack_stat = enums::Stats::Attack;
+        defense_stat = enums::Stats::Defense;
+    } else {
+        attack_stat = enums::Stats::SpecialAttack;
+        defense_stat = enums::Stats::SpecialDefense;
+    }
     let mut damage = 0;
     if attack.get_power().is_some() {
         let modifier = stab * attack.get_effectiveness(target.clone()) * random;
         damage = ((((2.0 * user.get_level() as f32 + 10.0) / 250.0) *
-                   user.get_current().get_stat(&enums::Stats::Attack) as f32 /
-                   target.get_current().get_stat(&enums::Stats::Defense) as f32 *
+                   user.get_current().get_stat(&attack_stat) as f32 /
+                   target.get_current().get_stat(&defense_stat) as f32 *
                    attack.get_power().unwrap() as f32 + 2.0) * modifier) as u16;
     }
     let current = target.get_current().get_stat(&enums::Stats::Hp);
@@ -162,6 +171,24 @@ pub fn ailment(name: String,
                 enums::Ailment::Trap => {
                     if !target.get_end_of_turn_flags().contains_key(&enums::EndOfTurn::Trap) {
                         target.add_end_flag(enums::EndOfTurn::Trap);
+                    }
+                }
+
+                enums::Ailment::Confusion => {
+                    if !target.get_fight_flags().contains_key(&enums::Fighting::Confusion) {
+                        target.add_fight_flag(enums::Fighting::Confusion);
+                    }
+                }
+
+                enums::Ailment::NoTypeImmunity => {
+                    if !target.get_resolve_flags().contains_key(&enums::Resolve::NoTypeImmunity) {
+                        target.add_resolve_flag(enums::Resolve::NoTypeImmunity)
+                    }
+                }
+
+                enums::Ailment::HealBlock => {
+                    if !target.get_resolve_flags().contains_key(&enums::Resolve::HealBlock) {
+                        target.add_resolve_flag(enums::Resolve::HealBlock)
                     }
                 }
 
@@ -308,6 +335,12 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: &mut PokemonToken) -
         };
         target.get_current().set_stats(stat, new_stat as u16);
         return true;
+    } else {
+        if stage < -6 {
+            println!("{}s {} cannot be lowered anymore",
+                     target.get_name(),
+                     enums::stat_to_string(stat));
+        }
     }
     return false;
 }

@@ -15,6 +15,7 @@ mod player;
 use player::Player;
 use player::PlayerType;
 use arena::Arena;
+use db::enums;
 
 fn main() {
     println!("");
@@ -26,13 +27,13 @@ fn main() {
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
     println!("Testing:");
-    // for entry in db::movedex::Movedex::new().get_entries() {
-    //     if entry.get_category() == enums::Move_Category::Swagger {
-    //         println!("{:?}", entry.get_name());
-    //     }
-    // }
+    for entry in db::movedex::Movedex::new().get_entries() {
+        if entry.get_category() == enums::MoveCategory::FieldEffect {
+            println!("{:?}", entry.get_name());
+        }
+    }
     // test_players();
-    test_arena();
+    // test_arena();
     // graphic::gui::draw_window();
 }
 
