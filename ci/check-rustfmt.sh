@@ -6,7 +6,7 @@ set -o errexit -o nounset
 echo ""
 echo "=== Checking Rust style with rustfmt... =============="
 
-FOLDER="base client plantex plantex-server server"
+FOLDER="pokemon_battle_arena"
 FILES='.+\.rs'
 
 ERROR=0
