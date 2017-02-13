@@ -12,7 +12,7 @@ use player::Player;
 use arena::Arena;
 
 use super::movedex;
-use unique;
+use super::unique;
 use super::pokedex::Pokedex;
 
 ///Struct that is a representation of a move a pokemon can learn. Contains everything that is
@@ -68,15 +68,7 @@ impl Technique {
                 //match over the category provides smaller samples that must be dealt with.
                 match self.get_category() {
 
-<<<<<<< HEAD
-                    enums::Move_Category::Unique => {
-                        unique::unique(self.get_name(), self.get_type(), self.get_ailment(), target);
-                    },
-
-                    enums::Move_Category::Damage => {
-=======
                     enums::MoveCategory::Damage => {
->>>>>>> 6b9eebc96c0457951c0642d9af2b3ddb647d5cfd
                         let _ = resolve::deal_damage(self.clone(), user.clone(), target);
                     },
 
@@ -229,11 +221,9 @@ impl Technique {
                             println!("It has no effect on {}", target.get_name());
                         }
                     },
-<<<<<<< HEAD
-=======
-
-                    enums::MoveCategory::Unique => {},
->>>>>>> 6b9eebc96c0457951c0642d9af2b3ddb647d5cfd
+                    enums::MoveCategory::Unique => {
+                        unique::unique(self.clone(), self.get_name(), self.get_type(), user, target, attacker, defender, field);
+                    },
                 };
             } else {
                 println!("{} missed {}", user.get_name(), target.get_name());
@@ -519,5 +509,9 @@ impl Technique {
 
     pub fn set_flags(&mut self, flag: Vec<enums::MoveFlags>) {
         self.move_flags = Some(flag);
+    }
+
+    pub fn set_power(&self, factor: u16) -> Option<u16> {
+        self.power = self.power+factor as u16;
     }
 }

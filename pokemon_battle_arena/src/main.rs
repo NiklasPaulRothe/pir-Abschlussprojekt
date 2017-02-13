@@ -9,18 +9,21 @@ mod arena;
 mod db;
 mod graphic;
 mod player;
-mod unique;
 
 use player::Player;
 use player::PlayerType;
 use arena::Arena;
+use db::unique;
 
 fn main() {
     println!("");
     println!("Hello and Welcome to the Pokemon Battle Arena");
     println!("");
-    testing();
-    unique::test();
+    //testing();
+    //unique::test();
+    //unique::test_match("teleport");
+    unique::test2();
+
 }
 
 

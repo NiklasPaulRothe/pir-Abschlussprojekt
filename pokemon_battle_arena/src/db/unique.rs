@@ -2,11 +2,12 @@ use time::get_time;
 use player::Player;
 use player::PlayerType;
 use arena::Arena;
-use db;
-use db::enums;
-use db::moves;
-use db::pokemon_token::PokemonToken;
-use db::movedex::Movedex;
+use super::enums;
+use super::moves;
+use super::pokemon_token::PokemonToken;
+use super::movedex::Movedex;
+use player::Player;
+use arena::Arena;
 
 // extern crate rand;
 // extern crate regex;
@@ -18,16 +19,432 @@ use db::movedex::Movedex;
 // use self::regex::Regex;
 // use player::Player;
 
+#[derive(Debug)]
+enum MoveName {
+    disable,
+    teleport
+}
+
 pub fn test(){
     println!("Unique");
     for entry in Movedex::new().get_entries() {
-         if entry.get_category() == enums::Move_Category::Unique {
+         if entry.get_category() == enums::MoveCategory::Unique {
              println!("{:?}: {:?} - {:?}", entry.get_id(), entry.get_name(), entry.get_type());
          }
     }
-
 }
 
-pub fn unique(name: String, move_type: enums::types, ailment: enums::Ailment, mut target: PokemonToken) {
-    target.get_moves(Movedex);
+pub fn test2(){
+    println!("Unique");
+    for entry in Movedex::new().get_entries() {
+         if entry.get_category() == enums::MoveCategory::Unique {
+             println!("{:?}", entry.get_name());
+         }
+    }
+}
+
+pub fn test_match(move_name: &str){
+    let dex = Movedex::new();
+    match move_name {
+        "disable" => {
+            println!("disable" );
+        },
+        "teleport" => {
+            println!("teleport");
+        },
+        "mimic" => {
+        },
+        "focus-energy" => {
+        },
+        "metronome" => {
+        },
+        "mirror-move" => {
+        },
+        "transform" => {
+        },
+        "splash" => {
+        },
+        "rest" => {
+        },
+        "conversion" => {
+        },
+        "substitute" => {
+        },
+        "sketch" => {
+        },
+        "spider-web" => {
+        },
+        "mind-reader" => {
+        },
+        "curse" => {
+        },
+        "conversion-2" => {
+        },
+        "spite" => {
+        },
+        "protect" => {
+        },
+        "belly-drum" => {
+        },
+        "destiny-bond" => {
+        },
+        "detect" => {
+        },
+        "lock-on" => {
+        },
+        "endure" => {
+        },
+        "mean-look" => {
+        },
+        "sleep-talk" => {
+        },
+        "heal-bell" => {
+        },
+        "pain-split" => {
+        },
+        "baton-pass" => {
+        },
+        "encore" => {
+        },
+        "psych-up" => {
+        },
+        "future-sight" => {
+        },
+        "stockpile" => {
+        },
+        "memento" => {
+        },
+        "follow-me" => {
+        },
+        "nature-power" => {
+        },
+        "taunt" => {
+        },
+        "helping-hand" => {
+        },
+        "trick" => {
+        },
+        "role-play" => {
+        },
+        "wish" => {
+        },
+        "assist" => {
+        },
+        "magic-coat" => {
+        },
+        "recycle" => {
+        },
+        "skill-swap" => {
+        },
+        "imprison" => {
+        },
+        "refresh" => {
+        },
+        "grudge" => {
+        },
+        "snatch" => {
+        },
+        "camouflage" => {
+        },
+        "aromatherapy" => {
+        },
+        "block" => {
+        },
+        "doom-desire" => {
+        },
+        "healing-wish" => {
+        },
+        "acupressure" => {
+        },
+        "psycho-shift" => {
+        },
+        "power-trick" => {
+        },
+        "gastro-acid" => {
+        },
+        "copycat" => {
+        },
+        "power-swap" => {
+        },
+        "guard-swap" => {
+        },
+        "worry-seed" => {
+        },
+        "heart-swap" => {
+        },
+        "aqua-ring" => {
+        },
+        "magnet-rise" => {
+        },
+        "switcheroo" => {
+        },
+        "defog" => {
+        },
+        "lunar-dance" => {
+        },
+        "guard-split" => {
+        },
+        "power-split" => {
+        },
+        "rage-powder" => {
+        },
+        "soak" => {
+        },
+        "simple-beam" => {
+        },
+        "entrainment" => {
+        },
+        "after-you" => {
+        },
+        "ally-switch" => {
+        },
+        "shell-smash" => {
+        },
+        "quash" => {
+        },
+        "reflect-type" => {
+        },
+        "bestow" => {
+        },
+        "trick-or-treat" => {
+        },
+        "forests-curse" => {
+        },
+        "topsy-turvy" => {
+        },
+        "flower-shield" => {
+        },
+        "electrify" => {
+        },
+        "kings-shield" => {
+        },
+        "spiky-shield" => {
+        },
+        "powder" => {
+        },
+        "happy-hour" => {
+        },
+        "celebrate" => {
+        },
+        "hold-hands" => {
+        },
+        _ => {},
+    };
+}
+
+pub fn unique(attack: Technique, name: String, move_type: enums::Types, mut user: PokemonToken, mut target: PokemonToken, attacker: Player, defender: Player, field: Arena) {
+    let dex = Movedex::new();
+    // target.get_moves(dex.move_by_id());
+    // match dex.get_entries() {
+    match name {
+        "disable" => {
+            println!("disable" );
+        },
+        "teleport" => {
+            println!("teleport");
+        },
+        "mimic" => {
+
+        },
+        "focus-energy" => {
+        },
+        "metronome" => {
+            attack.set_power(attack.get_power().unwrap()*(10/100));
+        },
+        "mirror-move" => {
+            if
+        },
+        "transform" => {
+        },
+        "splash" => {
+        },
+        "rest" => {
+        },
+        "conversion" => {
+        },
+        "substitute" => {
+        },
+        "sketch" => {
+        },
+        "spider-web" => {
+        },
+        "mind-reader" => {
+        },
+        "curse" => {
+        },
+        "conversion-2" => {
+        },
+        "spite" => {
+        },
+        "protect" => {
+        },
+        "belly-drum" => {
+        },
+        "destiny-bond" => {
+        },
+        "detect" => {
+        },
+        "lock-on" => {
+        },
+        "endure" => {
+        },
+        "mean-look" => {
+        },
+        "sleep-talk" => {
+        },
+        "heal-bell" => {
+        },
+        "pain-split" => {
+        },
+        "baton-pass" => {
+        },
+        "encore" => {
+        },
+        "psych-up" => {
+        },
+        "future-sight" => {
+        },
+        "stockpile" => {
+        },
+        "memento" => {
+        },
+        "follow-me" => {
+        },
+        "nature-power" => {
+            match field.get_effect() {
+                enums::Types::Grass => {
+
+                },
+                enums::Types::Rock => {
+
+                },
+                enums::Types::Grass => {
+
+                },
+                enums::Types::Grass => {
+
+                },
+                enums::Types::Grass => {
+
+                },
+                enums::Types::Grass => {
+
+                },
+                enums::Types::Grass => {
+
+                },
+            }
+        },
+        "taunt" => {
+        },
+        "helping-hand" => {
+        },
+        "trick" => {
+        },
+        "role-play" => {
+        },
+        "wish" => {
+        },
+        "assist" => {
+        },
+        "magic-coat" => {
+        },
+        "recycle" => {
+        },
+        "skill-swap" => {
+        },
+        "imprison" => {
+        },
+        "refresh" => {
+        },
+        "grudge" => {
+        },
+        "snatch" => {
+        },
+        "camouflage" => {
+        },
+        "aromatherapy" => {
+        },
+        "block" => {
+        },
+        "doom-desire" => {
+        },
+        "healing-wish" => {
+        },
+        "acupressure" => {
+        },
+        "psycho-shift" => {
+        },
+        "power-trick" => {
+        },
+        "gastro-acid" => {
+        },
+        "copycat" => {
+        },
+        "power-swap" => {
+        },
+        "guard-swap" => {
+        },
+        "worry-seed" => {
+        },
+        "heart-swap" => {
+        },
+        "aqua-ring" => {
+        },
+        "magnet-rise" => {
+        },
+        "switcheroo" => {
+        },
+        "defog" => {
+        },
+        "lunar-dance" => {
+        },
+        "guard-split" => {
+        },
+        "power-split" => {
+        },
+        "rage-powder" => {
+        },
+        "soak" => {
+        },
+        "simple-beam" => {
+        },
+        "entrainment" => {
+        },
+        "after-you" => {
+        },
+        "ally-switch" => {
+        },
+        "shell-smash" => {
+        },
+        "quash" => {
+        },
+        "reflect-type" => {
+        },
+        "bestow" => {
+        },
+        "trick-or-treat" => {
+        },
+        "forests-curse" => {
+        },
+        "topsy-turvy" => {
+        },
+        "flower-shield" => {
+        },
+        "electrify" => {
+        },
+        "kings-shield" => {
+        },
+        "spiky-shield" => {
+        },
+        "powder" => {
+        },
+        "happy-hour" => {
+        },
+        "celebrate" => {
+        },
+        "hold-hands" => {
+        },
+        _ => {},
+    };
 }
