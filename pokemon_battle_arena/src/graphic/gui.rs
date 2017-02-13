@@ -659,8 +659,51 @@ pub fn draw_window() {
                     .was_clicked() {
                     // temporaryly goes back to title screen
                     println!("Fight");
-                    app.screen = Screen::Title;
+                    app.screen = Screen::Battle;
                 }
+            }
+
+            // Draws Fight Screen
+            if let Screen::Battle = app.screen {
+                // Text BG
+                widget::Canvas::new()
+                    .color(conrod::color::LIGHT_GREY)
+                    .border(4.0)
+                    .w_h(WIDTH as f64, 240.0)
+                    .mid_bottom_with_margin_on(ids.canvas, 0.0)
+                    .set(ids.bg_text, ui);
+
+                // BG Pokemon1
+                widget::Canvas::new()
+                    .color(conrod::color::LIGHT_BLUE)
+                    .border(0.0)
+                    .w_h(300.0, 350.0)
+                    .bottom_left_with_margins_on(ids.canvas, 250.0, 10.0)
+                    .set(ids.bg_sprite, ui);
+
+                // BG Pokemon2
+                widget::Canvas::new()
+                    .color(conrod::color::LIGHT_RED)
+                    .border(0.0)
+                    .w_h(300.0, 350.0)
+                    .bottom_right_with_margins_on(ids.canvas, 250.0, 10.0)
+                    .set(ids.bg_sprite2, ui);
+
+                // BG What to do next
+                widget::Canvas::new()
+                    .color(conrod::color::GREY)
+                    .border(4.0)
+                    .w_h(350.0, 240.0)
+                    .mid_right_of(ids.bg_text)
+                    .set(ids.bg_whatdo, ui);
+
+                // BG Attack Selection
+                widget::Canvas::new()
+                    .color(conrod::color::WHITE)
+                    .border(4.0)
+                    .w_h(WIDTH as f64 - 350.0, 240.0)
+                    .left_from(ids.bg_whatdo, 0.0)
+                    .set(ids.bg_att_sel, ui);
             }
         });
 
@@ -685,7 +728,11 @@ widget_ids! {
         canvas,
         bg_description,
         bg_sprite,
+        bg_sprite2,
         bg_att_sel,
+        bg_text,
+        bg_whatdo,
+
 
         // === selection_list ===
         slist_pkmn,
