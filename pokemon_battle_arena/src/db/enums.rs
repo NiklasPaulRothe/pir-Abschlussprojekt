@@ -149,21 +149,30 @@ pub enum EndOfTurn {
     // Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
     // changed out. Lasts at least 2 and at most 5 turns.
     Trap,
+    // Restores 1/16 of the Users HP at the end of every Turn.
+    Ingrain,
 }
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub enum Fighting {
     Confusion,
+    Infatuation,
 }
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub enum Resolve {
     NoTypeImmunity,
     HealBlock,
+    Telekinesis,
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+pub enum Choose {
+    Torment,
 }
 
 /// Enum for Genders
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Gender {
     Male,
     Female,

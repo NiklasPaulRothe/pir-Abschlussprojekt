@@ -71,6 +71,7 @@ impl Technique {
                                      self.get_type(),
                                      self.get_ailment(),
                                      100,
+                                     user_clone,
                                      &mut target);
                 }
 
@@ -181,6 +182,7 @@ impl Technique {
                                      self.get_type(),
                                      self.get_ailment(),
                                      self.get_effect_chance(),
+                                     user_clone,
                                      &mut target);
                 }
 
@@ -197,6 +199,7 @@ impl Technique {
                                          self.get_type(),
                                          self.get_ailment(),
                                          100,
+                                         user_clone,
                                          &mut target);
                     }
                 }
@@ -288,6 +291,10 @@ impl Technique {
                 -> bool {
         // TODO: As soon as flags for semi invulnerability are added, they have to be taken into
         // account for hit calculation.
+        if target.get_resolve_flags().contains_key(&enums::Resolve::Telekinesis) &&
+           self.get_category() == enums::MoveCategory::Ohko {
+            return true;
+        }
         let probability: u16;
         if self.accuracy.is_some() {
             let mut modifier = user.get_current().get_stat(&enums::Stats::Accuracy) /
@@ -311,7 +318,7 @@ impl Technique {
     //
     /// Takes the attacked Pokemon as an input besides the move and calculate from their types
     /// how effective the move is. Returns an appropriate enum for further calculations.
-    pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> f32 {
+    pub fn get_effectiveness(&self, mut enemy: pokemon_token::PokemonToken) -> f32 {
         let mut eff_count = 0;
         if self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().0) {
             if !((enemy.get_types().0 == enums::Types::Ghost &&
