@@ -51,6 +51,18 @@ impl Player {
         }
     }
 
+    pub fn new_by_pokemon(pokemon: Vec<db::pokemon_token::PokemonToken>,
+                          player_type: PlayerType) -> Self {
+        Player {
+            player: player_type,
+            pokemon_list: pokemon,
+            pokemon_count = pokemon.len(),
+            current: 0,
+            next_move: None,
+            flags: HashMap::new(),
+            last_move: None,
+        }
+    }
     // Getter methods
     //
     /// Returns the list of pokemon choosen by the player
