@@ -4,6 +4,14 @@ cache: cargo
 sudo: false
 git:
   depth: 1
+before_install:
+  - chmod +x ci/check-basic-style.sh
+  - chmod +x ci/check-rustfmt.sh
+  - chmod +x ci/install-tools.sh
+  - chmod +x ci/run-all.sh
+  - chmod +x ci/test-all.sh
+  - chmod +x ci/upload-docs.sh
+
 before_script:
   - |
       export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH &&

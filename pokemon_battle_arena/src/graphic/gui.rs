@@ -132,8 +132,7 @@ pub fn draw_window() {
                     .middle_of(ids.canvas)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_play, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Play");
                     app.screen = Screen::Play;
                 }
@@ -147,8 +146,7 @@ pub fn draw_window() {
                     .down_from(ids.button_play, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_options, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     app.screen = Screen::Options;
                     println!("Options");
                 }
@@ -163,8 +161,7 @@ pub fn draw_window() {
                     .down_from(ids.button_options, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_exit, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     ::std::process::exit(0);
                 }
             }
@@ -183,8 +180,7 @@ pub fn draw_window() {
                     .middle_of(ids.canvas)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_sp, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     app.screen = Screen::ChooseTeam;
                     println!("Singleplayer");
                 }
@@ -199,8 +195,7 @@ pub fn draw_window() {
                     .down_from(ids.button_sp, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_mp, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Multiplayer");
                 }
 
@@ -214,8 +209,7 @@ pub fn draw_window() {
                     .down_from(ids.button_mp, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_back, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Back");
                     app.screen = Screen::Title;
                 }
@@ -231,8 +225,7 @@ pub fn draw_window() {
                     .down_from(ids.button_mp, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_back, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Back");
                     app.screen = Screen::Title;
                 }
@@ -259,7 +252,9 @@ pub fn draw_window() {
                     .set(ids.slist_pkmn, ui);
 
                 // Instantiate the scrollbar for the list.
-                if let Some(s) = scrollbar { s.set(ui); }
+                if let Some(s) = scrollbar {
+                    s.set(ui);
+                }
 
                 // Handle the `ListSelect`s events.
                 while let Some(event) = events.next(ui, |i| {
@@ -363,7 +358,6 @@ pub fn draw_window() {
                             } else {
                                 println!("Error: No Pokemon here");
                             }
-
                         }
                         // Do nothing for every other event
                         _ => {}
@@ -385,7 +379,7 @@ pub fn draw_window() {
                                     .to_string()
                             }
                         };
-
+                      
                         [
                             "#",
                             &pkmn.get_id().to_string(),
@@ -589,8 +583,7 @@ pub fn draw_window() {
                     .left_from(ids.button_fight, 75.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_select, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Select");
 
                     match app.sel_pkmn.clone() {
@@ -618,8 +611,7 @@ pub fn draw_window() {
                     .right_from(ids.button_back, 75.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_remove, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Remove");
                     if let Some(i) = app.sel_pkmn.1 {
                         app.pkmn_team.remove(i);
@@ -638,8 +630,7 @@ pub fn draw_window() {
                     .bottom_left_with_margins_on(ids.canvas, 35.0, 255.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_back, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Back");
                     app.screen = Screen::Play;
                 }
@@ -653,8 +644,7 @@ pub fn draw_window() {
                     .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_fight, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     // temporaryly goes back to title screen
                     println!("Fight");
                     app.screen = Screen::Title;
