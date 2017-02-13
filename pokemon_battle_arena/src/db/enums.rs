@@ -3,7 +3,7 @@ extern crate rand;
 
 use self::rand::{Rng, thread_rng};
 
-/// enum for the pokemon/attack types.
+/// Enum for the pokemon/attack types.
 /// Can be assigned from i32 value.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash)]
@@ -117,6 +117,18 @@ pub enum NonVolatile {
     BadPoison,
 }
 
+/// Print method for non volatile status changes.
+pub fn print_non_volatile(status: NonVolatile) -> String {
+    match status {
+        NonVolatile::Undefined => String::from(""),
+        NonVolatile::Paralysis => String::from("paralysed"),
+        NonVolatile::Sleep => String::from("asleep"),
+        NonVolatile::Freeze => String::from("freezed"),
+        NonVolatile::Burn => String::from("burned"),
+        _ => String::from("poisoned"),
+    }
+}
+
 /// Flags that have a influence at the end of each turn.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EndOfTurn {
@@ -150,18 +162,6 @@ pub enum Resolve {
     HealBlock,
 }
 
-/// Print method for non volatile status changes.
-pub fn print_non_volatile(status: NonVolatile) -> String {
-    match status {
-        NonVolatile::Undefined => String::from(""),
-        NonVolatile::Paralysis => String::from("paralysed"),
-        NonVolatile::Sleep => String::from("asleep"),
-        NonVolatile::Freeze => String::from("freezed"),
-        NonVolatile::Burn => String::from("burned"),
-        _ => String::from("poisoned"),
-    }
-}
-
 /// Enum for Genders
 #[derive(Debug, Clone)]
 pub enum Gender {
@@ -170,6 +170,47 @@ pub enum Gender {
     Genderless,
 }
 
+/// More or less randomly provides a gender for a pokemon given the distribution for the species.
+pub fn get_gender(gender_rate: i8) -> Gender {
+    let mut rng = thread_rng();
+    let probability = rng.gen_range(0.0, 100.1);
+    match gender_rate {
+        -1 => Gender::Genderless,
+        0 => Gender::Male,
+        1 => {
+            if probability < 87.5 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        2 => {
+            if probability < 75.0 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        4 => {
+            if probability < 50.0 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        6 => {
+            if probability < 25.0 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        7 => {
+            if probability < 12.5 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        8 => Gender::Female,
+        _ => Gender::Genderless,
+    }
+}
 
 /// Makes it easier to acces the Stats directly
 enum_from_primitive! {
@@ -203,7 +244,7 @@ pub enum Weather {
     AirCurrent,
 }
 
-/// enum for the Damage Class of a attack.
+/// Enum for the Damage Class of a attack.
 /// Can be assigned from a i32 value.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone, PartialEq)]
@@ -261,48 +302,6 @@ enum_from_primitive! {
         Balistic = 18,
         Mental = 19,
         NonSkyBattle = 20,
-    }
-}
-
-/// More or less randomly provides a gender for a pokemon given the distribution for the species.
-pub fn get_gender(gender_rate: i8) -> Gender {
-    let mut rng = thread_rng();
-    let probability = rng.gen_range(0.0, 100.1);
-    match gender_rate {
-        -1 => Gender::Genderless,
-        0 => Gender::Male,
-        1 => {
-            if probability < 87.5 {
-                return Gender::Male;
-            }
-            Gender::Female
-        }
-        2 => {
-            if probability < 75.0 {
-                return Gender::Male;
-            }
-            Gender::Female
-        }
-        4 => {
-            if probability < 50.0 {
-                return Gender::Male;
-            }
-            Gender::Female
-        }
-        6 => {
-            if probability < 25.0 {
-                return Gender::Male;
-            }
-            Gender::Female
-        }
-        7 => {
-            if probability < 12.5 {
-                return Gender::Male;
-            }
-            Gender::Female
-        }
-        8 => Gender::Female,
-        _ => Gender::Genderless,
     }
 }
 

@@ -7,14 +7,16 @@ use db::pokemon_token::PokemonToken;
 use db::pokedex::*;
 use db::{enums, moves};
 
-
-/// The Player Trait must be implemented by every sort of human players or ai´s
+/// The Player type represents if the Player is a Human or a specific Ai to call different funcions
+/// for e.g. choosing Pokemon
 #[derive(Clone, Debug)]
 pub enum PlayerType {
     Human,
     SimpleAi,
 }
 
+/// The Player struct represents a Player and holds his Type (Human, Ai...), a list of his pokemon,
+/// the amount of pokemon, his currently fighting pokemon and the next_move he wants to make
 #[derive(Clone, Debug)]
 pub struct Player {
     player: PlayerType,
@@ -44,7 +46,7 @@ impl Player {
         }
     }
 
-    // Getter Methods
+    // Getter methods
     //
     /// Returns the list of pokemon choosen by the player
     pub fn get_pokemon_list(&mut self) -> &mut Vec<PokemonToken> {
@@ -88,7 +90,7 @@ impl Player {
         self.next_move.clone()
     }
 
-    // Setter Methods
+    // Setter methods
     //
     /// Sets the current value (e.g. after a pokemon swap)
     /// Given values should be between 1 and the maximum amount of pokemon you have
@@ -116,11 +118,3 @@ pub enum AttackSlot {
     Three,
     Four,
 }
-
-
-// Ignore this section, it's only a note for me which work needs to be done:
-
-// moves: TODOs in resolve_effect method (2x Heal), is_asleep methode für PokemonToken
-
-// TODO Artur: hits in moves.rs, change stats + deal damage in resolve.rs, Methode zum errechnen
-// der stats in stats.rs

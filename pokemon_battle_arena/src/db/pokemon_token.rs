@@ -71,39 +71,49 @@ impl PokemonToken {
             mega_evolution: model.get_mega(),
         }
     }
-    pub fn is_asleep(&self) -> bool {
-        self.non_volatile_status.0 == enums::NonVolatile::Sleep
-    }
+    // Getter methods
+    //
+    /// Gets all possible moves the pokemon can learn
     pub fn get_moves(&self, dex: movedex::Movedex) -> movedex::Movedex {
         dex.for_token(self.get_level(), self.pokedex_id)
     }
+    /// Gets the pokedex id
     pub fn get_id(&self) -> usize {
         self.pokedex_id
     }
+    /// Gets the name
     pub fn get_name(&self) -> String {
-        self.clone().name
+        self.name.clone()
     }
+    /// Gets the current level
     pub fn get_level(&self) -> u16 {
-        self.clone().level
+        self.level
     }
+    /// Gets the current gender
     pub fn get_gender(&self) -> enums::Gender {
-        self.clone().gender
+        self.gender.clone()
     }
+    /// Gets the current types
     pub fn get_types(&self) -> (enums::Types, enums::Types) {
-        (self.clone().type_one, self.clone().type_two)
+        (self.type_one.clone(), self.type_two.clone())
     }
+    /// Gets the current nature
     pub fn get_nature(&self) -> natures::Nature {
-        self.clone().nature
+        self.nature.clone()
     }
+    /// Gets the actual non volatile status and the amount of rounds the pokemon is holding it
     pub fn get_non_volatile(&self) -> (enums::NonVolatile, u8) {
-        self.clone().non_volatile_status
+        self.non_volatile_status.clone()
     }
+    /// Gets the list of the determinant values
     pub fn get_dv(&self) -> determinant_values::Dv {
-        self.clone().dv
+        self.dv.clone()
     }
+    /// Gets the current stats
     pub fn get_current(&mut self) -> &mut stats::Stats {
         &mut self.current_stats
     }
+    /// Gets the base stats for the level and all other influeces
     pub fn get_base(&self) -> stats::Stats {
         self.base_stats.clone()
     }
@@ -116,21 +126,21 @@ impl PokemonToken {
         &self.fight_flags
     }
 
+    /// Gets the list of end of turn flags
     pub fn get_end_of_turn_flags(&self) -> HashMap<enums::EndOfTurn, u8> {
-        self.clone().end_of_turn_flags
+        self.end_of_turn_flags.clone()
     }
-
+    /// Gets the description of the pokemon which also can be read by the user of the program
     pub fn get_description(&self) -> String {
-        self.clone().description
+        self.description.clone()
     }
-
+    /// Gets the mega evolution
     pub fn get_mega(&self) -> Option<PokemonToken> {
         if self.mega_evolution.is_some() {
             return Some(PokemonToken::from_model(self.mega_evolution.clone().unwrap()));
         }
         None
     }
-
     /// Getter function for move one. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_one(self) -> Option<moves::Technique> {
@@ -163,23 +173,14 @@ impl PokemonToken {
         }
         None
     }
-
+    // Setter methods
+    //
+    /// Sets the non volatile status initial
     pub fn set_non_volatile(&mut self, status: enums::NonVolatile) {
         self.non_volatile_status = (status, 0);
     }
 
-    pub fn add_resolve_flag(&mut self, flag: enums::Resolve) {
-        self.resolve_flags.insert(flag, 0);
-    }
-
-    pub fn add_fight_flag(&mut self, flag: enums::Fighting) {
-        self.fight_flags.insert(flag, 0);
-    }
-
-    pub fn add_end_flag(&mut self, flag: enums::EndOfTurn) {
-        self.end_of_turn_flags.insert(flag, 0);
-    }
-
+    /// Sets the moves to the pokemon
     pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {
         self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
         if moves.len() >= 1 {
@@ -193,6 +194,7 @@ impl PokemonToken {
         }
     }
 
+    /// Sets the type of the pokemon
     pub fn set_type(&mut self, position: u8, change: enums::Types) {
         match position {
             0 => self.type_one = change,
@@ -200,7 +202,23 @@ impl PokemonToken {
             _ => unreachable!(),
         }
     }
-
+    // Other methods
+    //
+    /// Adds an end of turn flag
+    pub fn add_end_flag(&mut self, flag: enums::EndOfTurn) {
+        self.end_of_turn_flags.insert(flag, 0);
+    }
+    pub fn add_resolve_flag(&mut self, flag: enums::Resolve) {
+        self.resolve_flags.insert(flag, 0);
+    }
+    pub fn add_fight_flag(&mut self, flag: enums::Fighting) {
+        self.fight_flags.insert(flag, 0);
+    }
+    /// Checks of the pokemon is asleep
+    pub fn is_asleep(&self) -> bool {
+        self.non_volatile_status.0 == enums::NonVolatile::Sleep
+    }
+    /// Decrements the AP
     pub fn decrement_ap(&mut self) {
         unimplemented!();
     }

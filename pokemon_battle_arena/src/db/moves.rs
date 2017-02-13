@@ -53,19 +53,11 @@ impl Technique {
     /// Matches over the category of a move and calls a specific method in resolve.rs for this
     /// category. All calculation is done inside the method, therefore no return is needed.
     pub fn resolve(&self, arena: &mut Arena, flag: u8) {
-        // if no target is provided push user as target, so that the loop afterwards works, also
-        // attacks that have no target usually affect the field or the user.
-        // if targets.is_empty() {
-        //     targets.push(&mut user.clone());
-        // }
-
-        // for loop that calls the resolve methods for every choosen target.
-        println!("{:?}", "Test");
-        // first call the hits method to sort out missing moves.
+        // First call the hits method to sort out missing moves.
         let mut user_clone = get_user(flag, arena).clone();
         let mut target_clone = get_user(flag, arena).clone();
         if self.hits(&mut target_clone, &mut user_clone) {
-            // match over the category provides smaller samples that must be dealt with.
+            // Match over the category provides smaller samples that must be dealt with.
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
@@ -151,12 +143,12 @@ impl Technique {
                             resolve::heal(&mut user, value);
                         } else if self.get_name() == String::from("heal-pulse") {
                             resolve::heal(&mut user, 50);
-                            // the use of swallow is bound to a former use of stockpile
+                            // TShe use of swallow is bound to a former use of stockpile
                         } else if self.get_name() == String::from("swallow") {
                             // TODO: find a way to get a percentage according to the use of
                             // stockpile in the rounds before
                             resolve::heal(&mut user, 25);
-                            // besides healing roost changes the type of pokemon with type
+                            // Besides healing roost changes the type of pokemon with type
                             // flying.
                         } else if self.get_name() == String::from("roost") {
                             // TODO: find a way to change type of user for one round
@@ -247,7 +239,6 @@ impl Technique {
                     }
                 }
 
-                // totally done
                 // K.O. Attacks that instantly let the target faint if hitting. Besides low
                 // accuracy every K.O. Attack has another requirement, that must be met for it
                 // to work.
@@ -289,6 +280,8 @@ impl Technique {
         }
     }
 
+    /// Checks if the attacking pokemon is hitting the enemy. Returns true if the target will be
+    /// hit by the user and false if not
     pub fn hits(&self,
                 user: &mut pokemon_token::PokemonToken,
                 target: &mut pokemon_token::PokemonToken)
@@ -314,6 +307,8 @@ impl Technique {
         false
     }
 
+    // Getter Methods
+    //
     /// Takes the attacked Pokemon as an input besides the move and calculate from their types
     /// how effective the move is. Returns an appropriate enum for further calculations.
     pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> f32 {
@@ -354,11 +349,11 @@ impl Technique {
             _ => 0.0,
         }
     }
-
+    /// Gets the id of the attack
     pub fn get_id(&self) -> usize {
         self.attack_id
     }
-
+    /// Gets the name of the attack
     pub fn get_name(&self) -> String {
         self.name.clone()
     }
@@ -372,7 +367,7 @@ impl Technique {
 
         output
     }
-
+    /// Gets the type of the attack
     pub fn get_type(&self) -> enums::Types {
         let a_type: &str = &self.attack_type;
         match a_type {
@@ -397,23 +392,24 @@ impl Technique {
             _ => enums::Types::Undefined,
         }
     }
-
+    /// Gets the power of the attack. None if no damage can be applied
     pub fn get_power(&self) -> Option<u16> {
         self.power
     }
-
+    /// Gets the ap of the attack
     pub fn get_power_points(&self) -> Option<u8> {
         self.power_points
     }
-
+    /// Gets the accuracy of the attack
     pub fn get_accuracy(&self) -> Option<u16> {
         self.accuracy
     }
-
+    /// Gets the priority of the attack.
     pub fn get_priority(&self) -> i8 {
         self.priority
     }
 
+    /// Gets the possible targets which will be hit by using this attack
     pub fn get_target(&self) -> enums::Target {
         let tmp: &str = &self.target;
         match tmp {
@@ -434,7 +430,7 @@ impl Technique {
             _ => unreachable!(),
         }
     }
-
+    /// Gets the damage class of the attack
     pub fn get_damage_class(&self) -> enums::DamageClass {
         let tmp: &str = &self.damage_class;
         match tmp {
@@ -444,22 +440,22 @@ impl Technique {
             _ => unreachable!(),
         }
     }
-
+    /// Gets a short description of the attack effect
     pub fn get_short_effect(&self) -> String {
         self.effect_short.clone()
     }
-
+    /// Gets a long description of the attack effect
     pub fn get_long_effect(&self) -> String {
         self.effect_long.clone()
     }
-
+    /// Gets the chance an effect will hit
     pub fn get_effect_chance(&self) -> u8 {
         if self.effect_chance.is_some() {
             return self.effect_chance.unwrap();
         }
         100
     }
-
+    /// Gets the category of the attack. (e.g. heal, damage...)
     pub fn get_category(&self) -> enums::MoveCategory {
         let tmp: &str = &self.category;
         match tmp {
@@ -480,7 +476,7 @@ impl Technique {
             _ => unreachable!(),
         }
     }
-
+    /// Gets the possible ailment caused by the attack
     pub fn get_ailment(&self) -> enums::Ailment {
         let tmp: &str = &self.ailment;
         match tmp {
@@ -507,92 +503,92 @@ impl Technique {
             _ => unreachable!(),
         }
     }
-
+    /// Gets the min amount of hits the attack can do (e.g. Double Kick with two)
     pub fn get_min_hits(&self) -> u8 {
         if self.min_hits.is_some() {
             return self.min_hits.unwrap();
         }
         1
     }
-
+    /// Gets the max amount of hits the attack can do (e.g. Double Kick with two)
     pub fn get_max_hits(&self) -> u8 {
         if self.max_hits.is_some() {
             return self.max_hits.unwrap();
         }
         1
     }
-
+    /// Gets the mininum duration of the attack used in rounds
     pub fn get_min_turn(&self) -> u8 {
         if self.min_turns.is_some() {
             return self.min_turns.unwrap();
         }
         1
     }
-
+    /// Gets the maximum duration of the attack used in rounds
     pub fn get_max_turns(&self) -> u8 {
         if self.max_turns.is_some() {
             return self.max_turns.unwrap();
         }
         1
     }
-
+    /// Gets the drain percentage
     pub fn get_drain_percentage(&self) -> i8 {
         self.drain_percentage
     }
-
+    /// Gets the healing percentage
     pub fn get_healing_percentage(&self) -> i8 {
         self.healing_percentage
     }
-
+    /// Gets the chance for a critical hit
     pub fn get_crit_rate(&self) -> u8 {
         self.crit_rate
     }
-
+    /// Gets the chance the additional ailment will hit
     pub fn get_ailment_chance(&self) -> u8 {
         self.ailment_chance
     }
-
+    /// Gets the chance the enemy pokemon will flinch
     pub fn get_flinch_chance(&self) -> u8 {
         self.flinch_chance
     }
-
+    /// Gets the chance that the attack causes stat changes
     pub fn get_stat_chance(&self) -> u8 {
         self.stat_chance
     }
-
+    /// Gets the description of attack readable by the user of the program
     pub fn get_description(&self) -> String {
         self.description.clone()
     }
-
+    /// Gets the stat that will be changed by the attack
     pub fn get_stat(&self) -> enums::Stats {
         if self.stat.is_some() {
             return enums::Stats::from_i32(self.stat.unwrap()).unwrap();
         }
         enums::Stats::from_i32(0).unwrap()
     }
-
+    /// Gets the multiplier stage a stat will be changed with
     pub fn get_stat_change_rate(&self) -> i8 {
         if self.stat_change_rate.is_some() {
             return self.stat_change_rate.unwrap();
         }
         0
     }
-
+    /// Gets the effectivity map
     pub fn get_effectivity_map(&self) -> HashMap<enums::Types, i8> {
         self.clone().effectivity_map.unwrap()
     }
-
+    /// Gets the style of the attack
     pub fn get_flags(&self) -> Vec<enums::MoveFlags> {
         if self.move_flags.is_some() {
             return self.move_flags.clone().unwrap();
         }
         Vec::new()
     }
-
+    /// Sets the effectivity map
     pub fn set_effectivity_map(&mut self, map: HashMap<enums::Types, i8>) {
         self.effectivity_map = Some(map);
     }
-
+    /// Sets the move flags
     pub fn set_flags(&mut self, flag: Vec<enums::MoveFlags>) {
         self.move_flags = Some(flag);
     }
@@ -618,6 +614,7 @@ impl PartialEq for Technique {
 
 impl Eq for Technique {}
 
+/// Helper function which will get the mutable reference of the targets pokemon out of an arena
 fn get_target<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
     match target {
         1 => {
@@ -631,6 +628,7 @@ fn get_target<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::Po
     }
 }
 
+/// Helper function which will get the mutable reference of the users pokemon out of an arena
 fn get_user<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
     match target {
         2 => {

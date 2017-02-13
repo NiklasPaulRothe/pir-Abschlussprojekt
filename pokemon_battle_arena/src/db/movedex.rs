@@ -19,7 +19,7 @@ pub struct Movedex {
 // DB must be extended and if statements adjusted accordingly
 
 impl Movedex {
-    /// takes an ID and a movedex and returns an option with the move that can be find with the
+    /// Takes an ID and a movedex and returns an option with the move that can be find with the
     /// given ID. Returns None if the ID isn't in the movedex.
     pub fn move_by_id(&self, id: usize) -> Option<Technique> {
         if id < 617 && self.is_complete() {

@@ -87,7 +87,9 @@ impl Stats {
             evasion: 100,
         }
     }
-
+    // Getter methods
+    //
+    /// Gets the stat value of the given stat
     pub fn get_stat(&self, stat: &enums::Stats) -> u16 {
         match stat {
             &enums::Stats::Hp => self.hp,
@@ -101,7 +103,9 @@ impl Stats {
             _ => 0,
         }
     }
-
+    // Setter methods
+    //
+    /// Sets the stat value of the given stat
     pub fn set_stats(&mut self, stat: enums::Stats, value: u16) {
         match stat {
             enums::Stats::Hp => self.hp = value,
