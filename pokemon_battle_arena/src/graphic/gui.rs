@@ -379,7 +379,7 @@ pub fn draw_window() {
                                     .to_string()
                             }
                         };
-                      
+
                         [
                             "#",
                             &pkmn.get_id().to_string(),
@@ -517,8 +517,8 @@ pub fn draw_window() {
                     {
                         println!("Att Button 1");
                         if app.pkmn_moves.len() > 0 {
-                            app.pkmn_moves.remove(0);    
-                        } 
+                            app.pkmn_moves.remove(0);
+                        }
                     }
 
 
@@ -535,7 +535,7 @@ pub fn draw_window() {
                     {
                         println!("Att Button 2");
                         if app.pkmn_moves.len() > 1 {
-                            app.pkmn_moves.remove(1);    
+                            app.pkmn_moves.remove(1);
                         }
                     }
 
@@ -552,7 +552,7 @@ pub fn draw_window() {
                     {
                         println!("Att Button 3");
                         if app.pkmn_moves.len() > 2 {
-                            app.pkmn_moves.remove(2);    
+                            app.pkmn_moves.remove(2);
                         }
                     }
 
@@ -569,7 +569,7 @@ pub fn draw_window() {
                     {
                         println!("Att Button 4");
                         if app.pkmn_moves.len() > 3 {
-                            app.pkmn_moves.remove(3);    
+                            app.pkmn_moves.remove(3);
                         }
                     }
                 }
