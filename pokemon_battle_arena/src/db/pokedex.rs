@@ -10,7 +10,7 @@ use super::enums;
 
 /// Pokedex struct that is used to get an overview over the possible Pokemon. Besides the entries
 /// Vector with PokemonModels inside, it contains a bool variable which tells if the pokedex contains
-/// every known Pokemon or not.
+/// every known Pokemon or not. 
 #[derive(Clone)]
 pub struct Pokedex {
     entries: Vec<PokemonModel>,
@@ -18,7 +18,7 @@ pub struct Pokedex {
 }
 
 impl Pokedex {
-    /// returns a pokemon from it's pokedex number
+    /// Returns a pokemon from it's pokedex number
     pub fn pokemon_by_id(&self, id: usize) -> Option<PokemonModel> {
         if id < 722 && self.is_complete() {
             return Some(self.entries[id - 1].clone());
@@ -32,6 +32,7 @@ impl Pokedex {
         None
     }
 
+    /// Creates a new Pokedex with the composed of the given types
     pub fn type_filter(&self, types: Vec<enums::Types>) -> Pokedex {
         let mut new_dex = Pokedex {
             entries: Vec::new(),
@@ -45,7 +46,7 @@ impl Pokedex {
         new_dex
     }
 
-    /// returns a pokemon from it's name
+    /// Returns a pokemon from it's name
     pub fn pokemon_by_name(&self, name: String) -> Option<PokemonModel> {
         for entry in self.entries.clone() {
             if entry.get_name() == name {
@@ -54,22 +55,23 @@ impl Pokedex {
         }
         None
     }
-
+    /// Returns a Vector with the Pokemon of the Pokedex
     pub fn get_entries(&self) -> Vec<PokemonModel> {
         self.entries.clone()
     }
-
+    /// Checks if the Pokedex is complete. Returns false if e.g. the Pokedex only contains Pokemon
+    /// of one type
     fn is_complete(&self) -> bool {
         self.complete
     }
 
 
-    /// creates a pokedex with all known Pokemon
+    /// Creates a pokedex with all known Pokemon
     pub fn new() -> Pokedex {
         let mut pokemon = Vec::new();
         let mut mega = HashMap::new();
 
-        // creates the basic pokemon model with pokedex ID and name.
+        // Creates the basic pokemon model with pokedex ID and name.
         let mut pokemon_db = csv::Reader::from_file("./src/db/tables/pokemon.csv").unwrap();
         for record in pokemon_db.decode() {
             let (id, name, species_id, height, weight, gender_rate, flavor_text): (usize,
@@ -84,7 +86,7 @@ impl Pokedex {
             if id < 722 {
                 pokemon.push(PokemonModel::new(id, name, height, weight, gender_rate, flavor_text));
             }
-            // adds mega evolutions if available
+            // Adds mega evolutions if available
             else if id > 10000 && re.is_match(&name) {
                 pokemon[species_id - 1].set_mega(PokemonModel::new(id,
                                                                    name,
@@ -92,12 +94,12 @@ impl Pokedex {
                                                                    weight,
                                                                    gender_rate,
                                                                    flavor_text));
-                // saves where to find the mega evolutions by their ID
+                // Saves where to find the mega evolutions by their ID
                 mega.insert(id, species_id);
             }
         }
 
-        // adds types to the constructed pokemon models
+        // Adds types to the constructed pokemon models
         let mut type_db = csv::Reader::from_file("./src/db/tables/pokemon_types.csv").unwrap();
         for record in type_db.decode() {
             let (poke_id, type_id, slot): (usize, i32, u16) = record.unwrap();
@@ -113,7 +115,7 @@ impl Pokedex {
             }
         }
 
-        // adds the base stats to every Pokemon Model
+        // Adds the base stats to every Pokemon Model
         let mut stat_db = csv::Reader::from_file("./src/db/tables/pokemon_stats.csv").unwrap();
         for record in stat_db.decode() {
             let (poke_id, stat_id, stat, _): (usize, i32, u16, u8) = record.unwrap();
