@@ -3,7 +3,7 @@ use super::stats;
 
 use enum_primitive::FromPrimitive;
 
-///Basic values for Pokemon species. Equal for every instance of the given Pokemon.
+/// Basic values for Pokemon species. Equal for every instance of the given Pokemon.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PokemonModel {
     pokedex_id: usize,
@@ -19,20 +19,25 @@ pub struct PokemonModel {
 }
 
 impl PokemonModel {
-    pub fn new(id: usize, name: String, height: u8, weight: u16, gender_rate: i8,
-        flavor_text: String) -> PokemonModel {
+    pub fn new(id: usize,
+               name: String,
+               height: u8,
+               weight: u16,
+               gender_rate: i8,
+               flavor_text: String)
+               -> PokemonModel {
         PokemonModel {
-                    pokedex_id: id,
-                    name: name,
-                    height: height,
-                    weight: weight,
-                    gender_rate: gender_rate,
-                    description: flavor_text,
-                    type_one: enums::Types::from_i32(19).unwrap(),
-                    type_two: enums::Types::from_i32(19).unwrap(),
-                    base_stats: stats::Stats::default(),
-                    mega_evolution: Box::new(None),
-                }
+            pokedex_id: id,
+            name: name,
+            height: height,
+            weight: weight,
+            gender_rate: gender_rate,
+            description: flavor_text,
+            type_one: enums::Types::from_i32(19).unwrap(),
+            type_two: enums::Types::from_i32(19).unwrap(),
+            base_stats: stats::Stats::default(),
+            mega_evolution: Box::new(None),
+        }
     }
 
     pub fn get_id(&self) -> usize {
@@ -69,7 +74,7 @@ impl PokemonModel {
 
     pub fn get_mega(&self) -> Option<PokemonModel> {
         if self.has_mega() {
-           return Some(self.clone().mega_evolution.unwrap());
+            return Some(self.clone().mega_evolution.unwrap());
         }
         None
     }

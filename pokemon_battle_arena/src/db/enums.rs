@@ -120,26 +120,26 @@ pub enum NonVolatile {
 /// Flags that have a influence at the end of each turn.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EndOfTurn {
-    //absorbs some HP at the End of every Turn
+    // absorbs some HP at the End of every Turn
     LeechSeed,
-    //Counts from 0 to 4, one step each round, even in the turn it was initially used.
-    //When 4 is reached the Pokemon faints. Counting only continues when the Pokemon is part of
-    //the battle, but the counter will not be resetted if the Pokemon is changed.
+    // Counts from 0 to 4, one step each round, even in the turn it was initially used.
+    // When 4 is reached the Pokemon faints. Counting only continues when the Pokemon is part of
+    // the battle, but the counter will not be resetted if the Pokemon is changed.
     PerishSong,
-    //Changes the NonVolatile Status of the Pokemon to Sleep after one round if possible.
+    // Changes the NonVolatile Status of the Pokemon to Sleep after one round if possible.
     Yawn,
-    //Is set after a flying type uses roost. This changes the flying type either to undefined, if
-    //the Pokemon has two types, or to Normal if it has only one. Because of the possible
-    //combination of normal and flying it is needed to have two indicators to determine which type
-    //must be changed back.
+    // Is set after a flying type uses roost. This changes the flying type either to undefined, if
+    // the Pokemon has two types, or to Normal if it has only one. Because of the possible
+    // combination of normal and flying it is needed to have two indicators to determine which type
+    // must be changed back.
     RoostTypeOne,
     RoostTypeTwo,
-    //Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
-    //changed out. Lasts at least 2 and at most 5 turns.
+    // Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
+    // changed out. Lasts at least 2 and at most 5 turns.
     Trap,
 }
 
-///Print method for non volatile status changes.
+/// Print method for non volatile status changes.
 pub fn print_non_volatile(status: NonVolatile) -> String {
     match status {
         NonVolatile::Undefined => String::from(""),
@@ -147,7 +147,7 @@ pub fn print_non_volatile(status: NonVolatile) -> String {
         NonVolatile::Sleep => String::from("asleep"),
         NonVolatile::Freeze => String::from("freezed"),
         NonVolatile::Burn => String::from("burned"),
-        _ => String::from("poisoned")
+        _ => String::from("poisoned"),
     }
 }
 
@@ -181,14 +181,14 @@ enum_from_primitive! {
 pub enum Weather {
     ClearSky,
     Sunlight,
-    //no need to handle it right now, only caused by abilities
+    // no need to handle it right now, only caused by abilities
     HarshSunlight,
     Rain,
-    //no need to handle it right now, only caused by abilities
+    // no need to handle it right now, only caused by abilities
     HeavyRain,
     Sandstorm,
     Hail,
-    //no need to handle it right now, only caused by abilities
+    // no need to handle it right now, only caused by abilities
     AirCurrent,
 }
 
@@ -262,31 +262,31 @@ pub fn get_gender(gender_rate: i8) -> Gender {
         0 => Gender::Male,
         1 => {
             if probability < 87.5 {
-                return Gender::Male
+                return Gender::Male;
             }
             Gender::Female
         }
         2 => {
             if probability < 75.0 {
-                return Gender::Male
+                return Gender::Male;
             }
             Gender::Female
         }
         4 => {
             if probability < 50.0 {
-                return Gender::Male
+                return Gender::Male;
             }
             Gender::Female
         }
         6 => {
             if probability < 25.0 {
-                return Gender::Male
+                return Gender::Male;
             }
             Gender::Female
         }
         7 => {
             if probability < 12.5 {
-                return Gender::Male
+                return Gender::Male;
             }
             Gender::Female
         }

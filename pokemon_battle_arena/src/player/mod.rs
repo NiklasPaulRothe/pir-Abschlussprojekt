@@ -9,7 +9,6 @@ use db::{enums, moves};
 
 
 /// The Player Trait must be implemented by every sort of human players or ai´s
-
 #[derive(Clone, Debug)]
 pub enum PlayerType {
     Human,
@@ -26,7 +25,6 @@ pub struct Player {
 }
 
 impl Player {
-    //
     // Constuctor
     //
     /// Takes an array with pokemon id´s and the PlayerType and returns a player
@@ -46,7 +44,6 @@ impl Player {
         }
     }
 
-    //
     // Getter Methods
     //
     /// Returns the list of pokemon choosen by the player
@@ -83,7 +80,7 @@ impl Player {
             &AttackSlot::One => self.pokemon_list[self.current].clone().get_move_one().unwrap(),
             &AttackSlot::Two => self.pokemon_list[self.current].clone().get_move_two().unwrap(),
             &AttackSlot::Three => self.pokemon_list[self.current].clone().get_move_three().unwrap(),
-            &AttackSlot::Four =>  self.pokemon_list[self.current].clone().get_move_four().unwrap(),
+            &AttackSlot::Four => self.pokemon_list[self.current].clone().get_move_four().unwrap(),
         }
     }
     /// Gets the next attack from the Player. Returns none if no Technique is selected
@@ -91,7 +88,6 @@ impl Player {
         self.next_move.clone()
     }
 
-    //
     // Setter Methods
     //
     /// Sets the current value (e.g. after a pokemon swap)
@@ -103,7 +99,6 @@ impl Player {
     pub fn set_next_move(&mut self, next: Option<moves::Technique>) {
         self.next_move = next;
     }
-    //
     // Other
     //
     pub fn attack_or_swap(&self) -> arena::to_ui::Move {
@@ -123,9 +118,9 @@ pub enum AttackSlot {
 }
 
 
-//Ignore this section, it's only a note for me which work needs to be done:
+// Ignore this section, it's only a note for me which work needs to be done:
 
-//moves: TODOs in resolve_effect method (2x Heal), is_asleep methode für PokemonToken
+// moves: TODOs in resolve_effect method (2x Heal), is_asleep methode für PokemonToken
 
-//TODO Artur: hits in moves.rs, change stats + deal damage in resolve.rs, Methode zum errechnen
-//der stats in stats.rs
+// TODO Artur: hits in moves.rs, change stats + deal damage in resolve.rs, Methode zum errechnen
+// der stats in stats.rs
