@@ -235,34 +235,80 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: &mut PokemonToken) -
             }
         }
     };
-    let new_stage = stage + stages;
-    let mut modifier = 1;
-    if target.get_non_volatile().0 == enums::NonVolatile::Paralysis {
-        modifier = 2;
-    }
-
-    let new_stat = match stat {
-        enums::Stats::Accuracy => {
-            match new_stage {
-                -6 => {}
-                -5 => {}
-                -4 => {}
-                -3 => {}
-                -2 => {}
-                -1 => {}
-                0 => {}
-                1 => {}
-                2 => {}
-                3 => {}
-                4 => {}
-                5 => {}
-                6 => {}
-                _ => {}
-            }
+    if !stage <= -6 || !stage >= 6 {
+        let mut new_stage = stage + stages;
+        if new_stage > 6 {
+            new_stage = 6;
+        } else if new_stage < -6 {
+            new_stage = -6
         }
-        _ => {}
-    };
-    true
+        let mut modifier = 1.0;
+        if target.get_non_volatile().0 == enums::NonVolatile::Paralysis {
+            modifier = 0.5;
+        }
+        let base = target.get_base().get_stat(&stat) as f32;
+
+        let new_stat = modifier *
+                       match stat {
+            enums::Stats::Accuracy => {
+                match new_stage {
+                    -6 => base / 3.0,
+                    -5 => base / 8.0 * 3.0,
+                    -4 => base / 7.0 * 3.0,
+                    -3 => base / 2.0,
+                    -2 => base / 5.0 * 3.0,
+                    -1 => base / 4.0 * 3.0,
+                    0 => base,
+                    1 => base / 3.0 * 4.0,
+                    2 => base / 3.0 * 5.0,
+                    3 => base * 2.0,
+                    4 => base / 3.0 * 7.0,
+                    5 => base / 3.0 * 8.0,
+                    6 => base * 3.0,
+                    _ => base,
+                }
+            }
+            enums::Stats::Evasion => {
+                match new_stage {
+                    6 => base / 3.0,
+                    5 => base / 8.0 * 3.0,
+                    4 => base / 7.0 * 3.0,
+                    3 => base / 2.0,
+                    2 => base / 5.0 * 3.0,
+                    1 => base / 4.0 * 3.0,
+                    0 => base,
+                    -1 => base / 3.0 * 4.0,
+                    -2 => base / 3.0 * 5.0,
+                    -3 => base * 2.0,
+                    -4 => base / 3.0 * 7.0,
+                    -5 => base / 3.0 * 8.0,
+                    -6 => base * 3.0,
+                    _ => base,
+                }
+            }
+            _ => {
+                match new_stage {
+                    -6 => base / 4.0,
+                    -5 => base / 7.0 * 2.0,
+                    -4 => base / 3.0,
+                    -3 => base / 5.0 * 2.0,
+                    -2 => base / 2.0,
+                    -1 => base / 3.0 * 2.0,
+                    0 => base,
+                    1 => base * 1.5,
+                    2 => base * 2.0,
+                    3 => base * 2.5,
+                    4 => base * 3.0,
+                    5 => base * 3.5,
+                    6 => base * 4.0,
+                    _ => base,
+                }
+            }
+        };
+        target.get_current().set_stats(stat, new_stat as u16);
+        return true;
+    }
+    return false;
 }
 
 
