@@ -77,25 +77,25 @@ impl PokemonToken {
         self.pokedex_id
     }
     pub fn get_name(&self) -> String {
-        self.clone().name
+        self.name.clone()
     }
     pub fn get_level(&self) -> u16 {
-        self.clone().level
+        self.level
     }
     pub fn get_gender(&self) -> enums::Gender {
-        self.clone().gender
+        self.gender.clone()
     }
     pub fn get_types(&self) -> (enums::Types, enums::Types) {
-        (self.clone().type_one, self.clone().type_two)
+        (self.type_one.clone(), self.type_two.clone())
     }
     pub fn get_nature(&self) -> natures::Nature {
-        self.clone().nature
+        self.nature.clone()
     }
     pub fn get_non_volatile(&self) -> (enums::NonVolatile, u8) {
-        self.clone().non_volatile_status
+        self.non_volatile_status.clone()
     }
     pub fn get_dv(&self) -> determinant_values::Dv {
-        self.clone().dv
+        self.dv.clone()
     }
     pub fn get_current(&mut self) -> &mut stats::Stats {
         &mut self.current_stats
@@ -104,11 +104,11 @@ impl PokemonToken {
         self.base_stats.clone()
     }
     pub fn get_end_of_turn_flags(&self) -> HashMap<enums::EndOfTurn, u8> {
-        self.clone().end_of_turn_flags
+        self.end_of_turn_flags.clone()
     }
 
     pub fn get_description(&self) -> String {
-        self.clone().description
+        self.description.clone()
     }
 
     pub fn get_mega(&self) -> Option<PokemonToken> {
