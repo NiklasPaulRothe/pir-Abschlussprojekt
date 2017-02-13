@@ -5,7 +5,7 @@ pub mod ki;
 use arena;
 use db::pokemon_token::PokemonToken;
 use db::pokedex::*;
-use db::{enums, moves};
+use db::moves;
 
 /// The Player type represents if the Player is a Human or a specific Ai to call different funcions
 /// for e.g. choosing Pokemon
@@ -70,7 +70,7 @@ impl Player {
     }
     /// Returns a Vec with the id´s from the pokemon which are alive
     pub fn get_alive_list(&self) -> Vec<usize> {
-        let mut vec = Vec::new();
+        let vec = Vec::new();
         // for i in 0..self.pokemon_list.len() {
         //     if self.get_pokemon_list()[i].get_current().get_stat(enums::Stats::Hp) != 0 {
         //         vec.push(i);
