@@ -9,6 +9,7 @@ use super::resolve;
 use self::num::FromPrimitive;
 use self::rand::{Rng, thread_rng};
 use std::collections::HashMap;
+use std::cmp::Ordering;
 use arena::Arena;
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
@@ -548,6 +549,26 @@ impl Technique {
         self.move_flags = Some(flag);
     }
 }
+
+impl Ord for Technique {
+    fn cmp(&self, other: &Technique) -> Ordering {
+        self.attack_id.cmp((&other.attack_id))
+    }
+}
+
+impl PartialOrd for Technique {
+    fn partial_cmp(&self, other: &Technique) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for Technique {
+    fn eq(&self, other: &Technique) -> bool {
+        self.attack_id == other.attack_id
+    }
+}
+
+impl Eq for Technique {}
 
 fn get_target<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
     match target {

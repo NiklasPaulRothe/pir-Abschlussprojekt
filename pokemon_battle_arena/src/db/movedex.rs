@@ -51,6 +51,8 @@ impl Movedex {
                 }
             }
         }
+        new_dex.sort();
+        new_dex.dedup();
         Movedex {
             entries: new_dex,
             complete: false,
