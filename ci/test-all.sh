@@ -10,7 +10,7 @@ export RUSTFLAGS="--deny warnings"
 # Build the main crate which depends on all others
 echo ""
 echo "=== Building PokemonBattleArena ==============="
-cargo build
+cd pokemon_battle_arena && cargo build
 
 for crate in pokemon_battle_arena; do
     echo ""
