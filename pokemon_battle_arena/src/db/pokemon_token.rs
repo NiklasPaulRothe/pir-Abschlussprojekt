@@ -30,6 +30,8 @@ pub struct PokemonToken {
     dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
+    resolve_flags: HashMap<enums::Resolve, u8>,
+    fight_flags: HashMap<enums::Fighting, u8>,
     end_of_turn_flags: HashMap<enums::EndOfTurn, u8>,
     description: String,
     mega_evolution: Option<pokemon_model::PokemonModel>,
@@ -62,6 +64,8 @@ impl PokemonToken {
             dv: dv,
             base_stats: stats.clone(),
             current_stats: stats,
+            resolve_flags: HashMap::new(),
+            fight_flags: HashMap::new(),
             end_of_turn_flags: HashMap::new(),
             description: model.get_description(),
             mega_evolution: model.get_mega(),
@@ -113,6 +117,15 @@ impl PokemonToken {
     pub fn get_base(&self) -> stats::Stats {
         self.base_stats.clone()
     }
+
+    pub fn get_resolve_flags(&self) -> &HashMap<enums::Resolve, u8> {
+        &self.resolve_flags
+    }
+
+    pub fn get_fight_flags(&self) -> &HashMap<enums::Fighting, u8> {
+        &self.fight_flags
+    }
+
     /// Gets the list of end of turn flags
     pub fn get_end_of_turn_flags(&self) -> HashMap<enums::EndOfTurn, u8> {
         self.end_of_turn_flags.clone()
@@ -166,6 +179,7 @@ impl PokemonToken {
     pub fn set_non_volatile(&mut self, status: enums::NonVolatile) {
         self.non_volatile_status = (status, 0);
     }
+
     /// Sets the moves to the pokemon
     pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {
         self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
@@ -179,6 +193,7 @@ impl PokemonToken {
             self.move_four = Some((moves[3].clone(), moves[3].get_power_points().unwrap()));
         }
     }
+
     /// Sets the type of the pokemon
     pub fn set_type(&mut self, position: u8, change: enums::Types) {
         match position {
@@ -192,6 +207,12 @@ impl PokemonToken {
     /// Adds an end of turn flag
     pub fn add_end_flag(&mut self, flag: enums::EndOfTurn) {
         self.end_of_turn_flags.insert(flag, 0);
+    }
+    pub fn add_resolve_flag(&mut self, flag: enums::Resolve) {
+        self.resolve_flags.insert(flag, 0);
+    }
+    pub fn add_fight_flag(&mut self, flag: enums::Fighting) {
+        self.fight_flags.insert(flag, 0);
     }
     /// Checks of the pokemon is asleep
     pub fn is_asleep(&self) -> bool {

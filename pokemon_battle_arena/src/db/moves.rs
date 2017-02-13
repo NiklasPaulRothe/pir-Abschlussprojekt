@@ -184,7 +184,6 @@ impl Technique {
                                      &mut target);
                 }
 
-                // Apart from the Math done
                 // Swagger moves confuse the target and raise their stats. Important is that the
                 // stats will be raised even when the target is already confused or can not be
                 // confused due to other reasons, but it will not get confused if the stats can
@@ -281,7 +280,7 @@ impl Technique {
         }
     }
 
-    /// Checks if the attacking pokemon is hitting the enemy. Returns true if the target will be 
+    /// Checks if the attacking pokemon is hitting the enemy. Returns true if the target will be
     /// hit by the user and false if not
     pub fn hits(&self,
                 user: &mut pokemon_token::PokemonToken,
@@ -315,21 +314,31 @@ impl Technique {
     pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> f32 {
         let mut eff_count = 0;
         if self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().0) {
-            eff_count = eff_count +
-                        self.clone()
-                .effectivity_map
-                .unwrap()
-                .get(&enemy.get_types().0)
-                .unwrap();
+            if !((enemy.get_types().0 == enums::Types::Ghost &&
+                  *self.clone().effectivity_map.unwrap().get(&enums::Types::Ghost).unwrap() ==
+                  -4) &&
+                 enemy.get_resolve_flags().contains_key(&enums::Resolve::NoTypeImmunity)) {
+                eff_count = eff_count +
+                            self.clone()
+                    .effectivity_map
+                    .unwrap()
+                    .get(&enemy.get_types().0)
+                    .unwrap();
+            }
         }
         if enemy.get_types().1 != enums::Types::Undefined &&
            self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().1) {
-            eff_count = eff_count +
-                        self.clone()
-                .effectivity_map
-                .unwrap()
-                .get(&enemy.get_types().1)
-                .unwrap();
+            if !((enemy.get_types().1 == enums::Types::Ghost &&
+                  *self.clone().effectivity_map.unwrap().get(&enums::Types::Ghost).unwrap() ==
+                  -4) &&
+                 enemy.get_resolve_flags().contains_key(&enums::Resolve::NoTypeImmunity)) {
+                eff_count = eff_count +
+                            self.clone()
+                    .effectivity_map
+                    .unwrap()
+                    .get(&enemy.get_types().1)
+                    .unwrap();
+            }
         }
         match eff_count {
             -2 => 0.25,
@@ -395,7 +404,7 @@ impl Technique {
     pub fn get_accuracy(&self) -> Option<u16> {
         self.accuracy
     }
-    /// Gets the priority of the attack. 
+    /// Gets the priority of the attack.
     pub fn get_priority(&self) -> i8 {
         self.priority
     }
