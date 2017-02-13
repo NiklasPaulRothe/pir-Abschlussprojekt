@@ -14,8 +14,11 @@ pub struct Arena<'a> {
 impl<'a> Arena<'a> {
     /// Creates a new arena with a list of players for both teams, the default effect and the
     /// default weather
-    pub fn new(i_player_1: &'a mut Player, i_player_2: &'a mut Player, i_effect: enums::Types,
-        i_weather: enums::Weather) -> Self {
+    pub fn new(i_player_1: &'a mut Player,
+               i_player_2: &'a mut Player,
+               i_effect: enums::Types,
+               i_weather: enums::Weather)
+               -> Self {
         Arena {
             effect: i_effect,
             weather: i_weather,
@@ -24,7 +27,6 @@ impl<'a> Arena<'a> {
         }
     }
 
-    //
     // Getter Methods
     //
     /// Gets the type of the arena
@@ -48,7 +50,6 @@ impl<'a> Arena<'a> {
         self.player_2
     }
 
-    //
     // Setter Methods
     //
     /// Sets the effect of the arena

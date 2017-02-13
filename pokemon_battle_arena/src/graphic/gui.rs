@@ -50,7 +50,7 @@ impl App {
             sel_pkmn: (None, None),
             selected_idx: None,
             techs: None,
-            tech_names: Vec::new()
+            tech_names: Vec::new(),
         }
     }
 
@@ -69,14 +69,14 @@ impl App {
 
 pub fn draw_window() {
     // Construct the window.
-    let mut window: Window =
-        piston::window::WindowSettings::new("PokemonBattleArena", [WIDTH, HEIGHT])
-            .opengl(OpenGL::V3_2)
-            .vsync(true)
-            .samples(4)
-            .exit_on_esc(true)
-            .build()
-            .unwrap_or_else(|e| { panic!("Failed to build window: {}", e) });
+    let mut window: Window = piston::window::WindowSettings::new("PokemonBattleArena",
+                                                                 [WIDTH, HEIGHT])
+        .opengl(OpenGL::V3_2)
+        .vsync(true)
+        .samples(4)
+        .exit_on_esc(true)
+        .build()
+        .unwrap_or_else(|e| panic!("Failed to build window: {}", e));
 
     // Create the event loop.
     let mut events = WindowEvents::new();
@@ -88,13 +88,11 @@ pub fn draw_window() {
     let ids = Ids::new(ui.widget_id_generator());
 
     // Add a font from file
-    let assets = find_folder::Search::KidsThenParents(3, 5).for_folder("assets").unwrap_or_else(
-        |e| { panic!("Failed to find folder: {}", e) }
-    );
+    let assets = find_folder::Search::KidsThenParents(3, 5)
+        .for_folder("assets")
+        .unwrap_or_else(|e| panic!("Failed to find folder: {}", e));
     let font_path = assets.join("fonts/arial/arial.ttf");
-    ui.fonts.insert_from_file(font_path).unwrap_or_else(
-        |e| { panic!("Failed to get font: {}", e) }
-    );
+    ui.fonts.insert_from_file(font_path).unwrap_or_else(|e| panic!("Failed to get font: {}", e));
 
     // No text to draw -> create an empty text texture cache.
     let mut text_texture_cache = piston::window::GlyphCache::new(&mut window, WIDTH, HEIGHT);
@@ -134,8 +132,7 @@ pub fn draw_window() {
                     .middle_of(ids.canvas)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_play, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Play");
                     app.screen = Screen::Play;
                 }
@@ -149,8 +146,7 @@ pub fn draw_window() {
                     .down_from(ids.button_play, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_options, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     app.screen = Screen::Options;
                     println!("Options");
                 }
@@ -165,8 +161,7 @@ pub fn draw_window() {
                     .down_from(ids.button_options, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_exit, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     ::std::process::exit(0);
                 }
             }
@@ -185,8 +180,7 @@ pub fn draw_window() {
                     .middle_of(ids.canvas)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_sp, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     app.screen = Screen::ChooseTeam;
                     println!("Singleplayer");
                 }
@@ -201,8 +195,7 @@ pub fn draw_window() {
                     .down_from(ids.button_sp, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_mp, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Multiplayer");
                 }
 
@@ -216,8 +209,7 @@ pub fn draw_window() {
                     .down_from(ids.button_mp, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_back, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Back");
                     app.screen = Screen::Title;
                 }
@@ -233,8 +225,7 @@ pub fn draw_window() {
                     .down_from(ids.button_mp, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_back, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Back");
                     app.screen = Screen::Title;
                 }
@@ -261,7 +252,9 @@ pub fn draw_window() {
                     .set(ids.slist_pkmn, ui);
 
                 // Instantiate the scrollbar for the list.
-                if let Some(s) = scrollbar { s.set(ui); }
+                if let Some(s) = scrollbar {
+                    s.set(ui);
+                }
 
                 // Create Vec with all the pokemon names to be displayed
                 let mut pkmn_names = Vec::new();
@@ -270,7 +263,9 @@ pub fn draw_window() {
                 }
 
                 // Handle the `ListSelect`s events.
-                while let Some(event) = events.next(ui, |i| ::std::collections::HashSet::<usize>::new().contains(&i)) {
+                while let Some(event) = events.next(ui, |i| {
+                    ::std::collections::HashSet::<usize>::new().contains(&i)
+                }) {
                     use conrod::widget::list_select::Event;
 
                     match event {
@@ -285,29 +280,26 @@ pub fn draw_window() {
                                 .label(label)
                                 .label_color(app.label_color);
                             item.set(button, ui);
-                        },
+                        }
 
                         // Add pokemon to team when button is pressed
                         Event::Selection(selection) => {
                             println!("selected index (PokeDex): {:?}", selection);
 
-                            app.sel_pkmn = (
-                                Some(
-                                    db::pokemon_token::PokemonToken::from_model(
-                                        app.pokedex.pokemon_by_id(selection + 1).unwrap()
-                                    )
-                                ),
-                                None
-                            );
+                            app.sel_pkmn =
+                                (Some(db::pokemon_token::PokemonToken::from_model(app.pokedex
+                                     .pokemon_by_id(selection + 1)
+                                     .unwrap())),
+                                 None);
                         }
-                        _ => {},
+                        _ => {}
                     }
                 }
 
                 // =====================================
                 // = List that shows the player's team =
                 // =====================================
-                let (mut events, _) = widget::ListSelect::single(6, 650.0/6.0)
+                let (mut events, _) = widget::ListSelect::single(6, 650.0 / 6.0)
                     .w_h(200.0, 650.0)
                     .mid_right_with_margin_on(ids.canvas, 25.0)
                     .set(ids.slist_team, ui);
@@ -319,7 +311,9 @@ pub fn draw_window() {
 
 
                 // Handle the `ListSelect`s events.
-                while let Some(event) = events.next(ui, |i| ::std::collections::HashSet::<usize>::new().contains(&i)) {
+                while let Some(event) = events.next(ui, |i| {
+                    ::std::collections::HashSet::<usize>::new().contains(&i)
+                }) {
                     use conrod::widget::list_select::Event;
 
                     match event {
@@ -340,7 +334,7 @@ pub fn draw_window() {
                                 .label(label)
                                 .label_color(app.label_color);
                             item.set(button, ui);
-                        },
+                        }
 
                         // Remove pokemon from team when button is pressed
                         //
@@ -349,10 +343,11 @@ pub fn draw_window() {
                         //  in the middle of the screen (with stats, etc)
                         Event::Selection(selection) => {
                             println!("selected index (Team): {:?}", selection);
-                            app.sel_pkmn = (Some(app.pkmn_team[selection].clone()), Some(selection));
+                            app.sel_pkmn = (Some(app.pkmn_team[selection].clone()),
+                                            Some(selection));
                         }
                         // Do nothing for every other event
-                        _ => {},
+                        _ => {}
                     }
                 }
 
@@ -364,39 +359,44 @@ pub fn draw_window() {
                     Some(ref pkmn) => {
                         // === Moves ===
                         if let None = app.techs {
-                            app.techs = Some(pkmn.get_moves(db::movedex::Movedex::new()).get_entries());
-                            app.tech_names = db::moves::Technique::get_name_vec(app.techs.clone().unwrap());
+                            app.techs = Some(pkmn.get_moves(db::movedex::Movedex::new())
+                                .get_entries());
+                            app.tech_names =
+                                db::moves::Technique::get_name_vec(app.techs.clone().unwrap());
                         }
 
                         // Drop down list for the first attack
-                        for selected_idx in widget::DropDownList::new(&app.tech_names, app.selected_idx)
+                        for selected_idx in widget::DropDownList::new(&app.tech_names,
+                                                                      app.selected_idx)
                             .border(1.0)
                             .color(conrod::color::LIGHT_GREY)
                             .mid_bottom_with_margin_on(ids.canvas, 100.0)
                             .w_h(BUTTON_W, BUTTON_H)
                             .max_visible_items(3)
                             .scrollbar_next_to()
-                            .set(ids.ddlist_att1, ui)
-                        {
+                            .set(ids.ddlist_att1, ui) {
                             app.selected_idx = Some(selected_idx);
                         }
 
                         // === Description ===
                         let types = match pkmn.get_types() {
                             (type1, db::enums::Types::Undefined) => type1.to_string(),
-                            (type1, type2) => [type1.to_string(), "/".to_string(), type2.to_string()].concat().to_string(),
+                            (type1, type2) => {
+                                [type1.to_string(), "/".to_string(), type2.to_string()]
+                                    .concat()
+                                    .to_string()
+                            }
                         };
 
-                        [
-                            "#",
-                            &pkmn.get_id().to_string(),
-                            " ",
-                            &pkmn.get_name(),
-                            "\n\nType: ",
-                            &types,
-                            "\n",
-                            &pkmn.get_description()
-                        ].concat()
+                        ["#",
+                         &pkmn.get_id().to_string(),
+                         " ",
+                         &pkmn.get_name(),
+                         "\n\nType: ",
+                         &types,
+                         "\n",
+                         &pkmn.get_description()]
+                            .concat()
                     }
                 };
 
@@ -417,8 +417,7 @@ pub fn draw_window() {
                     .mid_bottom_with_margin(50.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_select, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Select");
 
                     match app.sel_pkmn.0.clone() {
@@ -439,8 +438,7 @@ pub fn draw_window() {
                     .down_from(ids.button_select, 0.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_remove, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Remove");
                     if let Some(i) = app.sel_pkmn.1 {
                         app.pkmn_team.remove(i);
@@ -459,8 +457,7 @@ pub fn draw_window() {
                     .bottom_left_with_margins(35.0, 250.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_back, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     println!("Back");
                     app.screen = Screen::Play;
                 }
@@ -474,8 +471,7 @@ pub fn draw_window() {
                     .bottom_right_with_margins(35.0, 250.0)
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_fight, ui)
-                    .was_clicked()
-                {
+                    .was_clicked() {
                     // temporaryly goes back to title screen
                     println!("Fight");
                     app.screen = Screen::Title;
@@ -485,8 +481,12 @@ pub fn draw_window() {
 
         window.draw_2d(&event, |c, g| {
             if let Some(primitives) = ui.draw_if_changed() {
-                fn texture_from_image<T>(img: &T) -> &T { img };
-                piston::window::draw(c, g, primitives,
+                fn texture_from_image<T>(img: &T) -> &T {
+                    img
+                };
+                piston::window::draw(c,
+                                     g,
+                                     primitives,
                                      &mut text_texture_cache,
                                      &image_map,
                                      texture_from_image);

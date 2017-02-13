@@ -1,6 +1,8 @@
 #![allow(dead_code)]
-#[macro_use] extern crate enum_primitive;
-#[macro_use] extern crate conrod;
+#[macro_use]
+extern crate enum_primitive;
+#[macro_use]
+extern crate conrod;
 extern crate rustc_serialize;
 extern crate time;
 extern crate piston_window;
@@ -96,27 +98,36 @@ fn test_arena() {
     // Arena erstellen
     let mut p1 = Player::new_by_id(&[5], PlayerType::Human);
     let mut p2 = Player::new_by_id(&[8], PlayerType::Human);
-    let mut arena = Arena::new(&mut p1, &mut p2,
-        db::enums::Types::Normal,
-        db::enums::Weather::ClearSky);
+    let mut arena = Arena::new(&mut p1,
+                               &mut p2,
+                               db::enums::Types::Normal,
+                               db::enums::Weather::ClearSky);
     println!("Player One: {:#?}", arena.get_player_one());
     println!("Player Two: {:#?}", arena.get_player_two());
     // Attacke erstellen und "Kampf"
     let movedex = db::movedex::Movedex::new();
-    let attack = movedex.move_by_id(195).unwrap();
+    let attack = movedex.move_by_id(151).unwrap();
     println!("Attack: {}", attack.get_name());
 
-    println!("HP1 vorher: {}", arena.get_player_one().get_pokemon_list()[0].get_current()
-        .get_stat(db::enums::Stats::Hp));
-    println!("HP2 vorher: {}", arena.get_player_two().get_pokemon_list()[0].get_current()
-        .get_stat(db::enums::Stats::Hp));
+    println!("HP1 vorher: {}",
+             arena.get_player_one().get_pokemon_list()[0]
+                 .get_current()
+                 .get_stat(&db::enums::Stats::Hp));
+    println!("HP2 vorher: {}",
+             arena.get_player_two().get_pokemon_list()[0]
+                 .get_current()
+                 .get_stat(&db::enums::Stats::Hp));
 
     attack.resolve(&mut arena, 2);
-    println!("HP1 nachher: {}", arena.get_player_one().get_pokemon_list()[0].get_current()
-        .get_stat(db::enums::Stats::Hp));
-    println!("HP2 nachher: {}", arena.get_player_two().get_pokemon_list()[0].get_current()
-        .get_stat(db::enums::Stats::Hp));
-    println!("Player Two: {:#?}", arena.get_player_two());
+    println!("HP1 nachher: {}",
+             arena.get_player_one().get_pokemon_list()[0]
+                 .get_current()
+                 .get_stat(&db::enums::Stats::Hp));
+    println!("HP2 nachher: {}",
+             arena.get_player_two().get_pokemon_list()[0]
+                 .get_current()
+                 .get_stat(&db::enums::Stats::Hp));
+    println!("Player One: {:#?}", arena.get_player_one());
 
     // use std::cell::RefCell;
     // use std::rc::Rc;
