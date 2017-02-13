@@ -1,9 +1,10 @@
 extern crate csv;
 
-use super::moves::{Technique};
+use super::moves::Technique;
 use super::enums;
 use std::collections::HashMap;
 use enum_primitive::FromPrimitive;
+
 
 ///Manages the list of moves that are available. Contains a bool that is true whenever all available
 ///moves are inside the entries to make an easier search possible.
@@ -15,17 +16,16 @@ pub struct Movedex {
     complete: bool,
 }
 
-//TODO: last 4 attacks are missing in move_meta.csv, therefore are not implemented right now.
-//DB must be extended and if statements adjusted accordingly
+// TODO: last 4 attacks are missing in move_meta.csv, therefore are not implemented right now.
+// DB must be extended and if statements adjusted accordingly
 
 impl Movedex {
-    ///takes an ID and a movedex and returns an option with the move that can be find with the
-    ///given ID. Returns None if the ID isn't in the movedex.
+    /// Takes an ID and a movedex and returns an option with the move that can be find with the
+    /// given ID. Returns None if the ID isn't in the movedex.
     pub fn move_by_id(&self, id: usize) -> Option<Technique> {
         if id < 617 && self.is_complete() {
             return Some(self.get_entries()[id - 1].clone());
-        }
-        else if id < 617 {
+        } else if id < 617 {
             for entry in self.entries.clone() {
                 if entry.get_id() == id {
                     return Some(entry);
@@ -35,48 +35,55 @@ impl Movedex {
         None
     }
 
-    ///Returns a list of all learnable moves by level for a specific pokemon with a specific level.
+    /// Returns a list of all learnable moves by level for a specific pokemon with a specific
+    /// level.
     pub fn for_token(&self, level: u16, id: usize) -> Movedex {
         let mut new_dex = Vec::new();
         let mut move_db = csv::Reader::from_file("./src/db/tables/pokemon_moves.csv").unwrap();
         for record in move_db.decode() {
-            let(poke_id, version, move_id, _, move_level, _): (usize, u8, usize, usize, u16,
-                Option<usize>) = record.unwrap();
+            let (poke_id, version, move_id, _, move_level, _): (usize,
+                                                                u8,
+                                                                usize,
+                                                                usize,
+                                                                u16,
+                                                                Option<usize>) = record.unwrap();
             if move_id < 617 && move_level <= level && poke_id == id && version == 16 {
                 if self.move_by_id(move_id).is_some() {
                     new_dex.push(self.move_by_id(move_id).unwrap());
                 }
             }
         }
+        new_dex.sort();
+        new_dex.dedup();
         Movedex {
             entries: new_dex,
             complete: false,
         }
     }
 
-    ///Returns the entry field of a movedex.
+    /// Returns the entry field of a movedex.
     pub fn get_entries(&self) -> Vec<Technique> {
         self.entries.clone()
     }
 
-    ///Returns true if the movedex contains all possible moves, and false if not.
+    /// Returns true if the movedex contains all possible moves, and false if not.
     fn is_complete(&self) -> bool {
         self.complete
     }
 
-    ///Creates a complete Movedex from the type_efficacy, moves_whole and move_flag_map databases in
-    ///the table folder.
+    /// Creates a complete Movedex from the type_efficacy, moves_whole and move_flag_map databases
+    /// in the table folder.
     pub fn new() -> Movedex {
-        //In the first step creates a vec with the effectivities for every type.
+        // In the first step creates a vec with the effectivities for every type.
         let mut effectivity = Vec::new();
         let mut effective_db = csv::Reader::from_file("./src/db/tables/type_efficacy.csv").unwrap();
         for record in effective_db.decode() {
-            let(off, def, factor): (i32, i32, u8) = record.unwrap();
+            let (off, def, factor): (i32, i32, u8) = record.unwrap();
             effectivity.push((off, def, factor));
         }
 
-        //Creates the main part with most simpel values and directly adds a Hash Map for the type
-        //efficiency of the move.
+        // Creates the main part with most simpel values and directly adds a Hash Map for the type
+        // efficiency of the move.
         let mut moves = Vec::new();
         let mut move_db = csv::Reader::from_file("./src/db/tables/moves_whole.csv").unwrap();
         for record in move_db.decode() {
@@ -99,7 +106,7 @@ impl Movedex {
             moves.push(move_tmp);
         }
 
-        //Adds all flags, that are valid for the moves.
+        // Adds all flags, that are valid for the moves.
         let mut flags = Vec::new();
         let mut last_id = 1;
         let mut flag_db = csv::Reader::from_file("./src/db/tables/move_flag_map.csv").unwrap();
@@ -107,7 +114,7 @@ impl Movedex {
             let (id, identifier): (usize, i32) = record.unwrap();
             if id < 617 {
                 if !(id == last_id) {
-                    moves[last_id -1].set_flags(flags);
+                    moves[last_id - 1].set_flags(flags);
                     last_id = id;
                     flags = Vec::new();
                 }

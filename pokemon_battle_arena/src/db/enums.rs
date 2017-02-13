@@ -3,7 +3,7 @@ extern crate rand;
 
 use self::rand::{Rng, thread_rng};
 
-/// enum for the pokemon/attack types.
+/// Enum for the pokemon/attack types.
 /// Can be assigned from i32 value.
 enum_from_primitive! {
     #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash)]
@@ -117,29 +117,7 @@ pub enum NonVolatile {
     BadPoison,
 }
 
-/// Flags that have a influence at the end of each turn.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EndOfTurn {
-    //absorbs some HP at the End of every Turn
-    LeechSeed,
-    //Counts from 0 to 4, one step each round, even in the turn it was initially used.
-    //When 4 is reached the Pokemon faints. Counting only continues when the Pokemon is part of
-    //the battle, but the counter will not be resetted if the Pokemon is changed.
-    PerishSong,
-    //Changes the NonVolatile Status of the Pokemon to Sleep after one round if possible.
-    Yawn,
-    //Is set after a flying type uses roost. This changes the flying type either to undefined, if
-    //the Pokemon has two types, or to Normal if it has only one. Because of the possible
-    //combination of normal and flying it is needed to have two indicators to determine which type
-    //must be changed back.
-    RoostTypeOne,
-    RoostTypeTwo,
-    //Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
-    //changed out. Lasts at least 2 and at most 5 turns.
-    Trap,
-}
-
-///Print method for non volatile status changes.
+/// Print method for non volatile status changes.
 pub fn print_non_volatile(status: NonVolatile) -> String {
     match status {
         NonVolatile::Undefined => String::from(""),
@@ -147,18 +125,106 @@ pub fn print_non_volatile(status: NonVolatile) -> String {
         NonVolatile::Sleep => String::from("asleep"),
         NonVolatile::Freeze => String::from("freezed"),
         NonVolatile::Burn => String::from("burned"),
-        _ => String::from("poisoned")
+        _ => String::from("poisoned"),
     }
 }
 
+/// Flags that have a influence at the end of each turn.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EndOfTurn {
+    // absorbs some HP at the End of every Turn
+    LeechSeed,
+    // Counts from 0 to 4, one step each round, even in the turn it was initially used.
+    // When 4 is reached the Pokemon faints. Counting only continues when the Pokemon is part of
+    // the battle, but the counter will not be resetted if the Pokemon is changed.
+    PerishSong,
+    // Changes the NonVolatile Status of the Pokemon to Sleep after one round if possible.
+    Yawn,
+    // Is set after a flying type uses roost. This changes the flying type either to undefined, if
+    // the Pokemon has two types, or to Normal if it has only one. Because of the possible
+    // combination of normal and flying it is needed to have two indicators to determine which type
+    // must be changed back.
+    RoostTypeOne,
+    RoostTypeTwo,
+    // Attacks that deal damage at the end of every turn and binds the Pokemon -> It can not be
+    // changed out. Lasts at least 2 and at most 5 turns.
+    Trap,
+    // Restores 1/16 of the Users HP at the end of every Turn.
+    Ingrain,
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+pub enum Fighting {
+    Confusion,
+    Infatuation,
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+pub enum Resolve {
+    NoTypeImmunity,
+    HealBlock,
+    Telekinesis,
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+pub enum Choose {
+    Torment,
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+pub enum PlayerFlag {
+
+}
+
 /// Enum for Genders
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Gender {
     Male,
     Female,
     Genderless,
 }
 
+/// More or less randomly provides a gender for a pokemon given the distribution for the species.
+pub fn get_gender(gender_rate: i8) -> Gender {
+    let mut rng = thread_rng();
+    let probability = rng.gen_range(0.0, 100.1);
+    match gender_rate {
+        -1 => Gender::Genderless,
+        0 => Gender::Male,
+        1 => {
+            if probability < 87.5 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        2 => {
+            if probability < 75.0 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        4 => {
+            if probability < 50.0 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        6 => {
+            if probability < 25.0 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        7 => {
+            if probability < 12.5 {
+                return Gender::Male;
+            }
+            Gender::Female
+        }
+        8 => Gender::Female,
+        _ => Gender::Genderless,
+    }
+}
 
 /// Makes it easier to acces the Stats directly
 enum_from_primitive! {
@@ -181,21 +247,21 @@ enum_from_primitive! {
 pub enum Weather {
     ClearSky,
     Sunlight,
-    //no need to handle it right now, only caused by abilities
+    // no need to handle it right now, only caused by abilities
     HarshSunlight,
     Rain,
-    //no need to handle it right now, only caused by abilities
+    // no need to handle it right now, only caused by abilities
     HeavyRain,
     Sandstorm,
     Hail,
-    //no need to handle it right now, only caused by abilities
+    // no need to handle it right now, only caused by abilities
     AirCurrent,
 }
 
-/// enum for the Damage Class of a attack.
+/// Enum for the Damage Class of a attack.
 /// Can be assigned from a i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone)]
+    #[derive(Debug, RustcDecodable, Clone, PartialEq)]
     pub enum DamageClass {
         Physical = 1,
         Special = 2,
@@ -253,44 +319,16 @@ enum_from_primitive! {
     }
 }
 
-/// More or less randomly provides a gender for a pokemon given the distribution for the species.
-pub fn get_gender(gender_rate: i8) -> Gender {
-    let mut rng = thread_rng();
-    let probability = rng.gen_range(0.0, 100.1);
-    match gender_rate {
-        -1 => Gender::Genderless,
-        0 => Gender::Male,
-        1 => {
-            if probability < 87.5 {
-                return Gender::Male
-            }
-            Gender::Female
-        }
-        2 => {
-            if probability < 75.0 {
-                return Gender::Male
-            }
-            Gender::Female
-        }
-        4 => {
-            if probability < 50.0 {
-                return Gender::Male
-            }
-            Gender::Female
-        }
-        6 => {
-            if probability < 25.0 {
-                return Gender::Male
-            }
-            Gender::Female
-        }
-        7 => {
-            if probability < 12.5 {
-                return Gender::Male
-            }
-            Gender::Female
-        }
-        8 => Gender::Female,
-        _ => Gender::Genderless,
+pub fn stat_to_string(stat: Stats) -> &'static str {
+    match stat {
+        Stats::Hp => "hp",
+        Stats::Attack => "attack",
+        Stats::Defense => "defense",
+        Stats::SpecialAttack => "special attack",
+        Stats::SpecialDefense => "special defense",
+        Stats::Speed => "speed",
+        Stats::Accuracy => "accuracy",
+        Stats::Evasion => "evasion",
+        _ => "",
     }
 }

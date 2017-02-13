@@ -1,6 +1,8 @@
 #![allow(dead_code)]
-#[macro_use] extern crate enum_primitive;
-#[macro_use] extern crate conrod;
+#[macro_use]
+extern crate enum_primitive;
+#[macro_use]
+extern crate conrod;
 extern crate rustc_serialize;
 extern crate time;
 extern crate piston_window;
@@ -13,6 +15,7 @@ mod player;
 use player::Player;
 use player::PlayerType;
 use arena::Arena;
+use db::enums;
 
 fn main() {
     println!("");
@@ -24,14 +27,14 @@ fn main() {
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
     println!("Testing:");
-    // for entry in db::movedex::Movedex::new().get_entries() {
-    //     if entry.get_category() == enums::Move_Category::Swagger {
-    //         println!("{:?}", entry.get_name());
-    //     }
-    // }
-    test_players();
-    test_arena();
-    graphic::gui::draw_window();
+    for entry in db::movedex::Movedex::new().get_entries() {
+        if entry.get_category() == enums::MoveCategory::FieldEffect {
+            println!("{:?}", entry.get_name());
+        }
+    }
+    // test_players();
+    // test_arena();
+    // graphic::gui::draw_window();
 }
 
 
@@ -58,13 +61,37 @@ fn test_players() {
 }
 
 fn test_arena() {
-    let human1 = Player::new_by_id(&[5, 3, 17], PlayerType::Human);
-    let human2 = Player::new_by_id(&[18, 19, 122], PlayerType::Human);
-    let arena = Arena::new(human1, human2,
-        db::enums::Types::Normal, db::enums::Weather::ClearSky);
-    println!("{}", arena.get_player_one().get_pokemon_count());
-    println!("{}", arena.get_player_two().get_pokemon_count());
-    println!("{:#?}", arena.get_player_one().get_pokemon_list());
-    println!("{:#?}", arena.get_player_two().get_pokemon_list());
-    println!("{:?}", arena.get_weather());
+    // Arena erstellen
+    let mut p1 = Player::new_by_id(&[5], PlayerType::Human);
+    let mut p2 = Player::new_by_id(&[8], PlayerType::Human);
+    let mut arena = Arena::new(&mut p1,
+                               &mut p2,
+                               db::enums::Types::Normal,
+                               db::enums::Weather::ClearSky);
+    println!("Player One: {:#?}", arena.get_player_one());
+    println!("Player Two: {:#?}", arena.get_player_two());
+    // Attacke erstellen und "Kampf"
+    let movedex = db::movedex::Movedex::new();
+    let attack = movedex.move_by_id(151).unwrap();
+    println!("Attack: {}", attack.get_name());
+
+    println!("HP1 vorher: {}",
+             arena.get_player_one().get_pokemon_list()[0]
+                 .get_current()
+                 .get_stat(&db::enums::Stats::Hp));
+    println!("HP2 vorher: {}",
+             arena.get_player_two().get_pokemon_list()[0]
+                 .get_current()
+                 .get_stat(&db::enums::Stats::Hp));
+
+    attack.resolve(&mut arena, 2);
+    println!("HP1 nachher: {}",
+             arena.get_player_one().get_pokemon_list()[0]
+                 .get_current()
+                 .get_stat(&db::enums::Stats::Hp));
+    println!("HP2 nachher: {}",
+             arena.get_player_two().get_pokemon_list()[0]
+                 .get_current()
+                 .get_stat(&db::enums::Stats::Hp));
+    println!("Player One: {:#?}", arena.get_player_one());
 }
