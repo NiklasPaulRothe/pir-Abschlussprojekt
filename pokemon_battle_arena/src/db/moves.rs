@@ -56,14 +56,16 @@ impl Technique {
     pub fn resolve(&self, arena: &mut Arena, flag: u8) {
         // First call the hits method to sort out missing moves.
         let mut user_clone = get_user(flag, arena).clone();
-        let mut target_clone = get_user(flag, arena).clone();
-        if self.hits(&mut target_clone, &mut user_clone) {
+        let mut target_clone = get_target(flag, arena).clone();
+        let mut defender_clone = get_defender(flag, arena).clone();
+        let mut attacker_clone = get_attacker(flag, arena).clone();
+        if self.hits(&mut target_clone, &mut user_clone, &mut defender_clone) {
             // Match over the category provides smaller samples that must be dealt with.
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
                     let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target);
+                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
                 }
 
                 enums::MoveCategory::Ailment => {
@@ -73,7 +75,8 @@ impl Technique {
                                      self.get_ailment(),
                                      100,
                                      user_clone,
-                                     &mut target);
+                                     &mut target,
+                                     &mut defender_clone);
                 }
 
                 enums::MoveCategory::NetGoodStats => {
@@ -81,37 +84,44 @@ impl Technique {
                     if Regex::new(r"attack").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::Attack,
-                                              &mut target);
+                                              &mut target,
+                                              &mut attacker_clone);
                     }
                     if Regex::new(r"defense").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::Defense,
-                                              &mut target);
+                                              &mut target,
+                                              &mut attacker_clone);
                     }
                     if Regex::new(r"special-attack").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::SpecialAttack,
-                                              &mut target);
+                                              &mut target,
+                                              &mut attacker_clone);
                     }
                     if Regex::new(r"special-defense").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::SpecialDefense,
-                                              &mut target);
+                                              &mut target,
+                                              &mut attacker_clone);
                     }
                     if Regex::new(r"speed").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::Speed,
-                                              &mut target);
+                                              &mut target,
+                                              &mut attacker_clone);
                     }
                     if Regex::new(r"accuracy").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::Accuracy,
-                                              &mut target);
+                                              &mut target,
+                                              &mut attacker_clone);
                     }
                     if Regex::new(r"evasion").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::Evasion,
-                                              &mut target);
+                                              &mut target,
+                                              &mut attacker_clone);
                     }
                 }
 
@@ -177,14 +187,16 @@ impl Technique {
                 }
 
                 enums::MoveCategory::DamageAndAilment => {
+                    let mut defender = get_defender(flag, arena).clone();
                     let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target);
+                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
                     resolve::ailment(self.get_name(),
                                      self.get_type(),
                                      self.get_ailment(),
                                      self.get_effect_chance(),
                                      user_clone,
-                                     &mut target);
+                                     &mut target,
+                                     &mut defender);
                 }
 
                 // Swagger moves confuse the target and raise their stats. Important is that the
@@ -192,33 +204,38 @@ impl Technique {
                 // confused due to other reasons, but it will not get confused if the stats can
                 // not be raised anymore.
                 enums::MoveCategory::Swagger => {
+                    let mut defender = get_defender(flag, arena).clone();
                     let mut target = get_target(flag, arena);
                     if resolve::change_stats(self.get_stat_change_rate(),
                                              self.get_stat(),
-                                             &mut target) {
+                                             &mut target,
+                                             &mut defender_clone) {
                         resolve::ailment(self.get_name(),
                                          self.get_type(),
                                          self.get_ailment(),
                                          100,
                                          user_clone,
-                                         &mut target);
+                                         &mut target,
+                                         &mut defender);
                     }
                 }
 
                 enums::MoveCategory::DamageAndLower => {
                     let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target);
+                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
                     resolve::change_stats(self.get_stat_change_rate(),
                                           self.get_stat(),
-                                          &mut target);
+                                          &mut target,
+                                          &mut defender_clone);
                 }
 
                 enums::MoveCategory::DamageAndRaise => {
                     let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target);
+                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
                     resolve::change_stats(self.get_stat_change_rate(),
                                           self.get_stat(),
-                                          &mut target);
+                                          &mut target,
+                                          &mut attacker_clone);
                 }
 
                 // First deals damage and afterwards heals themselve for a percentage of the
@@ -231,7 +248,10 @@ impl Technique {
                         let mut value: u16;
                         {
                             let mut target = get_target(flag, arena);
-                            value = resolve::deal_damage(&self, &mut user_clone, &mut target);
+                            value = resolve::deal_damage(&self,
+                                                         &mut user_clone,
+                                                         &mut target,
+                                                         &mut defender_clone);
                             match self.get_drain_percentage() {
                                 50 => value = value / 2,
                                 75 => value = (value / 4) * 3,
@@ -268,9 +288,9 @@ impl Technique {
                 enums::MoveCategory::FieldEffect => {
                     let target_side = Regex::new(r"opposing").unwrap();
                     if target_side.is_match(&self.effect_long) {
-                        resolve::opponent_field(self, get_defender(flag, arena));
+                        resolve::field_effect(self, get_defender(flag, arena));
                     } else {
-                        resolve::user_field();
+                        resolve::field_effect(self, get_attacker(flag, arena));
                     }
                 }
 
@@ -295,16 +315,41 @@ impl Technique {
     /// hit by the user and false if not
     pub fn hits(&self,
                 user: &mut pokemon_token::PokemonToken,
-                target: &mut pokemon_token::PokemonToken)
+                target: &mut pokemon_token::PokemonToken,
+                player: &mut Player)
                 -> bool {
-        // TODO: As soon as flags for semi invulnerability are added, they have to be taken into
+        // TODO: As soon as flags for semi invulnerability are added, they have to be taken mut
         // account for hit calculation.
+        if self.get_flags().contains(&enums::MoveFlags::Protect) &&
+           target.get_resolve_flags().contains_key(&enums::Resolve::Protect) {
+            return false;
+        }
+        if !(self.get_name() == "mat-block" && player.get_switched()) {
+            return false;
+        }
+
+        if player.get_flags().contains_key(&enums::PlayerFlag::MatBlock) &&
+           !self.get_flags().contains(&enums::MoveFlags::Protect) {
+            return false;
+        }
+        if player.get_flags().contains_key(&enums::PlayerFlag::WideGuard) &&
+           (self.get_target() == enums::Target::AllOtherPokemon ||
+            self.get_target() == enums::Target::AllOpponents ||
+            self.get_target() == enums::Target::UserAndAllies ||
+            self.get_target() == enums::Target::AllPokemon) {
+            return false;
+        }
         if target.get_resolve_flags().contains_key(&enums::Resolve::Telekinesis) &&
            self.get_category() == enums::MoveCategory::Ohko {
             return true;
         }
         let probability: u16;
         if self.accuracy.is_some() {
+            if player.get_flags().contains_key(&enums::PlayerFlag::CraftyShield) &&
+               self.get_name() != "perish-song" &&
+               self.get_damage_class() == enums::DamageClass::Status {
+                return false;
+            }
             let mut modifier = user.get_current().get_stat(&enums::Stats::Accuracy) /
                                target.get_current().get_stat(&enums::Stats::Evasion);
             if modifier < 33 {

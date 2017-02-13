@@ -26,12 +26,12 @@ fn main() {
 
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
-    println!("Testing:");
-    for entry in db::movedex::Movedex::new().get_entries() {
-        if entry.get_category() == enums::MoveCategory::FieldEffect {
-            println!("{:?}", entry.get_name());
-        }
-    }
+    // println!("Testing:");
+    // for entry in db::movedex::Movedex::new().get_entries() {
+    //     if entry.get_category() == enums::MoveCategory::FieldEffect {
+    //         println!("{:?}", entry.get_name());
+    //     }
+    // }
     // test_players();
     // test_arena();
     // graphic::gui::draw_window();

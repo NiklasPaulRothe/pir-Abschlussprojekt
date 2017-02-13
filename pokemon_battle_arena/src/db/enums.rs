@@ -164,6 +164,7 @@ pub enum Resolve {
     NoTypeImmunity,
     HealBlock,
     Telekinesis,
+    Protect,
 }
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
@@ -183,6 +184,17 @@ pub enum PlayerFlag {
     LuckyChant,
     // deals Damage to Pokemon that are switched in.
     Spikes,
+    CraftyShield,
+    MatBlock,
+    // protects the User from every move with Priority > 0 for one round.
+    QuickGuard,
+    WideGuard,
+    // Doubles the speed for speed check.
+    Tailwind,
+    Safeguard,
+    Reflect,
+    LightScreen,
+    Mist,
 }
 
 /// Enum for Genders
@@ -281,7 +293,7 @@ enum_from_primitive! {
 /// Enum that contains the valid target(s) of a move.
 /// Can be assigned from a i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone)]
+    #[derive(Debug, RustcDecodable, Clone, PartialEq)]
     pub enum Target {
         SpecificMove = 1,
         SelectedPokemonMeFirst = 2,
@@ -303,7 +315,7 @@ enum_from_primitive! {
 /// All Flags that can be important for a move. Contains for example if a move is influenced by
 /// another move or condition the pokemon or arena is in.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone)]
+    #[derive(Debug, RustcDecodable, Clone, PartialEq)]
     pub enum MoveFlags {
         Contact = 1,
         Charge = 2,

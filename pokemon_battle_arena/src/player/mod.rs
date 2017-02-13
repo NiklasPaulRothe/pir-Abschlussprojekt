@@ -27,6 +27,7 @@ pub struct Player {
     next_move: Option<(moves::Technique, u8)>,
     flags: HashMap<enums::PlayerFlag, u8>,
     last_move: Option<(moves::Technique, AttackSlot)>,
+    switched: bool,
 }
 
 impl Player {
@@ -48,6 +49,7 @@ impl Player {
             next_move: None,
             flags: HashMap::new(),
             last_move: None,
+            switched: false,
         }
     }
 
@@ -103,6 +105,10 @@ impl Player {
         &mut self.flags
     }
 
+    pub fn get_switched(&mut self) -> bool {
+        self.switched
+    }
+
     // Setter methods
     //
     /// Sets the current value (e.g. after a pokemon swap)
@@ -115,7 +121,11 @@ impl Player {
         self.next_move = next;
     }
     pub fn add_flag(&mut self, flag: enums::PlayerFlag) {
-        self.flags.insert(flag, 0);
+        if !self.flags.contains_key(&flag) {
+            self.flags.insert(flag, 0);
+        } else {
+            println!("It has no effect");
+        }
     }
     /// Sets the last move the attacking pokemon made with the Slot in which it is saved
     pub fn set_last_move(&mut self, last: Option<(moves::Technique, AttackSlot)>) {
