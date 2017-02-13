@@ -6,6 +6,7 @@ use arena;
 use db::pokemon_token::PokemonToken;
 use db::pokedex::*;
 use db::{enums, moves};
+use std::collections::HashMap;
 
 /// The Player type represents if the Player is a Human or a specific Ai to call different funcions
 /// for e.g. choosing Pokemon
@@ -24,10 +25,11 @@ pub struct Player {
     pokemon_count: usize,
     current: usize,
     next_move: Option<moves::Technique>,
+    flags: HashMap<enums::PlayerFlag, u8>,
 }
 
 impl Player {
-    // Constuctor
+    // Constructor
     //
     /// Takes an array with pokemon id´s and the PlayerType and returns a player
     pub fn new_by_id(input: &[usize], player_type: PlayerType) -> Self {
@@ -43,6 +45,7 @@ impl Player {
             pokemon_count: len,
             current: 0,
             next_move: None,
+            flags: HashMap::new(),
         }
     }
 
@@ -90,6 +93,10 @@ impl Player {
         self.next_move.clone()
     }
 
+    pub fn get_flags(&mut self) -> &mut HashMap<enums::PlayerFlag, u8> {
+        &mut self.flags
+    }
+
     // Setter methods
     //
     /// Sets the current value (e.g. after a pokemon swap)
@@ -100,6 +107,9 @@ impl Player {
     /// Sets a next move to the Player
     pub fn set_next_move(&mut self, next: Option<moves::Technique>) {
         self.next_move = next;
+    }
+    pub fn add_flag(&mut self, flag: enums::PlayerFlag) {
+        self.flags.insert(flag, 0);
     }
     // Other
     //

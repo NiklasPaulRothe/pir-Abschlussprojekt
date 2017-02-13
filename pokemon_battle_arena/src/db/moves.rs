@@ -264,7 +264,11 @@ impl Technique {
 
                 enums::MoveCategory::WholeFieldEffect => {}
 
-                enums::MoveCategory::FieldEffect => {}
+                enums::MoveCategory::FieldEffect => {
+                    // match self.get_name() {
+
+                    // }
+                }
 
                 enums::MoveCategory::ForceSwitch => {
                     let mut defender = &mut arena.get_player_two();

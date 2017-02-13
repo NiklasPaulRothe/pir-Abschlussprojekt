@@ -171,6 +171,11 @@ pub enum Choose {
     Torment,
 }
 
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+pub enum PlayerFlag {
+
+}
+
 /// Enum for Genders
 #[derive(Debug, Clone, PartialEq)]
 pub enum Gender {
