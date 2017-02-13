@@ -354,7 +354,7 @@ pub fn draw_window() {
                                 if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_two() {
                                     app.pkmn_moves.push(att);
                                 }
-                                if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_three() {
+                                if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_three(){
                                     app.pkmn_moves.push(att);
                                 }
                                 if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_four() {
@@ -490,8 +490,6 @@ pub fn draw_window() {
                                 } else {
                                     println!("Error: Pokemon can only have 4 moves");
                                 }
-
-                                println!("{:?}", db::moves::Technique::get_name_vec(app.pkmn_moves.clone()));
                             }
                             _ => {}
                         }
