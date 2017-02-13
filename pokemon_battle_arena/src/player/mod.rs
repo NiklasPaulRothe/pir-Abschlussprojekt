@@ -78,7 +78,7 @@ impl Player {
     /// Returns a Vec with the id´s in the player model from the pokemon which are alive
     pub fn get_alive_list(&mut self) -> Vec<usize> {
         let mut vec = Vec::new();
-         for i in 0..self.pokemon_list.len() {
+        for i in 0..self.pokemon_list.len() {
             if self.get_pokemon_list()[i].get_current().get_stat(&enums::Stats::Hp) != 0 {
                 vec.push(i);
             }
