@@ -188,14 +188,16 @@ impl PokemonToken {
 
     /// Sets the moves to the pokemon
     pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {
-        self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
-        if moves.len() >= 1 {
+        if moves.len() > 1 {
+            self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
+        }
+        if moves.len() > 1 {
             self.move_two = Some((moves[1].clone(), moves[1].get_power_points().unwrap()));
         }
-        if moves.len() >= 2 {
+        if moves.len() > 2 {
             self.move_three = Some((moves[2].clone(), moves[2].get_power_points().unwrap()));
         }
-        if moves.len() >= 3 {
+        if moves.len() > 3 {
             self.move_four = Some((moves[3].clone(), moves[3].get_power_points().unwrap()));
         }
     }
