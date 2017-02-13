@@ -23,7 +23,8 @@ pub struct Player {
     pokemon_list: Vec<PokemonToken>,
     pokemon_count: usize,
     current: usize,
-    next_move: Option<moves::Technique>,
+    next_move: Option<(moves::Technique, u8)>,
+    last_move: Option<(moves::Technique, AttackSlot)>,
 }
 
 impl Player {
@@ -43,6 +44,7 @@ impl Player {
             pokemon_count: len,
             current: 0,
             next_move: None,
+            last_move: None,
         }
     }
 
@@ -86,8 +88,12 @@ impl Player {
         }
     }
     /// Gets the next attack from the Player. Returns none if no Technique is selected
-    pub fn get_next_move(&self) -> Option<moves::Technique> {
+    pub fn get_next_move(&self) -> Option<(moves::Technique, u8)> {
         self.next_move.clone()
+    }
+    /// Gets the last move with the Slot. Returns None if the last move wasn´t an attack
+    pub fn get_last_move(&self) -> Option<(moves::Technique, AttackSlot)> {
+        self.last_move.clone()
     }
 
     // Setter methods
@@ -98,8 +104,12 @@ impl Player {
         self.current = new;
     }
     /// Sets a next move to the Player
-    pub fn set_next_move(&mut self, next: Option<moves::Technique>) {
+    pub fn set_next_move(&mut self, next: Option<(moves::Technique, u8)>) {
         self.next_move = next;
+    }
+    /// Sets the last move the attacking pokemon made with the Slot in which it is saved
+    pub fn set_last_move(&mut self, last: Option<(moves::Technique, AttackSlot)>) {
+        self.last_move = last;
     }
     // Other
     //
@@ -112,6 +122,7 @@ impl Player {
 }
 
 /// An enum which represents the AttackSlot to match with it
+#[derive(Debug, Clone)]
 pub enum AttackSlot {
     One,
     Two,

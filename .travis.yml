@@ -7,7 +7,9 @@ git:
 before_install:
  - chmod +x ci/install-tools.sh
 before_script:
-  - ci/install-tools.sh
+  - |
+      export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$PATH &&
+      ci/install-tools.sh
 script:
   - ci/run-all.sh
 after_success:
