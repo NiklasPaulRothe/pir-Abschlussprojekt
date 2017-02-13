@@ -49,6 +49,7 @@ pub fn ailment(name: String,
                move_type: enums::Types,
                ailment: enums::Ailment,
                effect_chance: u8,
+               user: PokemonToken,
                target: &mut PokemonToken) {
     let mut rng = thread_rng();
     let random = rng.gen_range(0, 101);
@@ -189,6 +190,40 @@ pub fn ailment(name: String,
                 enums::Ailment::HealBlock => {
                     if !target.get_resolve_flags().contains_key(&enums::Resolve::HealBlock) {
                         target.add_resolve_flag(enums::Resolve::HealBlock)
+                    }
+                }
+
+                enums::Ailment::Ingrain => {
+                    if !target.get_end_of_turn_flags().contains_key(&enums::EndOfTurn::Ingrain) {
+                        target.add_end_flag(enums::EndOfTurn::Ingrain);
+                        if target.get_fight_flags().contains_key(&enums::Fighting::Infatuation) {
+                            target.get_fight_flags().remove(&enums::Fighting::Infatuation);
+                        }
+                    }
+                }
+
+                // Unimplemented for now. Would prevent the Player from using Items on a Pokemon, but
+                // as far as there are no items it has no effect.
+                enums::Ailment::Embargo => {}
+
+                enums::Ailment::Torment => {
+                    if !target.get_choose_flags().contains_key(&enums::Choose::Torment) {
+                        target.add_choose_flag(enums::Choose::Torment)
+                    }
+                }
+
+                enums::Ailment::Infatuation => {
+                    if !target.get_fight_flags().contains_key(&enums::Fighting::Infatuation) &&
+                       target.get_gender() != user.get_gender() {
+                        target.add_fight_flag(enums::Fighting::Infatuation);
+                    } else {
+                        println!("{} was not affected by Attract", target.get_name());
+                    }
+                }
+
+                enums::Ailment::Unknown => {
+                    if !target.get_resolve_flags().contains_key(&enums::Resolve::Telekinesis) {
+                        target.add_resolve_flag(enums::Resolve::Telekinesis);
                     }
                 }
 
@@ -349,14 +384,18 @@ pub fn change_stats(stages: i8, stat: enums::Stats, target: &mut PokemonToken) -
 // Heals the targets HP by the provided value, or, if this would raise the HP above the base stat,
 // to their base HP.
 pub fn heal(target: &mut PokemonToken, value: u16) {
-    if value + target.get_current().get_stat(&enums::Stats::Hp) >=
-       target.get_base().get_stat(&enums::Stats::Hp) {
-        let base = target.get_base().clone();
-        target.get_current().set_stats(enums::Stats::Hp, base.get_stat(&enums::Stats::Hp));
+    if !target.get_resolve_flags().contains_key(&enums::Resolve::HealBlock) {
+        if value + target.get_current().get_stat(&enums::Stats::Hp) >=
+           target.get_base().get_stat(&enums::Stats::Hp) {
+            let base = target.get_base().clone();
+            target.get_current().set_stats(enums::Stats::Hp, base.get_stat(&enums::Stats::Hp));
+        } else {
+            let current = target.get_current().clone();
+            target.get_current().set_stats(enums::Stats::Hp,
+                                           (current.get_stat(&enums::Stats::Hp) + value));
+        }
     } else {
-        let current = target.get_current().clone();
-        target.get_current().set_stats(enums::Stats::Hp,
-                                       (current.get_stat(&enums::Stats::Hp) + value));
+        println!("{} could not be healed", target.get_name());
     }
 }
 

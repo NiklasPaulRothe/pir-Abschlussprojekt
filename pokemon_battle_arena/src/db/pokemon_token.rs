@@ -30,6 +30,7 @@ pub struct PokemonToken {
     dv: determinant_values::Dv,
     base_stats: stats::Stats,
     current_stats: stats::Stats,
+    choose_flags: HashMap<enums::Choose, u8>,
     resolve_flags: HashMap<enums::Resolve, u8>,
     fight_flags: HashMap<enums::Fighting, u8>,
     end_of_turn_flags: HashMap<enums::EndOfTurn, u8>,
@@ -64,6 +65,7 @@ impl PokemonToken {
             dv: dv,
             base_stats: stats.clone(),
             current_stats: stats,
+            choose_flags: HashMap::new(),
             resolve_flags: HashMap::new(),
             fight_flags: HashMap::new(),
             end_of_turn_flags: HashMap::new(),
@@ -118,17 +120,21 @@ impl PokemonToken {
         self.base_stats.clone()
     }
 
-    pub fn get_resolve_flags(&self) -> &HashMap<enums::Resolve, u8> {
-        &self.resolve_flags
+    pub fn get_choose_flags(&mut self) -> &mut HashMap<enums::Choose, u8> {
+        &mut self.choose_flags
     }
 
-    pub fn get_fight_flags(&self) -> &HashMap<enums::Fighting, u8> {
-        &self.fight_flags
+    pub fn get_resolve_flags(&mut self) -> &mut HashMap<enums::Resolve, u8> {
+        &mut self.resolve_flags
+    }
+
+    pub fn get_fight_flags(&mut self) -> &mut HashMap<enums::Fighting, u8> {
+        &mut self.fight_flags
     }
 
     /// Gets the list of end of turn flags
-    pub fn get_end_of_turn_flags(&self) -> HashMap<enums::EndOfTurn, u8> {
-        self.end_of_turn_flags.clone()
+    pub fn get_end_of_turn_flags(&mut self) -> &mut HashMap<enums::EndOfTurn, u8> {
+        &mut self.end_of_turn_flags
     }
     /// Gets the description of the pokemon which also can be read by the user of the program
     pub fn get_description(&self) -> String {
@@ -207,6 +213,9 @@ impl PokemonToken {
     /// Adds an end of turn flag
     pub fn add_end_flag(&mut self, flag: enums::EndOfTurn) {
         self.end_of_turn_flags.insert(flag, 0);
+    }
+    pub fn add_choose_flag(&mut self, flag: enums::Choose) {
+        self.choose_flags.insert(flag, 0);
     }
     pub fn add_resolve_flag(&mut self, flag: enums::Resolve) {
         self.resolve_flags.insert(flag, 0);
