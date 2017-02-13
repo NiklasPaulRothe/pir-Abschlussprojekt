@@ -41,6 +41,7 @@ impl Dv {
             speed: sample[5],
         }
     }
+    /// Returns the determinant value given in the parameters
     pub fn get_dv(&self, stat: Stats) -> u8 {
         match stat {
             Stats::Hp => self.hp,

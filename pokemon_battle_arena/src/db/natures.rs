@@ -15,7 +15,7 @@ pub struct Nature {
     increase_stat: enums::Stats,
 }
 
-/// creates a Vec that contains every possible nature.
+/// Creates a Vector that contains every possible nature.
 pub fn create_naturedb() -> Vec<Nature> {
     let mut natures = Vec::new();
     let mut nature_db = csv::Reader::from_file("./src/db/tables/natures.csv").unwrap();
@@ -40,7 +40,7 @@ impl Nature {
         let nature = rng.choose(&dex);
         nature.unwrap().clone()
     }
-
+    /// Gets the stats which will increased or decresed if a pokemon is from this nature
     pub fn get_stats(&self) -> (enums::Stats, enums::Stats) {
         (self.decrease_stat.clone(), self.increase_stat.clone())
     }
