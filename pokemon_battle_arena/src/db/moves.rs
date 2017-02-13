@@ -13,7 +13,7 @@ use self::regex::Regex;
 use std::collections::HashMap;
 use std::cmp::Ordering;
 use arena::Arena;
-use player::Player;
+use player::{Player, Next};
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.
@@ -64,17 +64,24 @@ impl Technique {
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
-                    let mut target = get_target(flag, arena);
-                    let mut frequency = 1;
-                    if self.min_hits.is_some() {
-                        let mut rng = thread_rng();
-                        frequency = rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
+                    let mut rng = thread_rng();
+                    {
+                        let mut target = get_target(flag, arena);
+                        let mut frequency = 1;
+                        if self.min_hits.is_some() {
+                            frequency =
+                                rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
+                        }
+                        for _ in 0..frequency {
+                            resolve::deal_damage(&self,
+                                                 &mut user_clone,
+                                                 &mut target,
+                                                 &mut defender_clone);
+                        }
                     }
-                    for _ in 0..frequency {
-                        resolve::deal_damage(&self,
-                                             &mut user_clone,
-                                             &mut target,
-                                             &mut defender_clone);
+                    if self.flinch_chance > 0 &&
+                       rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
+                        get_defender(flag, arena).set_next_move(Some(Next::Flinch));
                     }
                 }
 
