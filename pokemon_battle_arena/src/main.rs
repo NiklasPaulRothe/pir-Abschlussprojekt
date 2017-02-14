@@ -27,13 +27,13 @@ fn main() {
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
     // println!("Testing:");
-    // for entry in db::movedex::Movedex::new().get_entries() {
-    //     if entry.get_category() == enums::MoveCategory::Damage {
-    //         println!("{:?}", entry.get_name());
-    //     }
-    // }
+    for entry in db::movedex::Movedex::new().get_entries() {
+        if entry.get_flags().contains(&enums::MoveFlags::Charge) {
+            println!("{:?}", entry.get_name());
+        }
+    }
     // test_players();
-    test_arena();
+    // test_arena();
     // graphic::gui::draw_window();
     // println!("{:?}", db::movedex::Movedex::new().move_by_id(245).unwrap());
 }

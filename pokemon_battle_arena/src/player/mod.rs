@@ -16,7 +16,7 @@ pub enum PlayerType {
     SimpleAi,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Next {
     Move(moves::Technique, u8),
     Switch,
@@ -34,6 +34,7 @@ pub struct Player {
     next_move: Option<Next>,
     flags: HashMap<enums::PlayerFlag, u8>,
     last_move: Option<(moves::Technique, AttackSlot)>,
+    last_action: Option<Next>,
     switched: bool,
 }
 
@@ -56,6 +57,7 @@ impl Player {
             next_move: None,
             flags: HashMap::new(),
             last_move: None,
+            last_action: None,
             switched: false,
         }
     }
@@ -112,6 +114,10 @@ impl Player {
         self.last_move.clone()
     }
 
+    pub fn get_last_action(&self) -> &Option<(Next)> {
+        &self.last_action
+    }
+
     pub fn get_flags(&mut self) -> &mut HashMap<enums::PlayerFlag, u8> {
         &mut self.flags
     }
@@ -141,6 +147,9 @@ impl Player {
     /// Sets the last move the attacking pokemon made with the Slot in which it is saved
     pub fn set_last_move(&mut self, last: Option<(moves::Technique, AttackSlot)>) {
         self.last_move = last;
+    }
+    pub fn set_last_action(&mut self, last: Next) {
+        self.last_action = Some(last);
     }
     // Other
     //

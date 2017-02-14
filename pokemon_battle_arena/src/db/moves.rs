@@ -64,24 +64,32 @@ impl Technique {
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
-                    let mut rng = thread_rng();
-                    {
-                        let mut target = get_target(flag, arena);
-                        let mut frequency = 1;
-                        if self.min_hits.is_some() {
-                            frequency =
-                                rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
+                    if self.get_flags().contains(&enums::MoveFlags::Charge) &&
+                       !(attacker_clone.get_last_action().clone().unwrap() ==
+                         Next::Move(self.clone(), 0)) {
+                        let attacker = get_attacker(flag, arena);
+                        attacker.set_last_action((Next::Move(self.clone(), 0)));
+                        attacker.set_next_move(Some(Next::Move(self.clone(), 0)))
+                    } else {
+                        let mut rng = thread_rng();
+                        {
+                            let mut target = get_target(flag, arena);
+                            let mut frequency = 1;
+                            if self.min_hits.is_some() {
+                                frequency =
+                                    rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
+                            }
+                            for _ in 0..frequency {
+                                resolve::deal_damage(&self,
+                                                     &mut user_clone,
+                                                     &mut target,
+                                                     &mut defender_clone);
+                            }
                         }
-                        for _ in 0..frequency {
-                            resolve::deal_damage(&self,
-                                                 &mut user_clone,
-                                                 &mut target,
-                                                 &mut defender_clone);
+                        if self.flinch_chance > 0 &&
+                           rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
+                            get_defender(flag, arena).set_next_move(Some(Next::Flinch));
                         }
-                    }
-                    if self.flinch_chance > 0 &&
-                       rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
-                        get_defender(flag, arena).set_next_move(Some(Next::Flinch));
                     }
                 }
 
