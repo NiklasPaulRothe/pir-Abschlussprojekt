@@ -33,8 +33,9 @@ fn testing() {
     //     }
     // }
     // test_players();
-    test_arena();
+    // test_arena();
     // graphic::gui::draw_window();
+    println!("{:?}", db::movedex::Movedex::new().move_by_id(245).unwrap());
 }
 
 
