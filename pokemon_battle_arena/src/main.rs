@@ -26,12 +26,21 @@ fn main() {
 
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
+
     println!("Testing:");
     for entry in db::movedex::Movedex::new().get_entries() {
         if entry.get_category() == enums::MoveCategory::WholeFieldEffect {
             println!("{:?}", entry.get_name());
         }
     }
+
+    // println!("Testing:");
+    // for entry in db::movedex::Movedex::new().get_entries() {
+    //     if entry.get_category() == enums::MoveCategory::Damage {
+    //         println!("{:?}", entry.get_name());
+    //     }
+    // }
+
     // test_players();
     test_arena();
     // graphic::gui::draw_window();
@@ -72,9 +81,10 @@ fn test_arena() {
     // println!("Player Two: {:#?}", arena.get_player_two());
     // Attacke erstellen und "Kampf"
     let movedex = db::movedex::Movedex::new();
+
     let attack = movedex.move_by_id(1).unwrap();
     let attack_haze = movedex.move_by_id(114).unwrap();
-    let attack_hail = movedex.move_by_id(257).unwrap();
+    let attack_hail = movedex.move_by_id(258).unwrap();
     println!("Attack: {}", attack_hail.get_name());
 
     println!("HP1 vorher: {}",

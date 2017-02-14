@@ -24,8 +24,9 @@ impl Stats {
                            level: u16)
                            -> Stats {
         let hp = ((((2.0 * model.get_stats().get_stat(&enums::Stats::Hp) as f32 +
-                     (dv.get_dv(enums::Stats::Hp) as f32 / 4.0)) as
-                    f32 * level as f32) / 100.0) + level as f32 + 10.0) as u16;
+                     (dv.get_dv(enums::Stats::Hp) as f32 /
+                      4.0)) as f32 * level as f32) / 100.0) + level as f32 +
+                  10.0) as u16;
 
         fn stat_formula(base: u16,
                         stat: enums::Stats,
