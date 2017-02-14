@@ -4,6 +4,7 @@ extern crate regex;
 use super::moves::Technique;
 use super::pokemon_token::PokemonToken;
 use super::enums;
+use arena::Arena;
 use self::rand::{Rng, thread_rng};
 use self::regex::Regex;
 use player::Player;
@@ -475,6 +476,79 @@ pub fn ko_attack(target: &mut PokemonToken) {
     target.get_current().set_stats(enums::Stats::Hp, 0);
 }
 
+/// Resolves the attack "haze". Changes all Stats to default.
+pub fn haze(pokemon: &mut PokemonToken) {
+    let clone = pokemon.get_base().clone();
+    pokemon.get_current().set_stats(enums::Stats::Attack, clone.get_stat(&enums::Stats::Attack));
+    pokemon.get_current().set_stats(enums::Stats::Defense,
+                                    clone.get_stat(&enums::Stats::Defense));
+    pokemon.get_current().set_stats(enums::Stats::SpecialAttack,
+                                    clone.get_stat(&enums::Stats::SpecialAttack));
+    pokemon.get_current().set_stats(enums::Stats::SpecialDefense,
+                                    clone.get_stat(&enums::Stats::SpecialDefense));
+    pokemon.get_current().set_stats(enums::Stats::Speed, clone.get_stat(&enums::Stats::Speed));
+    pokemon.get_current().set_stats(enums::Stats::Accuracy,
+                                    clone.get_stat(&enums::Stats::Accuracy));
+    pokemon.get_current().set_stats(enums::Stats::Evasion,
+                                    clone.get_stat(&enums::Stats::Evasion));
+}
+
+/// Resolves the field effects. Returns false if a new effect is set. True if it was not allowed
+pub fn field_effects(arena: &mut Arena, effect: enums::FieldEffects) -> bool {
+    if !arena.get_field_effects().contains_key(&effect) {
+        arena.get_field_effects().insert(effect, 0);
+        return false;
+    }
+    true
+}
+/// Resolves the terrain WholeFieldEffects
+pub fn terrain(arena: &mut Arena, effect: enums::FieldEffects) -> bool {
+
+    match effect {
+        enums::FieldEffects::GrassyTerrain => {
+            if arena.get_field_effects().contains_key(&enums::FieldEffects::MistyTerrain) {
+                arena.get_field_effects().remove(&enums::FieldEffects::MistyTerrain);
+            } else if arena.get_field_effects()
+                .contains_key(&enums::FieldEffects::ElectricTerrain) {
+                arena.get_field_effects().remove(&enums::FieldEffects::ElectricTerrain);
+            }
+        }
+        enums::FieldEffects::MistyTerrain => {
+            if arena.get_field_effects().contains_key(&enums::FieldEffects::GrassyTerrain) {
+                arena.get_field_effects().remove(&enums::FieldEffects::GrassyTerrain);
+            } else if arena.get_field_effects()
+                .contains_key(&enums::FieldEffects::ElectricTerrain) {
+                arena.get_field_effects().remove(&enums::FieldEffects::ElectricTerrain);
+            }
+        }
+        enums::FieldEffects::ElectricTerrain => {
+            if arena.get_field_effects().contains_key(&enums::FieldEffects::MistyTerrain) {
+                arena.get_field_effects().remove(&enums::FieldEffects::MistyTerrain);
+            } else if arena.get_field_effects().contains_key(&enums::FieldEffects::GrassyTerrain) {
+                arena.get_field_effects().remove(&enums::FieldEffects::GrassyTerrain);
+            }
+        }
+        _ => unreachable!(),
+
+    }
+    field_effects(arena, effect)
+}
+/// Resolves the special field effect trick room, magic room and wonder room
+pub fn rooms(arena: &mut Arena, effect: enums::FieldEffects) -> bool {
+    if field_effects(arena, effect) {
+        arena.get_field_effects().remove(&effect);
+    }
+    false
+}
+/// Resolves the weather. Returns false if no error accured and a new weather could be set
+pub fn weather(arena: &mut Arena, weather: enums::Weather) -> bool {
+    if arena.get_current_weather().0 != weather {
+        arena.set_current_weather(weather);
+        return false;
+    }
+    true
+}
+
 pub fn field_effect(attack: &Technique, player: &mut Player) {
     match attack.get_name() {
         "sticky-web" => player.add_flag(enums::PlayerFlag::StickyWeb),
@@ -493,4 +567,5 @@ pub fn field_effect(attack: &Technique, player: &mut Player) {
         "mist" => player.add_flag(enums::PlayerFlag::Mist),
         _ => {}
     }
+
 }
