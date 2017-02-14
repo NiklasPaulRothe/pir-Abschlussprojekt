@@ -42,7 +42,7 @@ fn testing() {
     // }
 
     // test_players();
-    // test_arena();
+    test_arena();
     // graphic::gui::draw_window();
 }
 
@@ -81,7 +81,6 @@ fn test_arena() {
     // println!("Player Two: {:#?}", arena.get_player_two());
     // Attacke erstellen und "Kampf"
     let movedex = db::movedex::Movedex::new();
-
     let attack = movedex.move_by_id(1).unwrap();
     let attack_haze = movedex.move_by_id(114).unwrap();
     let attack_hail = movedex.move_by_id(258).unwrap();
@@ -89,7 +88,6 @@ fn test_arena() {
     let attack_mudsport = movedex.move_by_id(300).unwrap();
     let attack_fairylock = movedex.move_by_id(587).unwrap();
     println!("Attack: {}", attack_hail.get_name());
-
     println!("HP1 vorher: {}",
              arena.get_player_one().get_pokemon_list()[0]
                  .get_current()
@@ -98,7 +96,6 @@ fn test_arena() {
              arena.get_player_two().get_pokemon_list()[0]
                  .get_current()
                  .get_stat(&db::enums::Stats::Hp));
-
     attack.resolve(&mut arena, 2);
     attack_hail.resolve(&mut arena, 2);
     attack_haze.resolve(&mut arena, 2);
@@ -106,6 +103,7 @@ fn test_arena() {
     attack_mudsport.resolve(&mut arena, 2);
     attack_fairylock.resolve(&mut arena, 2);
     attack.resolve(&mut arena, 2);
+
     println!("HP1 nachher: {}",
              arena.get_player_one().get_pokemon_list()[0]
                  .get_current()
