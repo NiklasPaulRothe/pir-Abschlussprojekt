@@ -3,6 +3,7 @@ extern crate conrod;
 
 use conrod::backend::piston::{self, Window, WindowEvents, OpenGL};
 use conrod::backend::piston::event::UpdateEvent;
+use conrod::{widget, Borderable, Colorable, Labelable, Positionable, Sizeable, Widget};
 use db;
 use player;
 
@@ -128,7 +129,7 @@ impl App {
         // The image map describing each of our widget->image mappings (in this case none)
         let image_map = conrod::image::Map::new();
 
-        let mut app = self;
+        let app = self;
 
         // Poll events from the window.
         while let Some(event) = window.next_event(&mut events) {
@@ -138,8 +139,6 @@ impl App {
             }
 
             event.update(|_| {
-                use conrod::{widget, Borderable, Colorable, Labelable, Positionable, Sizeable, Widget};
-
                 let mut ui = &mut ui.set_widgets();
 
                 // Create new empty canvas
@@ -268,7 +267,8 @@ impl App {
                 // Draws Choose Team Screen
                 // IDEAS:   - pictures of pokemon
                 //          - filter gen/type (get pokedex with only specific type/gen)
-                //          - search ( fn that gives Vec with pokemon that have certain string in name)
+                //          - search ( fn that gives Vec with pokemon that have certain string
+                //            in name)
                 if let Screen::ChooseTeam = app.screen {
 
                     // ===============================================================
@@ -380,10 +380,14 @@ impl App {
                                         .get_entries());
                                     app.pkmn_moves = Vec::new();
 
-                                    if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_one() {
+                                    if let Some(att) = app.sel_pkmn.clone().0
+                                        .unwrap()
+                                        .get_move_one() {
                                         app.pkmn_moves.push(att);
                                     }
-                                    if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_two() {
+                                    if let Some(att) = app.sel_pkmn.clone().0
+                                        .unwrap()
+                                        .get_move_two() {
                                         app.pkmn_moves.push(att);
                                     }
                                     if let Some(att) = app.sel_pkmn
@@ -393,7 +397,9 @@ impl App {
                                         .get_move_three() {
                                         app.pkmn_moves.push(att);
                                     }
-                                    if let Some(att) = app.sel_pkmn.clone().0.unwrap().get_move_four() {
+                                    if let Some(att) = app.sel_pkmn.clone().0
+                                        .unwrap()
+                                        .get_move_four() {
                                         app.pkmn_moves.push(att);
                                     }
                                 } else {
