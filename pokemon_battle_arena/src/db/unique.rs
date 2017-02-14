@@ -1,27 +1,15 @@
-use time::get_time;
-use player::Player;
-use player::PlayerType;
 use player;
+use player::Player;
 use arena::Arena;
 use super::enums;
-use super::moves;
-use super::resolve;
+use super::moves::Technique;
+//use super::resolve;
 use super::pokemon_token::PokemonToken;
 use super::movedex::Movedex;
-use super::moves::Technique;
+//use super::moves::Technique;
 use self::rand::{Rng, thread_rng};
-use self::regex::Regex;
 
 extern crate rand;
-extern crate regex;
-
-
-
-#[derive(Debug)]
-enum MoveName {
-    disable,
-    teleport
-}
 
 pub fn test(){
     println!("Unique");

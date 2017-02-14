@@ -15,7 +15,7 @@ mod player;
 use player::Player;
 use player::PlayerType;
 use arena::Arena;
-use db::unique;
+//use db::unique;
 use db::enums;
 
 fn main() {
@@ -25,7 +25,7 @@ fn main() {
     //testing();
     //unique::test();
     //unique::test_match("teleport");
-    unique::test2();
+    //unique::test2();
 
 }
 
