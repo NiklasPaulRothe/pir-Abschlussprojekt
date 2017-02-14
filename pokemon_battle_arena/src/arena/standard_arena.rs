@@ -1,5 +1,8 @@
+use std::collections::HashMap;
 use player::Next;
 use db::enums;
+use graphic;
+
 
 
 /// The standard arena is based on the default 1v1 fight.
@@ -9,7 +12,7 @@ impl<'a> super::Arena<'a> {
     /// the players to know what to do in this round.
     /// Important: All next_move variables must contain a Some() entry. If the function is called
     /// and atleast one variable is holding a None, this function will panic!
-    pub fn fight(&mut self) {
+    pub fn fight(&mut self, window: &graphic::gui::App) {
         // This flag is used to show that the round is "over" earlier as aspected.
         // This can be happen if pursuit was used or both pokemons are swapped.
         let mut end_of_fight = false;
@@ -33,7 +36,7 @@ impl<'a> super::Arena<'a> {
                         Next::Switch(_) => {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            technique.resolve(self, 2);
+                            technique.resolve(self, enums::Player::Two);
                             // let slot =
                             //     self.get_player_one().get_attack_slot(technique.clone())
                             //         .unwrap();
@@ -57,7 +60,7 @@ impl<'a> super::Arena<'a> {
                         if technique.get_id() == 228 {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            technique.resolve(self, 1);
+                            technique.resolve(self, enums::Player::One);
                             // let slot =
                             //     self.get_player_two().get_attack_slot(technique.clone())
                             //         .unwrap();
@@ -112,7 +115,7 @@ impl<'a> super::Arena<'a> {
         if self.get_player_one().get_next_move().is_none() &&
            self.get_player_two().get_next_move().is_some() {
             match self.get_player_two().get_next_move().unwrap() {
-                Next::Move(x) => x.resolve(self, 2),
+                Next::Move(x) => x.resolve(self, enums::Player::Two),
                 _ => {}
             }
             end_of_fight = true;
@@ -121,7 +124,7 @@ impl<'a> super::Arena<'a> {
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_some() {
             match self.get_player_one().get_next_move().unwrap() {
-                Next::Move(x) => x.resolve(self, 1),
+                Next::Move(x) => x.resolve(self, enums::Player::One),
                 _ => {}
             }
             end_of_fight = true;
@@ -168,27 +171,147 @@ impl<'a> super::Arena<'a> {
             // The attack with the higher Priority starts
             //
             if one_prio > two_prio {
-                one_attack.resolve(self, 1);
-                two_attack.resolve(self, 2);
+                one_attack.resolve(self, enums::Player::One);
+                two_attack.resolve(self, enums::Player::Two);
             } else if one_prio < two_prio {
-                two_attack.resolve(self, 2);
-                one_attack.resolve(self, 1);
+                two_attack.resolve(self, enums::Player::Two);
+                one_attack.resolve(self, enums::Player::One);
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
                 //
                 if one_speed >= two_speed {
-                    one_attack.resolve(self, 1);
-                    two_attack.resolve(self, 2);
+                    one_attack.resolve(self, enums::Player::One);
+                    two_attack.resolve(self, enums::Player::Two);
                 } else {
-                    two_attack.resolve(self, 2);
-                    one_attack.resolve(self, 1);
+                    two_attack.resolve(self, enums::Player::Two);
+                    one_attack.resolve(self, enums::Player::One);
                 }
             }
         }
         // End of Turn moves like validate the weather and effects, handle poison etc.
         //
+        end_of_turn_flags(self, enums::Player::One, window);
+        end_of_turn_flags(self, enums::Player::Two, window);
         self.validate_effects_and_weather();
         // TODO: All kind of effect like sleep, paralysis, poison... arent handled yet.
     }
+}
+
+fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &graphic::gui::App) {
+    let current_one = arena.get_player_one().get_current();
+    let current_two = arena.get_player_two().get_current();
+    let map: HashMap<enums::EndOfTurn, u8> = match player {
+        enums::Player::One => {
+            arena.get_player_one().get_pokemon_list()[current_one].get_end_of_turn_flags().clone()
+        }
+        enums::Player::Two => {
+            arena.get_player_two().get_pokemon_list()[current_two].get_end_of_turn_flags().clone()
+        }
+    };
+    for i in map.iter() {
+        match *i.0 {
+            enums::EndOfTurn::LeechSeed => {
+                match player {
+                    enums::Player::One => {
+                        // Get hp from defending Pokemon
+                        let mut hp = arena.get_player_two().get_pokemon_list()[current_two]
+                            .get_current()
+                            .get_stat(&enums::Stats::Hp);
+                        // Get the amount for heal and dmg
+                        let absorb = hp / 16;
+                        // Damage Defender
+                        arena.get_player_two().get_pokemon_list()[current_two]
+                            .get_current()
+                            .set_stats(enums::Stats::Hp, hp - absorb);
+                        // Get HP of attacking Pkmn
+                        hp = arena.get_player_one().get_pokemon_list()[current_one]
+                            .get_current()
+                            .get_stat(&enums::Stats::Hp);
+                        // If Atacker isnt fully healt after that action add the absorbed amount to
+                        // current Hp
+                        if arena.get_player_one().get_pokemon_list()[current_one]
+                            .get_base()
+                            .get_stat(&enums::Stats::Hp) >=
+                           (hp + absorb) {
+                            arena.get_player_one().get_pokemon_list()[current_one]
+                                .get_current()
+                                .set_stats(enums::Stats::Hp, hp + absorb);
+                        } else {
+                            // else set the hp to the base value
+                            hp = arena.get_player_one().get_pokemon_list()[current_one]
+                                .get_base()
+                                .get_stat(&enums::Stats::Hp);
+                            arena.get_player_one().get_pokemon_list()[current_one]
+                                .get_base()
+                                .set_stats(enums::Stats::Hp, hp);
+                        }
+                        if !arena.get_player_one().get_pokemon_list()[current_one].is_alive() {
+                            let new = window.get_changed_pokemon(enums::Player::One);
+                            arena.get_player_one().set_current(new);
+                        }
+                    }
+                    enums::Player::Two => {
+                        // Get hp from defending Pokemon
+                        let mut hp = arena.get_player_one().get_pokemon_list()[current_one]
+                            .get_current()
+                            .get_stat(&enums::Stats::Hp);
+                        // Get the amount for heal and dmg
+                        let absorb = hp / 16;
+                        // Damage Defender
+                        arena.get_player_one().get_pokemon_list()[current_one]
+                            .get_current()
+                            .set_stats(enums::Stats::Hp, hp - absorb);
+                        // Get HP of attacking Pkmn
+                        hp = arena.get_player_two().get_pokemon_list()[current_two]
+                            .get_current()
+                            .get_stat(&enums::Stats::Hp);
+                        // If Atacker isnt fully healt after that action add the absorbed amount to
+                        // current Hp
+                        if arena.get_player_two().get_pokemon_list()[current_two]
+                            .get_base()
+                            .get_stat(&enums::Stats::Hp) >=
+                           (hp + absorb) {
+                            arena.get_player_two().get_pokemon_list()[current_two]
+                                .get_current()
+                                .set_stats(enums::Stats::Hp, hp + absorb);
+                        } else {
+                            // else set the hp to the base value
+                            hp = arena.get_player_two().get_pokemon_list()[current_two]
+                                .get_base()
+                                .get_stat(&enums::Stats::Hp);
+                            arena.get_player_two().get_pokemon_list()[current_two]
+                                .get_base()
+                                .set_stats(enums::Stats::Hp, hp);
+                        }
+                        if !arena.get_player_two().get_pokemon_list()[current_two].is_alive() {
+                            let new = window.get_changed_pokemon(enums::Player::Two);
+                            arena.get_player_two().set_current(new);
+                        }
+
+                    }
+                }
+            }
+            enums::EndOfTurn::PerishSong => {
+                match player {
+                    enums::Player::One => {
+                        if *i.1 != 4 {
+                            *arena.get_player_one().get_pokemon_list()[current_one]
+                                .get_end_of_turn_flags()
+                                .get_mut(&enums::EndOfTurn::PerishSong)
+                                .unwrap() = *i.1 + 1;
+                        }
+                    }
+                    enums::Player::Two => {}
+                }
+            }
+            enums::EndOfTurn::Yawn => {}
+            enums::EndOfTurn::RoostTypeOne => {}
+            enums::EndOfTurn::RoostTypeTwo => {}
+            enums::EndOfTurn::Trap => {}
+            enums::EndOfTurn::Ingrain => {}
+        }
+    }
+
+
 }

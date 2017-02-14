@@ -216,9 +216,13 @@ impl PokemonToken {
     pub fn add_fight_flag(&mut self, flag: enums::Fighting) {
         self.fight_flags.insert(flag, 0);
     }
-    /// Checks of the pokemon is asleep
+    /// Checks if the pokemon is asleep
     pub fn is_asleep(&self) -> bool {
         self.non_volatile_status.0 == enums::NonVolatile::Sleep
+    }
+    /// Checks if the pokemon is alive
+    pub fn is_alive(&mut self) -> bool {
+        self.get_current().get_stat(&enums::Stats::Hp) <= 0
     }
     /// Decrements the AP
     pub fn decrement_ap(&mut self) {

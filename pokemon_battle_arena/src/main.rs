@@ -35,7 +35,8 @@ fn testing() {
     }
     // test_players();
     // test_arena();
-    graphic::gui::draw_window();
+    let mut window = graphic::gui::App::new();
+    window.draw_window();
 }
 
 
@@ -88,13 +89,13 @@ fn test_arena() {
              arena.get_player_two().get_pokemon_list()[0]
                  .get_current()
                  .get_stat(&db::enums::Stats::Hp));
-    attack.resolve(&mut arena, 2);
-    attack_hail.resolve(&mut arena, 2);
-    attack_haze.resolve(&mut arena, 2);
-    attack_sandstorm.resolve(&mut arena, 2);
-    attack_mudsport.resolve(&mut arena, 2);
-    attack_fairylock.resolve(&mut arena, 2);
-    attack.resolve(&mut arena, 2);
+    attack.resolve(&mut arena, enums::Player::Two);
+    attack_hail.resolve(&mut arena, enums::Player::Two);
+    attack_haze.resolve(&mut arena, enums::Player::Two);
+    attack_sandstorm.resolve(&mut arena, enums::Player::Two);
+    attack_mudsport.resolve(&mut arena, enums::Player::Two);
+    attack_fairylock.resolve(&mut arena, enums::Player::Two);
+    attack.resolve(&mut arena, enums::Player::Two);
 
     println!("HP1 nachher: {}",
              arena.get_player_one().get_pokemon_list()[0]
