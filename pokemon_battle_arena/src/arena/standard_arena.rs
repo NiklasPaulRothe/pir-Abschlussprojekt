@@ -24,12 +24,12 @@ impl<'a> super::Arena<'a> {
         // Handle the pursuit(ID: 228) attack
         ////////////////////////////////////////////////////////////////////////////////////////////
         match self.get_player_one()
-            .get_next_move()
+            .get_next_move().0
             .expect("Unexpected error! This field of player one shouldn`t be None at this point.") {
             Next::Move(technique) => {
                 if technique.get_id() == 228 {
                     match self.get_player_one()
-                        .get_next_move()
+                        .get_next_move().0
                         .expect("Unexpected error! This field of player one shouldn`t be None \
                                  at this point.") {
                         Next::Switch(_) => {
@@ -52,7 +52,7 @@ impl<'a> super::Arena<'a> {
             }
             Next::Switch(_) => {
                 match self.get_player_one()
-                    .get_next_move()
+                    .get_next_move().0
                     .expect("Unexpected error! This field of player one shouldn`t be None at \
                              this point.") {
                     Next::Move(technique) => {
@@ -78,7 +78,7 @@ impl<'a> super::Arena<'a> {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Switch Pokemon of Player One if he wants to
         ////////////////////////////////////////////////////////////////////////////////////////////
-        if let Some(x) = self.get_player_one().get_next_move() {
+        if let Some(x) = self.get_player_one().get_next_move().0 {
             match x {
                 Next::Switch(pkmn) => {
                     // Switch of the current pokemon + setting flag
@@ -96,7 +96,7 @@ impl<'a> super::Arena<'a> {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Switch Pokemon of Player Two if he wants to
         ////////////////////////////////////////////////////////////////////////////////////////////
-        if let Some(x) = self.get_player_two().get_next_move() {
+        if let Some(x) = self.get_player_two().get_next_move().0 {
             match x {
                 Next::Switch(pkmn) => {
                     // Switch of the current pokemon + setting flag
@@ -114,8 +114,8 @@ impl<'a> super::Arena<'a> {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // If player one doesnt need to make a move anymore, only resolve attack of player two
         ////////////////////////////////////////////////////////////////////////////////////////////
-        if self.get_player_one().get_next_move().is_none() &&
-           self.get_player_two().get_next_move().is_some() {
+        if self.get_player_one().get_next_move() != Next::None &&
+           self.get_player_two().get_next_move() != Next::None {
             match self.get_player_two().get_next_move().unwrap() {
                 Next::Move(x, _) => x.resolve(self, 2),
                 _ => {}
@@ -124,18 +124,18 @@ impl<'a> super::Arena<'a> {
             ////////////////////////////////////////////////////////////////////////////////////////
             // If player two doesnt need to make a move anymore, only resolve attack of player one
             ////////////////////////////////////////////////////////////////////////////////////////
-        } else if self.get_player_two().get_next_move().is_none() &&
-                  self.get_player_one().get_next_move().is_some() {
+        } else if self.get_player_two().get_next_move() == Next::None &&
+                  self.get_player_one().get_next_move() != Next::None {
             match self.get_player_one().get_next_move().unwrap() {
-                Next::Move(x, _) => x.resolve(self, 1),
+                Next::Move(x) => x.resolve(self, 1),
                 _ => {}
             }
             end_of_fight = true;
             ////////////////////////////////////////////////////////////////////////////////////////
             // If both player dont have a move go out of fight
             ////////////////////////////////////////////////////////////////////////////////////////
-        } else if self.get_player_two().get_next_move().is_none() &&
-                  self.get_player_one().get_next_move().is_some() {
+        } else if self.get_player_two().get_next_move() == Next::None &&
+                  self.get_player_one().get_next_move() != Next::None {
             end_of_fight = true;
         }
 
@@ -149,7 +149,7 @@ impl<'a> super::Arena<'a> {
         if !end_of_fight {
             let one_prio;
             let one_attack;
-            match self.get_player_one().get_next_move().unwrap() {
+            match self.get_player_one().get_next_move().unwrap().0 {
                 Next::Move(attack) => {
                     one_prio = attack.get_priority();
                     one_attack = attack.clone();
@@ -158,7 +158,7 @@ impl<'a> super::Arena<'a> {
             };
             let two_prio;
             let two_attack;
-            match self.get_player_two().get_next_move().unwrap() {
+            match self.get_player_two().get_next_move().unwrap().0 {
                 Next::Move(attack) => {
                     two_prio = attack.get_priority();
                     two_attack = attack.clone();
