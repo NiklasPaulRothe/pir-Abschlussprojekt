@@ -6,7 +6,7 @@ use arena;
 use db::pokemon_token::PokemonToken;
 use db::pokedex::*;
 use std::collections::HashMap;
-use db::{moves, enums};
+use db::{self, moves, enums};
 
 /// The Player type represents if the Player is a Human or a specific Ai to call different funcions
 /// for e.g. choosing Pokemon
@@ -52,11 +52,12 @@ impl Player {
     }
 
     pub fn new_by_pokemon(pokemon: Vec<db::pokemon_token::PokemonToken>,
-                          player_type: PlayerType) -> Self {
+                          player_type: PlayerType)
+                          -> Self {
         Player {
             player: player_type,
-            pokemon_list: pokemon,
-            pokemon_count = pokemon.len(),
+            pokemon_list: pokemon.clone(),
+            pokemon_count: pokemon.len(),
             current: 0,
             next_move: None,
             flags: HashMap::new(),
