@@ -33,9 +33,9 @@ fn testing() {
     //     }
     // }
     // test_players();
-    // test_arena();
+    test_arena();
     // graphic::gui::draw_window();
-    println!("{:?}", db::movedex::Movedex::new().move_by_id(245).unwrap());
+    // println!("{:?}", db::movedex::Movedex::new().move_by_id(245).unwrap());
 }
 
 
@@ -73,7 +73,7 @@ fn test_arena() {
     println!("Player Two: {:#?}", arena.get_player_two());
     // Attacke erstellen und "Kampf"
     let movedex = db::movedex::Movedex::new();
-    let attack = movedex.move_by_id(3).unwrap();
+    let attack = movedex.move_by_id(239).unwrap();
     println!("Attack: {}", attack.get_name());
 
     println!("HP1 vorher: {}",
@@ -85,7 +85,7 @@ fn test_arena() {
                  .get_current()
                  .get_stat(&db::enums::Stats::Hp));
 
-    attack.resolve(&mut arena, 2);
+    attack.resolve(&mut arena, 1);
     println!("HP1 nachher: {}",
              arena.get_player_one().get_pokemon_list()[0]
                  .get_current()
