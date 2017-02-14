@@ -15,6 +15,11 @@ use std::cmp::Ordering;
 use arena::Arena;
 use player::{Player, Next};
 
+// use super::movedex;
+use super::unique;
+// use super::pokedex::Pokedex;
+
+
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.
 #[derive(Debug, Clone, RustcDecodable)]
@@ -386,7 +391,17 @@ impl Technique {
                         println!("It has no effect on {}", target_clone.get_name());
                     }
                 }
-                enums::MoveCategory::Unique => {}
+                enums::MoveCategory::Unique => {
+                    //let mut target = get_target(flag, arena);
+                    unique::unique(&self,
+                                   self.get_name(), 
+                                   self.get_type(), 
+                                   user_clone, 
+                                   target_clone, 
+                                   &mut attacker_clone, 
+                                   &mut defender_clone,
+                                   arena);
+                }
             };
         } else {
             println!("{} missed {}",
