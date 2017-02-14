@@ -136,7 +136,7 @@ impl Player {
     pub fn get_alive_list(&mut self) -> Vec<usize> {
         let mut vec = Vec::new();
         for i in 0..self.pokemon_list.len() {
-            if self.get_pokemon_list()[i].get_current().get_stat(&enums::Stats::Hp) != 0 {
+            if self.pokemon_list[i].is_alive() {
                 vec.push(i);
             }
         }

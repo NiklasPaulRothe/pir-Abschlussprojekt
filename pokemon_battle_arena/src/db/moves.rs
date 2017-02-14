@@ -53,7 +53,7 @@ pub struct Technique {
 impl Technique {
     /// Matches over the category of a move and calls a specific method in resolve.rs for this
     /// category. All calculation is done inside the method, therefore no return is needed.
-    pub fn resolve(&self, arena: &mut Arena, flag: u8) {
+    pub fn resolve(&self, arena: &mut Arena, flag: enums::Player) {
         // First call the hits method to sort out missing moves.
         let mut user_clone = get_user(flag, arena).clone();
         let mut target_clone = get_target(flag, arena).clone();
@@ -770,13 +770,15 @@ impl PartialEq for Technique {
 impl Eq for Technique {}
 
 /// Helper function which will get the mutable reference of the targets pokemon out of an arena
-fn get_target<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
+fn get_target<'a>(target: enums::Player,
+                  arena: &'a mut Arena)
+                  -> &'a mut pokemon_token::PokemonToken {
     match target {
-        1 => {
+        enums::Player::One => {
             let current = arena.get_player_one().get_current();
             &mut arena.get_player_one().get_pokemon_list()[current]
         }
-        _ => {
+        enums::Player::Two => {
             let current = arena.get_player_two().get_current();
             &mut arena.get_player_two().get_pokemon_list()[current]
         }
@@ -784,29 +786,31 @@ fn get_target<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::Po
 }
 
 /// Helper function which will get the mutable reference of the users pokemon out of an arena
-fn get_user<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
+fn get_user<'a>(target: enums::Player,
+                arena: &'a mut Arena)
+                -> &'a mut pokemon_token::PokemonToken {
     match target {
-        2 => {
+        enums::Player::Two => {
             let current = arena.get_player_one().get_current();
             &mut arena.get_player_one().get_pokemon_list()[current]
         }
-        _ => {
+        enums::Player::One => {
             let current = arena.get_player_two().get_current();
             &mut arena.get_player_two().get_pokemon_list()[current]
         }
     }
 }
 
-fn get_attacker<'a>(target: u8, arena: &'a mut Arena) -> &'a mut Player {
+fn get_attacker<'a>(target: enums::Player, arena: &'a mut Arena) -> &'a mut Player {
     match target {
-        1 => arena.get_player_one(),
-        _ => arena.get_player_two(),
+        enums::Player::One => arena.get_player_one(),
+        enums::Player::Two => arena.get_player_two(),
     }
 }
 
-fn get_defender<'a>(target: u8, arena: &'a mut Arena) -> &'a mut Player {
+fn get_defender<'a>(target: enums::Player, arena: &'a mut Arena) -> &'a mut Player {
     match target {
-        1 => arena.get_player_two(),
-        _ => arena.get_player_one(),
+        enums::Player::One => arena.get_player_two(),
+        enums::Player::Two => arena.get_player_one(),
     }
 }

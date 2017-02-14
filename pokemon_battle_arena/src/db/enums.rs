@@ -387,3 +387,9 @@ impl FieldEffects {
         }
     }
 }
+/// Player enum for representing a player e.g. in resolve
+#[derive(Debug, Copy, Clone)]
+pub enum Player {
+    One,
+    Two,
+}
