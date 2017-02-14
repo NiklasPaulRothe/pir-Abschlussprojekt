@@ -90,6 +90,10 @@ impl App {
         self.clone().screen
     }
 
+    pub fn get_changed_pokemon(&self, player: db::enums::Player) -> usize {
+        2
+    }
+
     pub fn get_team(&mut self) -> Vec<db::pokemon_token::PokemonToken> {
         self.clone().pkmn_team
     }
@@ -380,12 +384,16 @@ impl App {
                                         .get_entries());
                                     app.pkmn_moves = Vec::new();
 
-                                    if let Some(att) = app.sel_pkmn.clone().0
+                                    if let Some(att) = app.sel_pkmn
+                                        .clone()
+                                        .0
                                         .unwrap()
                                         .get_move_one() {
                                         app.pkmn_moves.push(att);
                                     }
-                                    if let Some(att) = app.sel_pkmn.clone().0
+                                    if let Some(att) = app.sel_pkmn
+                                        .clone()
+                                        .0
                                         .unwrap()
                                         .get_move_two() {
                                         app.pkmn_moves.push(att);
@@ -397,7 +405,9 @@ impl App {
                                         .get_move_three() {
                                         app.pkmn_moves.push(att);
                                     }
-                                    if let Some(att) = app.sel_pkmn.clone().0
+                                    if let Some(att) = app.sel_pkmn
+                                        .clone()
+                                        .0
                                         .unwrap()
                                         .get_move_four() {
                                         app.pkmn_moves.push(att);
