@@ -69,7 +69,7 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
             attack.resolve(arena, 1);
         },
         "nature-power" => {
-            match arena.get_effect() {
+            match arena.get_current_effect().0 {
                 enums::Types::Normal => {
                     for entry in Movedex::new().get_entries() {
                         if entry.get_name() == "tri-attack" {
@@ -148,7 +148,7 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
         // "transform" => {
         // },
         "splash" => {
-            if arena.get_effect() == enums::Types::Flying{
+            if arena.get_current_effect().0 == enums::Types::Flying{
                 println!("The attack can not be used because {:?} is activated.", enums::Types::Flying);
             }else{
                 println!("Nothing happens...");
@@ -186,8 +186,8 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
         // "curse" => {
         // },
         "spite" => {
-            user.set_type(0, attack.get_type());
-            defender.get_last_move().unwrap().0.get_power_points()
+            // defender.get_last_move().unwrap().0.get_power_points();
+            // target.decrement_ap();
         },
         // "protect" => {
         // },
