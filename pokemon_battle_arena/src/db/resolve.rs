@@ -48,11 +48,6 @@ pub fn deal_damage(attack: &Technique,
               player.get_flags().contains_key(&enums::PlayerFlag::LightScreen) {
         damage = damage / 2;
     }
-    let current = target.get_current().get_stat(&enums::Stats::Hp);
-    target.get_current().set_stats(enums::Stats::Hp, current - damage);
-    println!("Damage: {}", damage);
-    println!("HP in resolve: {}",
-             target.get_current().get_stat(&enums::Stats::Hp));
     let critical = match attack.get_crit_rate() {
         0 => rng.gen_range(0.0, 100.1) <= 6.25,
         1 => rng.gen_range(0.0, 100.1) <= 12.5,
@@ -62,6 +57,11 @@ pub fn deal_damage(attack: &Technique,
     if critical {
         damage = (damage as f32 * 1.5) as u16;
     }
+    let current = target.get_current().get_stat(&enums::Stats::Hp);
+    target.get_current().set_stats(enums::Stats::Hp, current - damage);
+    println!("Damage: {}", damage);
+    println!("HP in resolve: {}",
+             target.get_current().get_stat(&enums::Stats::Hp));
     damage
 }
 
