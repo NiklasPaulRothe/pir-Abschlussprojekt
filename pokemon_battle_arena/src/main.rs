@@ -35,7 +35,7 @@ fn testing() {
     }
     // test_players();
     // test_arena();
-    // graphic::gui::draw_window();
+    graphic::gui::draw_window();
 }
 
 
