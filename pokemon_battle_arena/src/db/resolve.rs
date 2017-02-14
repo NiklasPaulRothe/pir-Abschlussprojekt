@@ -52,6 +52,15 @@ pub fn deal_damage(attack: &Technique,
     println!("Damage: {}", damage);
     println!("HP in resolve: {}",
              target.get_current().get_stat(&enums::Stats::Hp));
+    let critical = match attack.get_crit_rate() {
+        0 => rng.gen_range(0.0, 100.1) <= 6.25,
+        1 => rng.gen_range(0.0, 100.1) <= 12.5,
+        2 => rng.gen_range(0.0, 100.1) <= 50.0,
+        _ => true,
+    };
+    if critical {
+        damage = (damage as f32 * 1.5) as u16;
+    }
     damage
 }
 

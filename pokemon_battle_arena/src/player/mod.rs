@@ -16,6 +16,13 @@ pub enum PlayerType {
     SimpleAi,
 }
 
+#[derive(Clone, Debug)]
+pub enum Next {
+    Move(moves::Technique, u8),
+    Switch,
+    Flinch,
+}
+
 /// The Player struct represents a Player and holds his Type (Human, Ai...), a list of his pokemon,
 /// the amount of pokemon, his currently fighting pokemon and the next_move he wants to make
 #[derive(Clone, Debug)]
@@ -24,7 +31,7 @@ pub struct Player {
     pokemon_list: Vec<PokemonToken>,
     pokemon_count: usize,
     current: usize,
-    next_move: Option<(moves::Technique, u8)>,
+    next_move: Option<Next>,
     flags: HashMap<enums::PlayerFlag, u8>,
     last_move: Option<(moves::Technique, AttackSlot)>,
     switched: bool,
@@ -97,7 +104,7 @@ impl Player {
         }
     }
     /// Gets the next attack from the Player. Returns none if no Technique is selected
-    pub fn get_next_move(&self) -> Option<(moves::Technique, u8)> {
+    pub fn get_next_move(&self) -> Option<Next> {
         self.next_move.clone()
     }
     /// Gets the last move with the Slot. Returns None if the last move wasn´t an attack
@@ -121,7 +128,7 @@ impl Player {
         self.current = new;
     }
     /// Sets a next move to the Player
-    pub fn set_next_move(&mut self, next: Option<(moves::Technique, u8)>) {
+    pub fn set_next_move(&mut self, next: Option<Next>) {
         self.next_move = next;
     }
     pub fn add_flag(&mut self, flag: enums::PlayerFlag) {

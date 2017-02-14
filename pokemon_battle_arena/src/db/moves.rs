@@ -3,6 +3,7 @@ extern crate num;
 extern crate rustc_serialize;
 extern crate rand;
 extern crate regex;
+
 use super::pokemon_token;
 use super::enums;
 use super::resolve;
@@ -12,10 +13,12 @@ use self::regex::Regex;
 use std::collections::HashMap;
 use std::cmp::Ordering;
 use arena::Arena;
-use player::Player;
-use super::movedex;
+use player::{Player, Next};
+
+// use super::movedex;
 use super::unique;
-use super::pokedex::Pokedex;
+// use super::pokedex::Pokedex;
+
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.
@@ -66,8 +69,25 @@ impl Technique {
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
-                    let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                    let mut rng = thread_rng();
+                    {
+                        let mut target = get_target(flag, arena);
+                        let mut frequency = 1;
+                        if self.min_hits.is_some() {
+                            frequency =
+                                rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
+                        }
+                        for _ in 0..frequency {
+                            resolve::deal_damage(&self,
+                                                 &mut user_clone,
+                                                 &mut target,
+                                                 &mut defender_clone);
+                        }
+                    }
+                    if self.flinch_chance > 0 &&
+                       rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
+                        get_defender(flag, arena).set_next_move(Some(Next::Flinch));
+                    }
                 }
 
                 enums::MoveCategory::Ailment => {
@@ -305,15 +325,15 @@ impl Technique {
                     }
                 }
                 enums::MoveCategory::Unique => {
-                    let mut target = get_target(flag, arena);
+                    //let mut target = get_target(flag, arena);
                     unique::unique(&self,
                                    self.get_name(), 
                                    self.get_type(), 
                                    user_clone, 
-                                   &mut target, 
+                                   target_clone, 
                                    &mut attacker_clone, 
-                                   &mut defender_clone, 
-                                   &mut arena);
+                                   &mut defender_clone,
+                                   arena);
                 }
             };
         } else {
@@ -336,10 +356,9 @@ impl Technique {
            target.get_resolve_flags().contains_key(&enums::Resolve::Protect) {
             return false;
         }
-        if !(self.get_name() == "mat-block" && player.get_switched()) {
+        if self.get_name() == "mat-block" && !player.get_switched() {
             return false;
         }
-
         if player.get_flags().contains_key(&enums::PlayerFlag::MatBlock) &&
            !self.get_flags().contains(&enums::MoveFlags::Protect) {
             return false;
