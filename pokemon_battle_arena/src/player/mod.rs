@@ -16,10 +16,40 @@ pub enum PlayerType {
     SimpleAi,
 }
 
+/// An enum which represents the AttackSlot to match with it
+#[derive(Debug, Clone, Copy)]
+pub enum AttackSlot {
+    One,
+    Two,
+    Three,
+    Four,
+}
+/// An enum representing the PokemonSlot
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum PokemonSlot {
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+}
+impl PokemonSlot {
+    pub fn get_int(&self) -> usize {
+        match *self {
+            PokemonSlot::One => 1,
+            PokemonSlot::Two => 2,
+            PokemonSlot::Three => 3,
+            PokemonSlot::Four => 4,
+            PokemonSlot::Five => 5,
+            PokemonSlot::Six => 6,
+        }
+    }
+}
 #[derive(Clone, Debug, PartialEq)]
 pub enum Next {
+    Switch(PokemonSlot),
     Move(moves::Technique),
-    Switch,
     Flinch,
     None,
 }
@@ -106,6 +136,19 @@ impl Player {
             &AttackSlot::Four => self.pokemon_list[self.current].clone().get_move_four().unwrap(),
         }
     }
+    /// Checks if an attack is in the Attackslots and returns the Slot
+    pub fn get_attack_slot(&mut self, attack: moves::Technique) -> Option<AttackSlot> {
+        if self.get_attack(&AttackSlot::One) == attack {
+            return Some(AttackSlot::One);
+        } else if self.get_attack(&AttackSlot::Two) == attack {
+            return Some(AttackSlot::Two);
+        } else if self.get_attack(&AttackSlot::Three) == attack {
+            return Some(AttackSlot::Three);
+        } else if self.get_attack(&AttackSlot::Four) == attack {
+            return Some(AttackSlot::Four);
+        }
+        None
+    }
     /// Gets the next attack from the Player. Returns none if no Technique is selected
     pub fn get_next_move(&self) -> Option<Next> {
         self.next_move.clone()
@@ -149,8 +192,14 @@ impl Player {
     pub fn set_last_move(&mut self, last: Option<moves::Technique>) {
         self.last_move = last;
     }
+
+    /// Sets the last action
     pub fn set_last_action(&mut self, last: (Next, u8)) {
         self.last_action = last;
+    }
+    /// Sets the switched flag with a bool
+    pub fn set_switched(&mut self, stat: bool) {
+        self.switched = stat;
     }
     // Other
     //
@@ -160,13 +209,4 @@ impl Player {
             PlayerType::SimpleAi => arena::to_ui::ui_move(),
         }
     }
-}
-
-/// An enum which represents the AttackSlot to match with it
-#[derive(Debug, Clone)]
-pub enum AttackSlot {
-    One,
-    Two,
-    Three,
-    Four,
 }
