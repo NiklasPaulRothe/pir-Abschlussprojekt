@@ -48,9 +48,10 @@ impl PokemonSlot {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub enum Next {
-    Move(moves::Technique, u8),
     Switch(PokemonSlot),
+    Move(moves::Technique),
     Flinch,
+    None,
 }
 
 /// The Player struct represents a Player and holds his Type (Human, Ai...), a list of his pokemon,
@@ -63,8 +64,8 @@ pub struct Player {
     current: usize,
     next_move: Option<Next>,
     flags: HashMap<enums::PlayerFlag, u8>,
-    last_move: Option<(moves::Technique, AttackSlot)>,
-    last_action: Option<Next>,
+    last_move: Option<moves::Technique>,
+    last_action: (Next, u8),
     switched: bool,
 }
 
@@ -87,7 +88,7 @@ impl Player {
             next_move: None,
             flags: HashMap::new(),
             last_move: None,
-            last_action: None,
+            last_action: (Next::None, 0),
             switched: false,
         }
     }
@@ -153,11 +154,11 @@ impl Player {
         self.next_move.clone()
     }
     /// Gets the last move with the Slot. Returns None if the last move wasn´t an attack
-    pub fn get_last_move(&self) -> Option<(moves::Technique, AttackSlot)> {
+    pub fn get_last_move(&self) -> Option<moves::Technique> {
         self.last_move.clone()
     }
 
-    pub fn get_last_action(&self) -> &Option<Next> {
+    pub fn get_last_action(&self) -> &(Next, u8) {
         &self.last_action
     }
 
@@ -188,12 +189,13 @@ impl Player {
         }
     }
     /// Sets the last move the attacking pokemon made with the Slot in which it is saved
-    pub fn set_last_move(&mut self, last: Option<(moves::Technique, AttackSlot)>) {
+    pub fn set_last_move(&mut self, last: Option<moves::Technique>) {
         self.last_move = last;
     }
+
     /// Sets the last action
-    pub fn set_last_action(&mut self, last: Next) {
-        self.last_action = Some(last);
+    pub fn set_last_action(&mut self, last: (Next, u8)) {
+        self.last_action = last;
     }
     /// Sets the switched flag with a bool
     pub fn set_switched(&mut self, stat: bool) {

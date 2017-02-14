@@ -64,33 +64,45 @@ impl Technique {
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
-                    if self.get_flags().contains(&enums::MoveFlags::Charge) &&
-                       !(attacker_clone.get_last_action().clone().unwrap() ==
-                         Next::Move(self.clone(), 0)) {
-                        let attacker = get_attacker(flag, arena);
-                        attacker.set_last_action((Next::Move(self.clone(), 0)));
-                        attacker.set_next_move(Some(Next::Move(self.clone(), 0)))
-                    } else {
-                        let mut rng = thread_rng();
-                        {
-                            let mut target = get_target(flag, arena);
-                            let mut frequency = 1;
-                            if self.min_hits.is_some() {
-                                frequency =
-                                    rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
-                            }
-                            for _ in 0..frequency {
-                                resolve::deal_damage(&self,
-                                                     &mut user_clone,
-                                                     &mut target,
-                                                     &mut defender_clone);
-                            }
-                        }
-                        if self.flinch_chance > 0 &&
-                           rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
-                            get_defender(flag, arena).set_next_move(Some(Next::Flinch));
+                    if attacker_clone.get_last_action().0 != Next::None {
+                        if self.get_flags().contains(&enums::MoveFlags::Charge) &&
+                           !(attacker_clone.get_last_action().clone() ==
+                             (Next::Move(self.clone()), 0)) {
+                            let attacker = get_attacker(flag, arena);
+                            println!("{} prepares itself", user_clone.get_name());
+                            attacker.set_last_action(((Next::Move(self.clone()), 0)));
+                            attacker.set_next_move(Some(Next::Move(self.clone())));
+                            return;
+                        } else if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
+                                  attacker_clone.get_last_action().clone() ==
+                                  (Next::Move(self.clone()), 0) {
+                            let attacker = get_attacker(flag, arena);
+                            println!("{} has to recharge", user_clone.get_name());
+                            attacker.set_last_action((Next::Move(self.clone()), 1));
+                            return;
                         }
                     }
+                    let mut rng = thread_rng();
+                    {
+                        let mut target = get_target(flag, arena);
+                        let mut frequency = 1;
+                        if self.min_hits.is_some() {
+                            frequency =
+                                rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
+                        }
+                        for _ in 0..frequency {
+                            resolve::deal_damage(&self,
+                                                 &mut user_clone,
+                                                 &mut target,
+                                                 &mut defender_clone);
+                        }
+                    }
+                    if self.flinch_chance > 0 &&
+                       rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
+                        get_defender(flag, arena).set_next_move(Some(Next::Flinch));
+                        println!("{} has flinched", target_clone.get_name());
+                    }
+
                 }
 
                 enums::MoveCategory::Ailment => {
@@ -380,6 +392,18 @@ impl Technique {
             println!("{} missed {}",
                      user_clone.get_name(),
                      target_clone.get_name());
+        }
+        let attacker = get_attacker(flag, arena);
+        if self.get_flags().contains(&enums::MoveFlags::Charge) &&
+           attacker.get_last_action().0 == Next::Move(self.clone()) {
+            attacker.set_last_action((Next::Move(self.clone()), 1))
+        } else if self.get_min_turn() > 1 && attacker.get_last_action().1 < self.get_max_turns() &&
+                  attacker.get_last_action().0 == Next::Move(self.clone()) {
+            let turns = attacker.get_last_action().1 + 1;
+            attacker.set_last_action((Next::Move(self.clone()), turns));
+        } else {
+            attacker.set_last_action((Next::Move(self.clone()), 0));
+            attacker.set_last_move(Some(self.clone()));
         }
     }
 
