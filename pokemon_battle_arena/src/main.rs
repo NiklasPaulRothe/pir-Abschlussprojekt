@@ -35,7 +35,8 @@ fn testing() {
     }
     // test_players();
     // test_arena();
-    graphic::gui::draw_window();
+    let mut window = graphic::gui::App::new();
+    window.draw_window();
 }
 
 
