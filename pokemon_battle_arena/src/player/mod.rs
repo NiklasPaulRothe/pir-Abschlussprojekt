@@ -104,6 +104,8 @@ impl Player {
             next_move: None,
             flags: HashMap::new(),
             last_move: None,
+            last_action: (Next::None, 0),
+            switched: false,
         }
     }
     // Getter methods
