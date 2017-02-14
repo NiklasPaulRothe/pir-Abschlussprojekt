@@ -150,7 +150,7 @@ impl<'a> super::Arena<'a> {
             let one_prio;
             let one_attack;
             match self.get_player_one().get_next_move().unwrap() {
-                Next::Move(attack, _) => {
+                Next::Move(attack) => {
                     one_prio = attack.get_priority();
                     one_attack = attack.clone();
                 }
@@ -159,7 +159,7 @@ impl<'a> super::Arena<'a> {
             let two_prio;
             let two_attack;
             match self.get_player_two().get_next_move().unwrap() {
-                Next::Move(attack, _) => {
+                Next::Move(attack) => {
                     two_prio = attack.get_priority();
                     two_attack = attack.clone();
                 }
