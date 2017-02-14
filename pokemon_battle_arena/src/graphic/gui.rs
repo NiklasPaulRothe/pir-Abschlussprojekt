@@ -20,7 +20,7 @@ enum Screen {
     Battle,
     BattleText,
     BattleAttack,
-    Switch,  
+    Switch,
     None,
 }
 
@@ -691,8 +691,12 @@ pub fn draw_window() {
                             .set(ids.button_fight, ui)
                             .was_clicked() {
                             println!("Fight");
-                            app.player1 = Some(player::Player::new_by_pokemon(app.pkmn_team.clone(), player::PlayerType::Human));
-                            app.player2 = Some(player::Player::new_by_id(&[1, 2, 3, 4, 5, 6], player::PlayerType::SimpleAi));
+                            app.player1 =
+                                Some(player::Player::new_by_pokemon(app.pkmn_team.clone(),
+                                                                    player::PlayerType::Human));
+                            app.player2 =
+                                Some(player::Player::new_by_id(&[1, 2, 3, 4, 5, 6],
+                                                               player::PlayerType::SimpleAi));
                             println!("{:#?}", app.player1);
                             println!("{:#?}", app.player2);
                             app.screen = Screen::Battle;
@@ -709,7 +713,9 @@ pub fn draw_window() {
                             .set(ids.button_fight, ui)
                             .was_clicked() {
                             println!("Player Two");
-                            app.player1 = Some(player::Player::new_by_pokemon(app.pkmn_team.clone(), player::PlayerType::Human));
+                            app.player1 =
+                                Some(player::Player::new_by_pokemon(app.pkmn_team.clone(),
+                                                                    player::PlayerType::Human));
                             println!("{:#?}", app.player1);
                             app.pkmn_team = Vec::new();
                             app.sel_pkmn = (None, None);
@@ -729,13 +735,15 @@ pub fn draw_window() {
                             .set(ids.button_fight, ui)
                             .was_clicked() {
                             println!("Fight");
-                            app.player2 = Some(player::Player::new_by_pokemon(app.pkmn_team.clone(), player::PlayerType::Human));
+                            app.player2 =
+                                Some(player::Player::new_by_pokemon(app.pkmn_team.clone(),
+                                                                    player::PlayerType::Human));
                             println!("{:?}", app.player2);
                             app.screen = Screen::Battle;
                         }
                     }
                 }
-                    
+
             }
 
             // Draws Fight Screen
@@ -838,7 +846,7 @@ pub fn draw_window() {
                     println!("Att Button 4");
                 }
 
-                // ===== Pokemon Switch Buttons ===== 
+                // ===== Pokemon Switch Buttons =====
             }
         });
 
