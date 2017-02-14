@@ -1,52 +1,193 @@
-// use db::pokemon_token::PokemonToken;
+use player::Next;
+use db::enums;
 
 
-// /// The standard arena is based on the default XvX fight.
+/// The standard arena is based on the default 1v1 fight.
 
-// impl super::Arena {
-//     #[allow(dead_code)]
-//     pub fn fight(&self) {
-
-
-
-//         // Move der Spieler von Team 1 abfragen. (Methode in Player?)
-//         // Move der Spieler von Team 2 abfragen. (Methode in Player?)
-//             // Mögliche Moves:
-//                 // Pokemon Tausch (Swap)
-//                 // Attacke wählen
-//             // Auswahlscreens müssen für jeden human zur verfügung gestellt werden.
-//             // 1. Screen: Auswahl zwischen Swap und Attacke
-//             // Swap Screen: Anzeigen der Pokemon mit HP und Status (Schlaf etc.) evtl. more
-//             //              infos Button. Back Button
-//             // Attack Screen: Auswahl der Attacken mit AP und Typ(Farbig hinterlegt?) Back
-//             // Button
-
-//         // Wenn ein Spieler sein Pokemon tauschen möchte wird dies zu erst gemacht. Bei mehreren
-//         // in der Reihenfolge T1[0,1,2...] dann T2[0,1,2...]
+impl<'a> super::Arena<'a> {
+    pub fn fight(&mut self) {
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Setting the switched flag in the Player structs to false and reset if a swap will be done
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        self.get_player_one().set_switched(false);
+        self.get_player_two().set_switched(false);
 
 
-//         // Entscheidung zwischen Attackentypen:
-//             // Prioattacken zu erst (Ruckzuckhieb z.B.)
-//             // Dann Normale Attacken mit init wert
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Handle the pursuit(ID: 228) attack
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        match self.get_player_one()
+            .get_next_move()
+            .expect("Unexpected error! This field of player one shouldn`t be None at this point.") {
+            Next::Move(technique, _) => {
+                if technique.get_id() == 228 {
+                    match self.get_player_one()
+                        .get_next_move()
+                        .expect("Unexpected error! This field of player one shouldn`t be None \
+                                 at this point.") {
+                        Next::Switch(_) => {
+                            // Resolving pursuit, updating last action and last move
+                            // and setting the next move to None
+                            technique.resolve(self, 2);
+                            // let slot =
+                            //     self.get_player_one().get_attack_slot(technique.clone())
+                            //         .unwrap();
+                            // self.get_player_one().set_last_move(Some((technique, slot)));
+                            // let old_move = self.get_player_one().get_next_move().unwrap()
+                            //         .clone();
+                            // self.get_player_one().set_last_action(old_move);
+                            // self.get_player_one().set_next_move(None);
+
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            Next::Switch(_) => {
+                match self.get_player_one()
+                    .get_next_move()
+                    .expect("Unexpected error! This field of player one shouldn`t be None at \
+                             this point.") {
+                    Next::Move(technique, _) => {
+                        if technique.get_id() == 228 {
+                            // Resolving pursuit, updating last action and last move
+                            // and setting the next move to None
+                            technique.resolve(self, 1);
+                            // let slot =
+                            //     self.get_player_two().get_attack_slot(technique.clone())
+                            //         .unwrap();
+                            // self.get_player_two().set_last_move(Some((technique, slot)));
+                            // let old_move = self.get_player_two().get_next_move().unwrap()
+                            //         .clone();
+                            // self.get_player_two().set_last_action(old_move);
+                            // self.get_player_two().set_next_move(None);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Switch Pokemon of Player One if he wants to
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        if let Some(x) = self.get_player_one()
+            .get_next_move() {
+            match x {
+                Next::Switch(pkmn) => {
+                    // Switch of the current pokemon + setting flag
+                    self.get_player_one().set_current(pkmn.get_int());
+                    self.get_player_one().set_switched(true);
+                    // Updating last action and setting next move to None. Last Move isnt updated
+                    // because the last action wasnt a move
+                    let old_move = self.get_player_one().get_next_move().unwrap().clone();
+                    self.get_player_one().set_last_action(old_move);
+                    self.get_player_one().set_next_move(None);
+                }
+                _ => {}
+            }
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Switch Pokemon of Player Two if he wants to
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        if let Some(x) = self.get_player_two()
+            .get_next_move() {
+            match x {
+                Next::Switch(pkmn) => {
+                    // Switch of the current pokemon + setting flag
+                    self.get_player_two().set_current(pkmn.get_int());
+                    self.get_player_two().set_switched(true);
+                    // Updating last action and setting next move to None. Last Move isnt updated
+                    // because the last action wasnt a move
+                    let old_move = self.get_player_two().get_next_move().unwrap().clone();
+                    self.get_player_two().set_last_action(old_move);
+                    self.get_player_two().set_next_move(None);
+                }
+                _ => {}
+            }
+        }
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // If player one doesnt need to make a move anymore, only resolve attack of player two
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        if self.get_player_one().get_next_move().is_none() &&
+           self.get_player_two().get_next_move().is_some() {
+            match self.get_player_two().get_next_move().unwrap() {
+                Next::Move(x, _) => x.resolve(self, 2),
+                _ => {}
+            }
+            return;
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // If player two doesnt need to make a move anymore, only resolve attack of player one
+            ///////////////////////////////////////////////////////////////////////////////////////
+        } else if self.get_player_two().get_next_move().is_none() &&
+                  self.get_player_one().get_next_move().is_some() {
+            match self.get_player_one().get_next_move().unwrap() {
+                Next::Move(x, _) => x.resolve(self, 1),
+                _ => {}
+            }
+            return;
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // If both player dont have a move go out of fight
+            ///////////////////////////////////////////////////////////////////////////////////////
+        } else if self.get_player_two().get_next_move().is_none() &&
+                  self.get_player_one().get_next_move().is_some() {
+            return;
+        }
 
 
-//         // Diese methode wird die Moves der einzelnen Spieler abfragen und diese abspeichern.
-//         // Anschließend wird von hier aus in der jeweiligen Reihenfolge swap und battle
-//         // aufgerufen.
-
-//         // Von hier müsste auch die UI gesteuert werden. Zumindest in meinen Augen
-//     }
-// }
-// #[allow(dead_code)]
-// fn swap() {
-//     // von hier aus wird der tausch des aktiven pokemon abgehandelt.
-// }
-
-// #[allow(dead_code)]
-// fn battle(pokemon_one: &PokemonToken, pokemon_two: &PokemonToken) {
-//     // Hier wird zunächst auf die Priorität der Attacken und dann auf den Init Wert der pokemon
-//     // geprüft. Dann wird jeweils math aufgerufen.
-//     // Noch unklar: Schlaf, Paralyse, Vernarrtheit, etc.
-//     // XvX Kampf mit Area Attack wie Surfer: Attacke als Attacke gegen ein Pokemon ansehen und
-//     // math öfters aufrufen?
-// }
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // If both player want to perform an attack Priority and Speed of Pokemon will be used to
+        // decide which pokemon strikes first
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Variables for faster comparison. x_prio is the priority of the pokemon of player x and
+        // x_speed is the attackspeed of the pokemon of player x
+        let one_prio;
+        let one_attack;
+        match self.get_player_one().get_next_move().unwrap() {
+            Next::Move(attack, _) => {
+                one_prio = attack.get_priority();
+                one_attack = attack.clone();
+            }
+            _ => unreachable!(),
+        };
+        let two_prio;
+        let two_attack;
+        match self.get_player_two().get_next_move().unwrap() {
+            Next::Move(attack, _) => {
+                two_prio = attack.get_priority();
+                two_attack = attack.clone();
+            }
+            _ => unreachable!(),
+        };
+        let mut current = self.get_player_one().get_current();
+        let one_speed = self.get_player_one().get_pokemon_list()[current]
+            .get_current()
+            .get_stat(&enums::Stats::Speed);
+        current = self.get_player_two().get_current();
+        let two_speed = self.get_player_two().get_pokemon_list()[current]
+            .get_current()
+            .get_stat(&enums::Stats::Speed);
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // The attack with the higher Priority starts
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        if one_prio > two_prio {
+            one_attack.resolve(self, 1);
+            two_attack.resolve(self, 2);
+        } else if one_prio < two_prio {
+            two_attack.resolve(self, 2);
+            one_attack.resolve(self, 1);
+        } else {
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // If the attack priority is the same the pokemon with the higher attackspeed starts
+            // If the attack speed is the same, the pokemon of player one will strike first
+            ///////////////////////////////////////////////////////////////////////////////////////
+            if one_speed >= two_speed {
+                one_attack.resolve(self, 1);
+                two_attack.resolve(self, 2);
+            } else {
+                two_attack.resolve(self, 2);
+                one_attack.resolve(self, 1);
+            }
+        }
+    }
+}

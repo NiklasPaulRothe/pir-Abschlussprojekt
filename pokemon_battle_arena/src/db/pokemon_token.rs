@@ -150,34 +150,22 @@ impl PokemonToken {
     /// Getter function for move one. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_one(self) -> Option<moves::Technique> {
-        if let Some(x) = self.move_one {
-            return Some(x.0);
-        }
-        None
+        self.move_one.map(|x| x.0)
     }
     /// Getter function for move two. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_two(self) -> Option<moves::Technique> {
-        if let Some(x) = self.move_two {
-            return Some(x.0);
-        }
-        None
+        self.move_two.map(|x| x.0)
     }
     /// Getter function for move three. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_three(self) -> Option<moves::Technique> {
-        if let Some(x) = self.move_three {
-            return Some(x.0);
-        }
-        None
+        self.move_three.map(|x| x.0)
     }
     /// Getter function for move four. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_four(self) -> Option<moves::Technique> {
-        if let Some(x) = self.move_four {
-            return Some(x.0);
-        }
-        None
+        self.move_four.map(|x| x.0)
     }
     // Setter methods
     //
