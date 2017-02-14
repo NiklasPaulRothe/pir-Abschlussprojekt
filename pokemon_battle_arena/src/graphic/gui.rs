@@ -16,7 +16,9 @@ enum Screen {
     Play,
     Options,
     ChooseTeam,
-    Battle,
+    BattleStart,
+    BattleAttackSel,
+    BattleSwap,
 }
 
 /// App struct, which contains important data
@@ -115,7 +117,10 @@ pub fn draw_window() {
             let mut ui = &mut ui.set_widgets();
 
             // Create new empty canvas
-            widget::Canvas::new().color(app.bg_color).set(ids.canvas, ui);
+            widget::Canvas::new()
+                .border(0.0)
+                .color(app.bg_color)
+                .set(ids.canvas, ui);
 
             // draws Title-Screen
             // Contains:    Play-Button
@@ -498,7 +503,6 @@ pub fn draw_window() {
                     }
 
                     // Add buttons for attacks
-
                     let label1 = if app.pkmn_moves.len() > 0 {
                         app.pkmn_moves[0].get_name()
                     } else {
@@ -659,16 +663,16 @@ pub fn draw_window() {
                     .was_clicked() {
                     // temporaryly goes back to title screen
                     println!("Fight");
-                    app.screen = Screen::Battle;
+                    app.screen = Screen::BattleStart;
                 }
             }
 
             // Draws Fight Screen
-            if let Screen::Battle = app.screen {
+            if let Screen::BattleStart = app.screen {
                 // Text BG
                 widget::Canvas::new()
-                    .color(conrod::color::LIGHT_GREY)
-                    .border(4.0)
+                    .color(conrod::color::LIGHT_ORANGE)
+                    .border(2.0)
                     .w_h(WIDTH as f64, 240.0)
                     .mid_bottom_with_margin_on(ids.canvas, 0.0)
                     .set(ids.bg_text, ui);
@@ -691,19 +695,87 @@ pub fn draw_window() {
 
                 // BG What to do next
                 widget::Canvas::new()
-                    .color(conrod::color::GREY)
-                    .border(4.0)
+                    .color(conrod::color::TRANSPARENT)
+                    .border(0.0)
                     .w_h(350.0, 240.0)
                     .mid_right_of(ids.bg_text)
                     .set(ids.bg_whatdo, ui);
 
-                // BG Attack Selection
-                widget::Canvas::new()
-                    .color(conrod::color::WHITE)
-                    .border(4.0)
-                    .w_h(WIDTH as f64 - 350.0, 240.0)
-                    .left_from(ids.bg_whatdo, 0.0)
-                    .set(ids.bg_att_sel, ui);
+                widget::Tabs::new(&[(ids.tab_pokemon, "Pokémon"), (ids.tab_fight, "Fight")])
+                    .w_h(200.0, 240.0)
+                    .starting_canvas(ids.tab_fight)
+                    .border(3.0)
+                    .border_color(conrod::color::DARK_GREY)
+                    .color(conrod::color::LIGHT_GREY)
+                    .label_color(app.label_color)
+                    .layout_vertically()
+                    .bar_thickness(350.0)
+                    .pad_top(-120.0)
+                    .pad_bottom(120.0)
+                    .pad_left(1280.0)
+                    .pad_right(200.0)
+                    .x_y(390.0, -360.0)
+                    .set(ids.tab_whatdo, ui);
+
+                if widget::Button::new()
+                    .border(2.0)
+                    .color(app.bg_color)
+                    .label("Att1")
+                    .label_color(app.label_color)
+                    .top_left_with_margins_on(ids.tab_fight, 120.0, -815.0)
+                    .w_h(465.0, 120.0)
+                    .set(ids.button_att1, ui)
+                    .was_clicked() {
+                    println!("Att Button 1");
+                    if app.pkmn_moves.len() > 0 {
+                        app.pkmn_moves.remove(0);
+                    }
+                }
+
+                if widget::Button::new()
+                    .border(2.0)
+                    .color(app.bg_color)
+                    .label("Att2")
+                    .label_color(app.label_color)
+                    .right_from(ids.button_att1, 0.0)
+                    .w_h(465.0, 120.0)
+                    .set(ids.button_att2, ui)
+                    .was_clicked() {
+                    println!("Att Button 2");
+                    if app.pkmn_moves.len() > 1 {
+                        app.pkmn_moves.remove(1);
+                    }
+                }
+
+                if widget::Button::new()
+                    .border(2.0)
+                    .color(app.bg_color)
+                    .label("Att3")
+                    .label_color(app.label_color)
+                    .down_from(ids.button_att1, 0.0)
+                    .w_h(465.0, 120.0)
+                    .set(ids.button_att3, ui)
+                    .was_clicked() {
+                    println!("Att Button 3");
+                    if app.pkmn_moves.len() > 2 {
+                        app.pkmn_moves.remove(2);
+                    }
+                }
+
+                if widget::Button::new()
+                    .border(2.0)
+                    .color(app.bg_color)
+                    .label("Att4")
+                    .label_color(app.label_color)
+                    .right_from(ids.button_att3, 0.0)
+                    .w_h(465.0, 120.0)
+                    .set(ids.button_att4, ui)
+                    .was_clicked() {
+                    println!("Att Button 4");
+                    if app.pkmn_moves.len() > 3 {
+                        app.pkmn_moves.remove(3);
+                    }
+                }
             }
         });
 
@@ -741,6 +813,11 @@ widget_ids! {
 
         // === text ===
         text_sel_pkmn,
+        text_test,
+
+        tab_whatdo,
+        tab_pokemon,
+        tab_fight,
 
         // === buttons ===
         button_play,
@@ -756,5 +833,6 @@ widget_ids! {
         button_att2,
         button_att3,
         button_att4,
+        button_swap,
     }
 }
