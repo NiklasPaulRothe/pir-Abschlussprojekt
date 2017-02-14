@@ -4,6 +4,7 @@ extern crate conrod;
 use conrod::backend::piston::{self, Window, WindowEvents, OpenGL};
 use conrod::backend::piston::event::UpdateEvent;
 use db;
+use player;
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
@@ -16,9 +17,23 @@ enum Screen {
     Play,
     Options,
     ChooseTeam,
-    BattleStart,
-    BattleAttackSel,
-    BattleSwap,
+    Battle,
+    BattleText,
+    BattleAttack,
+    Switch,  
+    None,
+}
+
+#[derive(Clone)]
+enum Mode {
+    Singleplayer,
+    Multiplayer,
+}
+
+#[derive(Clone)]
+enum Player {
+    PlayerOne,
+    PlayerTwo,
 }
 
 /// App struct, which contains important data
@@ -29,8 +44,9 @@ enum Screen {
 ///     pkmn_team:      current team
 ///     sel_pkmn:       currently selected pokemon and its index in the team
 #[derive(Clone)]
-struct App {
+pub struct App {
     screen: Screen,
+    sub_screen: Screen,
     label_color: conrod::Color,
     bg_color: conrod::Color,
     pokedex: db::pokedex::Pokedex,
@@ -39,12 +55,17 @@ struct App {
     movedex: db::movedex::Movedex,
     techs: Option<Vec<db::moves::Technique>>,
     pkmn_moves: Vec<db::moves::Technique>,
+    player1: Option<player::Player>,
+    player2: Option<player::Player>,
+    player: Player,
+    mode: Mode,
 }
 
 impl App {
     fn new() -> Self {
         App {
             screen: Screen::Title,
+            sub_screen: Screen::None,
             label_color: conrod::color::BLACK,
             bg_color: conrod::color::WHITE,
             pokedex: db::pokedex::Pokedex::new(),
@@ -53,6 +74,10 @@ impl App {
             movedex: db::movedex::Movedex::new(),
             techs: None,
             pkmn_moves: Vec::new(),
+            player1: None,
+            player2: None,
+            player: Player::PlayerOne,
+            mode: Mode::Singleplayer,
         }
     }
 
@@ -186,8 +211,9 @@ pub fn draw_window() {
                     .w_h(BUTTON_W, BUTTON_H)
                     .set(ids.button_sp, ui)
                     .was_clicked() {
-                    app.screen = Screen::ChooseTeam;
                     println!("Singleplayer");
+                    app.mode = Mode::Singleplayer;
+                    app.screen = Screen::ChooseTeam;
                 }
 
                 // Multiplayer button
@@ -202,6 +228,8 @@ pub fn draw_window() {
                     .set(ids.button_mp, ui)
                     .was_clicked() {
                     println!("Multiplayer");
+                    app.mode = Mode::Multiplayer;
+                    app.screen = Screen::ChooseTeam;
                 }
 
                 // Back button
@@ -651,24 +679,67 @@ pub fn draw_window() {
                     app.screen = Screen::Play;
                 }
 
-                // Button to start the fight
-                if widget::Button::new()
-                    .border(1.0)
-                    .color(app.bg_color)
-                    .label("Fight")
-                    .label_color(app.label_color)
-                    .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
-                    .w_h(BUTTON_W, BUTTON_H)
-                    .set(ids.button_fight, ui)
-                    .was_clicked() {
-                    // temporaryly goes back to title screen
-                    println!("Fight");
-                    app.screen = Screen::BattleStart;
+                match (app.mode.clone(), app.player.clone()) {
+                    (Mode::Singleplayer, _) => {
+                        if widget::Button::new()
+                            .border(1.0)
+                            .color(app.bg_color)
+                            .label("Fight")
+                            .label_color(app.label_color)
+                            .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
+                            .w_h(BUTTON_W, BUTTON_H)
+                            .set(ids.button_fight, ui)
+                            .was_clicked() {
+                            println!("Fight");
+                            app.player1 = Some(player::Player::new_by_pokemon(app.pkmn_team.clone(), player::PlayerType::Human));
+                            app.player2 = Some(player::Player::new_by_id(&[1, 2, 3, 4, 5, 6], player::PlayerType::SimpleAi));
+                            println!("{:#?}", app.player1);
+                            println!("{:#?}", app.player2);
+                            app.screen = Screen::Battle;
+                        }
+                    }
+                    (Mode::Multiplayer, Player::PlayerOne) => {
+                        if widget::Button::new()
+                            .border(1.0)
+                            .color(app.bg_color)
+                            .label("Player Two")
+                            .label_color(app.label_color)
+                            .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
+                            .w_h(BUTTON_W, BUTTON_H)
+                            .set(ids.button_fight, ui)
+                            .was_clicked() {
+                            println!("Player Two");
+                            app.player1 = Some(player::Player::new_by_pokemon(app.pkmn_team.clone(), player::PlayerType::Human));
+                            println!("{:#?}", app.player1);
+                            app.pkmn_team = Vec::new();
+                            app.sel_pkmn = (None, None);
+                            app.techs = None;
+                            app.player = Player::PlayerTwo;
+                            app.screen = Screen::ChooseTeam;
+                        }
+                    }
+                    (Mode::Multiplayer, Player::PlayerTwo) => {
+                        if widget::Button::new()
+                            .border(1.0)
+                            .color(app.bg_color)
+                            .label("Fight")
+                            .label_color(app.label_color)
+                            .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
+                            .w_h(BUTTON_W, BUTTON_H)
+                            .set(ids.button_fight, ui)
+                            .was_clicked() {
+                            println!("Fight");
+                            app.player2 = Some(player::Player::new_by_pokemon(app.pkmn_team.clone(), player::PlayerType::Human));
+                            println!("{:?}", app.player2);
+                            app.screen = Screen::Battle;
+                        }
+                    }
                 }
+                    
             }
 
             // Draws Fight Screen
-            if let Screen::BattleStart = app.screen {
+            if let Screen::Battle = app.screen {
                 // Text BG
                 widget::Canvas::new()
                     .color(conrod::color::LIGHT_ORANGE)
@@ -701,6 +772,7 @@ pub fn draw_window() {
                     .mid_right_of(ids.bg_text)
                     .set(ids.bg_whatdo, ui);
 
+                // ===== Tabs to decide what to do =====
                 widget::Tabs::new(&[(ids.tab_pokemon, "Pokémon"), (ids.tab_fight, "Fight")])
                     .w_h(200.0, 240.0)
                     .starting_canvas(ids.tab_fight)
@@ -717,6 +789,7 @@ pub fn draw_window() {
                     .x_y(390.0, -360.0)
                     .set(ids.tab_whatdo, ui);
 
+                // ===== Attack selection =====
                 if widget::Button::new()
                     .border(2.0)
                     .color(app.bg_color)
@@ -764,6 +837,8 @@ pub fn draw_window() {
                     .was_clicked() {
                     println!("Att Button 4");
                 }
+
+                // ===== Pokemon Switch Buttons ===== 
             }
         });
 
