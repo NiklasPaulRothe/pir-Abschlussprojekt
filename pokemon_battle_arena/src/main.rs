@@ -42,7 +42,7 @@ fn testing() {
     // }
 
     // test_players();
-    test_arena();
+    // test_arena();
     // graphic::gui::draw_window();
 }
 
@@ -85,6 +85,9 @@ fn test_arena() {
     let attack = movedex.move_by_id(1).unwrap();
     let attack_haze = movedex.move_by_id(114).unwrap();
     let attack_hail = movedex.move_by_id(258).unwrap();
+    let attack_sandstorm = movedex.move_by_id(201).unwrap();
+    let attack_mudsport = movedex.move_by_id(300).unwrap();
+    let attack_fairylock = movedex.move_by_id(587).unwrap();
     println!("Attack: {}", attack_hail.get_name());
 
     println!("HP1 vorher: {}",
@@ -99,6 +102,10 @@ fn test_arena() {
     attack.resolve(&mut arena, 2);
     attack_hail.resolve(&mut arena, 2);
     attack_haze.resolve(&mut arena, 2);
+    attack_sandstorm.resolve(&mut arena, 2);
+    attack_mudsport.resolve(&mut arena, 2);
+    attack_fairylock.resolve(&mut arena, 2);
+    attack.resolve(&mut arena, 2);
     println!("HP1 nachher: {}",
              arena.get_player_one().get_pokemon_list()[0]
                  .get_current()
@@ -108,12 +115,19 @@ fn test_arena() {
                  .get_current()
                  .get_stat(&db::enums::Stats::Hp));
     println!("Hash vorher: {:?}", arena.get_field_effects());
-    arena.validate_field_effects();
-    arena.validate_field_effects();
+    println!("Weather vorher: {:?}", arena.get_current_weather());
+    arena.validate_effects_and_weather();
+    arena.validate_effects_and_weather();
     println!("Hash nach 2 Runden: {:?}", arena.get_field_effects());
-    arena.validate_field_effects();
-    arena.validate_field_effects();
-    arena.validate_field_effects();
-    println!("Hash am Ende: {:?}", arena.get_field_effects())
+    println!("Weather nach 2 Runden: {:?}", arena.get_current_weather());
+    arena.validate_effects_and_weather();
+    arena.validate_effects_and_weather();
+    arena.validate_effects_and_weather();
+    println!("Hash nach 5 Runden: {:?}", arena.get_field_effects());
+    println!("Weather nach 5 Runden: {:?}", arena.get_current_weather());
+    arena.validate_effects_and_weather();
+    arena.validate_effects_and_weather();
+    println!("Hash nach 7 Runden: {:?}", arena.get_field_effects());
+    println!("Weather nach 7 Runden: {:?}", arena.get_current_weather());
     // println!("Player One: {:#?}", arena.get_player_one());
 }

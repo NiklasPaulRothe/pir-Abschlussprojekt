@@ -154,7 +154,7 @@ impl Technique {
                         if (self.get_name() == String::from("moonlight")) ||
                            (self.get_name() == String::from("synthesis")) ||
                            (self.get_name() == String::from("morning-sun")) {
-                            match weather {
+                            match weather.0 {
                                 enums::Weather::ClearSky => {
                                     value = user.get_base().get_stat(&enums::Stats::Hp) / 2;
                                 }

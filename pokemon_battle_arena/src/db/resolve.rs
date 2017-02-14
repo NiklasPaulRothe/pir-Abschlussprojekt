@@ -479,7 +479,6 @@ pub fn ko_attack(target: &mut PokemonToken) {
 /// Resolves the attack "haze". Changes all Stats to default.
 pub fn haze(pokemon: &mut PokemonToken) {
     let clone = pokemon.get_base().clone();
-    pokemon.get_current().set_stats(enums::Stats::Hp, clone.get_stat(&enums::Stats::Hp));
     pokemon.get_current().set_stats(enums::Stats::Attack, clone.get_stat(&enums::Stats::Attack));
     pokemon.get_current().set_stats(enums::Stats::Defense,
                                     clone.get_stat(&enums::Stats::Defense));
@@ -543,9 +542,8 @@ pub fn rooms(arena: &mut Arena, effect: enums::FieldEffects) -> bool {
 }
 /// Resolves the weather. Returns false if no error accured and a new weather could be set
 pub fn weather(arena: &mut Arena, weather: enums::Weather) -> bool {
-    if arena.get_current_weather() != weather {
+    if arena.get_current_weather().0 != weather {
         arena.set_current_weather(weather);
-        arena.get_hash_weather().insert(weather, 0);
         return false;
     }
     true

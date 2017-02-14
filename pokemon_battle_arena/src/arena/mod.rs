@@ -9,11 +9,9 @@ use player::Player;
 /// two players
 pub struct Arena<'a> {
     default_effect: enums::Types,
-    current_effect: enums::Types,
-    effect_flag: HashMap<enums::Types, u8>,
+    current_effect: (enums::Types, u8),
     default_weather: enums::Weather,
-    current_weather: enums::Weather,
-    weather_flag: HashMap<enums::Weather, u8>,
+    current_weather: (enums::Weather, u8),
     field_effects: HashMap<enums::FieldEffects, u8>,
     player_1: &'a mut Player,
     player_2: &'a mut Player,
@@ -28,11 +26,9 @@ impl<'a> Arena<'a> {
                -> Self {
         Arena {
             default_effect: i_effect,
-            current_effect: i_effect,
-            effect_flag: HashMap::new(),
+            current_effect: (i_effect, 0),
             default_weather: i_weather,
-            current_weather: i_weather,
-            weather_flag: HashMap::new(),
+            current_weather: (i_weather, 0),
             field_effects: HashMap::new(),
             player_1: i_player_1,
             player_2: i_player_2,
@@ -50,20 +46,12 @@ impl<'a> Arena<'a> {
         self.default_weather
     }
     /// Gets the current type of the arena
-    pub fn get_current_effect(&self) -> enums::Types {
+    pub fn get_current_effect(&self) -> (enums::Types, u8) {
         self.current_effect
     }
-    /// Gets the actual weather of the arena
-    pub fn get_current_weather(&self) -> enums::Weather {
+    /// Gets the actual weather of the arena and the rounds its there
+    pub fn get_current_weather(&self) -> (enums::Weather, u8) {
         self.current_weather
-    }
-    /// Gets the effect flag list
-    pub fn get_hash_effect(&mut self) -> &mut HashMap<enums::Types, u8> {
-        &mut self.effect_flag
-    }
-    /// Gets the weather flag list
-    pub fn get_hash_weather(&mut self) -> &mut HashMap<enums::Weather, u8> {
-        &mut self.weather_flag
     }
     /// Gets the field effect list
     pub fn get_field_effects(&mut self) -> &mut HashMap<enums::FieldEffects, u8> {
@@ -83,17 +71,20 @@ impl<'a> Arena<'a> {
     //
     /// Sets the current effect of the arena
     pub fn set_current_effect(&mut self, new: enums::Types) {
-        self.current_effect = new;
+        self.current_effect = (new, 0);
     }
     /// Sets the current weather in the arena
     pub fn set_current_weather(&mut self, new: enums::Weather) {
-        self.current_weather = new;
+        self.current_weather = (new, 0);
     }
     // Other Methods
     //
-    /// Deletes all Field Effects which reached their maximum amount of rounds and increases the
-    /// rounds for all remaining effects by one
-    pub fn validate_field_effects(&mut self) {
+    /// Checks if field effects and weather are still valid.
+    /// Field effects are compared with their maximum lifetime. If the effects reached it their
+    /// dropped out of the HashMap
+    /// Weather lasts for 5 rounds after it, it is replaced with the default arena weather.
+    pub fn validate_effects_and_weather(&mut self) {
+        // Validate field effects
         let mut tmp: HashMap<enums::FieldEffects, u8> = HashMap::new();
         for (effect, act_rounds) in self.get_field_effects().iter() {
             if act_rounds < &effect.get_max_rounds() {
@@ -101,5 +92,14 @@ impl<'a> Arena<'a> {
             }
         }
         self.field_effects = tmp;
+        // Validate weather effects
+        if self.current_weather.1 < 4 {
+            self.current_weather.1 += 1;
+        } else {
+            self.current_weather = (self.default_weather, 0);
+        }
     }
+    /// Checks if the current weather is there for 5 rounds. If not the round counter is increased
+    /// If yes, the default weather is set again
+    pub fn validate_weather_effects(&mut self) {}
 }

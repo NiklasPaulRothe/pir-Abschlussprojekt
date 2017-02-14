@@ -373,17 +373,17 @@ impl FieldEffects {
     /// Returns the maximum amount of turns the given FieldEffect lasts.
     pub fn get_max_rounds(&self) -> u8 {
         match *self {
-            FieldEffects::MudSport => 5,
-            FieldEffects::WaterSport => 5,
-            FieldEffects::Gravity => 5,
-            FieldEffects::TrickRoom => 5,
-            FieldEffects::WonderRoom => 5,
-            FieldEffects::MagicRoom => 5,
-            FieldEffects::IonDeluge => 1,
-            FieldEffects::GrassyTerrain => 5,
-            FieldEffects::MistyTerrain => 5,
-            FieldEffects::ElectricTerrain => 5,
-            FieldEffects::FairyLock => 2,
+            FieldEffects::MudSport => 4,
+            FieldEffects::WaterSport => 4,
+            FieldEffects::Gravity => 4,
+            FieldEffects::TrickRoom => 4,
+            FieldEffects::WonderRoom => 4,
+            FieldEffects::MagicRoom => 4,
+            FieldEffects::IonDeluge => 0,
+            FieldEffects::GrassyTerrain => 4,
+            FieldEffects::MistyTerrain => 4,
+            FieldEffects::ElectricTerrain => 4,
+            FieldEffects::FairyLock => 1,
         }
     }
 }
