@@ -809,6 +809,8 @@ damage taken.",,,,
 This move cannot be copied by []{move:mirror-move}.",,"unique","none",,,,,0,0,0,0,0,0,"The user hypnotizes itself into
 copying any stat change made
 by the target.",,,,
+245,"extreme-speed","normal",80,5,100,2,"selected-pokemon","physical","User swaps Defense and Special Defense changes with the target.","User swaps its [Defense]{mechanic:defense} and [Special Defense]{mechanic:special-defense} modifiers with the target.",,"damage",none,,,,,0,0,0,0,0,0,"The user charges the target at blinding
+speed. This move always goes first.",,,,
 246,"ancient-power","rock","60",5,"100",0,"selected-pokemon","special","Has a $effect_chance% chance to raise all of the user's stats by one stage.","Inflicts [regular damage]{mechanic:regular-damage}. Has a $effect_chance% chance to raise all of the user's stats one [stage]{mechanic:stage}.","10","damage+raise","none",,,,,0,0,0,0,0,10,"The user attacks with a prehistoric power.
 This may also raise all the user’s stats
 at once.","6",,,"1"

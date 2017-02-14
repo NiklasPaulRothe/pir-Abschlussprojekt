@@ -6,7 +6,7 @@ use self::rand::{Rng, thread_rng};
 /// Enum for the pokemon/attack types.
 /// Can be assigned from i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash)]
+    #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash, Copy)]
     pub enum Types {
         Normal = 1,
         Fighting = 2,
@@ -164,6 +164,7 @@ pub enum Resolve {
     NoTypeImmunity,
     HealBlock,
     Telekinesis,
+    Protect,
 }
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
@@ -173,7 +174,27 @@ pub enum Choose {
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub enum PlayerFlag {
-
+    // lowers speed of Pokemon that are switched in.
+    StickyWeb,
+    // deals Damage to Pokemon that are switched in.
+    StealthRock,
+    // poisons Pokemon that are switched in.
+    ToxicSpikes,
+    // prevents opponents from landing criticla hits.
+    LuckyChant,
+    // deals Damage to Pokemon that are switched in.
+    Spikes,
+    CraftyShield,
+    MatBlock,
+    // protects the User from every move with Priority > 0 for one round.
+    QuickGuard,
+    WideGuard,
+    // Doubles the speed for speed check.
+    Tailwind,
+    Safeguard,
+    Reflect,
+    LightScreen,
+    Mist,
 }
 
 /// Enum for Genders
@@ -228,7 +249,7 @@ pub fn get_gender(gender_rate: i8) -> Gender {
 
 /// Makes it easier to acces the Stats directly
 enum_from_primitive! {
-    #[derive(Debug, Clone, PartialEq)]
+    #[derive(Debug, Clone, PartialEq, Copy)]
     pub enum Stats {
         Undefined = 0,
         Hp = 1,
@@ -243,7 +264,7 @@ enum_from_primitive! {
 }
 
 /// Weather enum for the arena.
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Copy)]
 pub enum Weather {
     ClearSky,
     Sunlight,
@@ -272,7 +293,7 @@ enum_from_primitive! {
 /// Enum that contains the valid target(s) of a move.
 /// Can be assigned from a i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone)]
+    #[derive(Debug, RustcDecodable, Clone, PartialEq)]
     pub enum Target {
         SpecificMove = 1,
         SelectedPokemonMeFirst = 2,
@@ -294,7 +315,7 @@ enum_from_primitive! {
 /// All Flags that can be important for a move. Contains for example if a move is influenced by
 /// another move or condition the pokemon or arena is in.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone)]
+    #[derive(Debug, RustcDecodable, Clone, PartialEq)]
     pub enum MoveFlags {
         Contact = 1,
         Charge = 2,
@@ -330,5 +351,39 @@ pub fn stat_to_string(stat: Stats) -> &'static str {
         Stats::Accuracy => "accuracy",
         Stats::Evasion => "evasion",
         _ => "",
+    }
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Copy)]
+pub enum FieldEffects {
+    MudSport,
+    WaterSport,
+    Gravity,
+    TrickRoom,
+    WonderRoom,
+    MagicRoom,
+    IonDeluge,
+    GrassyTerrain,
+    MistyTerrain,
+    ElectricTerrain,
+    FairyLock,
+}
+
+impl FieldEffects {
+    /// Returns the maximum amount of turns the given FieldEffect lasts.
+    pub fn get_max_rounds(&self) -> u8 {
+        match *self {
+            FieldEffects::MudSport => 4,
+            FieldEffects::WaterSport => 4,
+            FieldEffects::Gravity => 4,
+            FieldEffects::TrickRoom => 4,
+            FieldEffects::WonderRoom => 4,
+            FieldEffects::MagicRoom => 4,
+            FieldEffects::IonDeluge => 0,
+            FieldEffects::GrassyTerrain => 4,
+            FieldEffects::MistyTerrain => 4,
+            FieldEffects::ElectricTerrain => 4,
+            FieldEffects::FairyLock => 1,
+        }
     }
 }
