@@ -173,6 +173,15 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
         "conversion" => {
             user.set_type(0, attack.get_type());
         },
+        "spite" => {
+            // defender.get_last_move().unwrap().0.get_power_points();
+            // target.decrement_ap();
+        },
+        "sleep-talk" => {
+            if attacker.is_asleep(){
+                attacker.get_attack(0);
+            }
+        },
         // "conversion-2" => {
         // },
         // "substitute" => {
@@ -185,10 +194,6 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
         // },
         // "curse" => {
         // },
-        "spite" => {
-            // defender.get_last_move().unwrap().0.get_power_points();
-            // target.decrement_ap();
-        },
         // "protect" => {
         // },
         // "belly-drum" => {
@@ -202,8 +207,6 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
         // "endure" => {
         // },
         // "mean-look" => {
-        // },
-        // "sleep-talk" => {
         // },
         // "heal-bell" => {
         // },
