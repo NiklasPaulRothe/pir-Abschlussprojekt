@@ -5,6 +5,10 @@ use db::enums;
 /// The standard arena is based on the default 1v1 fight.
 
 impl<'a> super::Arena<'a> {
+    /// Simulating a fight. This function is called on a arena and uses the next_move variables of
+    /// the players to know what to do in this round.
+    /// Important: All next_move variables must contain a Some() entry. If the function is called
+    /// and atleast one variable is holding a None, this function will panic!
     pub fn fight(&mut self) {
         ///////////////////////////////////////////////////////////////////////////////////////////
         // Setting the switched flag in the Player structs to false and reset if a swap will be done
