@@ -1,6 +1,7 @@
 use time::get_time;
 use player::Player;
 use player::PlayerType;
+use player;
 use arena::Arena;
 use super::enums;
 use super::moves;
@@ -40,7 +41,7 @@ pub fn test2(){
     }
 }
 
-pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user: PokemonToken, target: PokemonToken, attacker: &mut Player, defender: &mut Player, arena: &mut Arena) {
+pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user: PokemonToken, mut target: PokemonToken, attacker: &mut Player, defender: &mut Player, arena: &mut Arena) {
     let movedex = Movedex::new();
     let mut rng = thread_rng();
 
@@ -164,7 +165,7 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
                     //                  entry.get_ailment(),
                     //                  100,
                     //                  user,
-                    //                  target,
+                    //                  &mut target,
                     //                  defender);
                 }
             }
@@ -178,9 +179,88 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
             // target.decrement_ap();
         },
         "sleep-talk" => {
-            if attacker.is_asleep(){
-                attacker.get_attack(0);
+            struct AllMoves {
+                one: String,
+                two: String,
+                three: String,
+                four: String,
             }
+            // let one: String;;
+            let mut moves = AllMoves {one: "".to_string(), two: "".to_string(), three: "".to_string(), four: "".to_string(), };
+            if user.is_asleep(){
+                if attacker.get_attack(&player::AttackSlot::One).get_name() != "sleep-talk"{
+                    // moves.one = attacker.get_attack(&player::AttackSlot::One).get_name();
+                    moves.one = attacker.get_attack(&player::AttackSlot::One).get_name().to_string();
+                }
+                if attacker.get_attack(&player::AttackSlot::Two).get_name() != "sleep-talk"{
+                    moves.two = attacker.get_attack(&player::AttackSlot::Two).get_name().to_string();
+                }
+                if attacker.get_attack(&player::AttackSlot::Three).get_name() != "sleep-talk"{
+                    moves.three = attacker.get_attack(&player::AttackSlot::Three).get_name().to_string();
+                }
+                if attacker.get_attack(&player::AttackSlot::Four).get_name() != "sleep-talk"{
+                    moves.four = attacker.get_attack(&player::AttackSlot::Four).get_name().to_string();
+                }
+
+                let mut random = rng.gen_range(1, 4);
+                loop {
+                    match random {
+                        1 => {
+                            if moves.one == "".to_string(){
+                                random = rng.gen_range(2, 4);
+                            }else{
+                                let attack = movedex.move_by_id(attacker.get_attack(&player::AttackSlot::One).get_id()).unwrap();
+                                attack.resolve(arena, 1);
+                                break
+                            }
+                        },
+                        2 => {
+                            if moves.two == "".to_string(){
+                                random = rng.gen_range(1, 4);
+                            }else{
+                                let attack = movedex.move_by_id(attacker.get_attack(&player::AttackSlot::Two).get_id()).unwrap();
+                                attack.resolve(arena, 1);
+                                break
+                            }
+                        },
+                        3 => {
+                            if moves.three == "".to_string(){
+                                random = rng.gen_range(1, 4);
+                            }else{
+                                let attack = movedex.move_by_id(attacker.get_attack(&player::AttackSlot::Three).get_id()).unwrap();
+                                attack.resolve(arena, 1);
+                                break
+                            }
+                        },
+                        4 => {
+                            if moves.four == "".to_string(){
+                                random = rng.gen_range(1, 3);
+                            }else{
+                                let attack = movedex.move_by_id(attacker.get_attack(&player::AttackSlot::Four).get_id()).unwrap();
+                                attack.resolve(arena, 1);
+                                break
+                            }
+                        },
+                        _=> { random = rng.gen_range(1, 4); }
+                    }
+                }
+            }
+        },
+        "celebrate" => {
+            println!("{:?} disappears and then rises out of a birthday present that falls into the picture from above.", user.get_name());
+        },
+        "powder" => {
+            if target.get_types().0 == enums::Types::Grass || target.get_types().1 == enums::Types::Grass{
+                println!("{:?} has no effect on  Pokemon type plants", name);
+            }
+        },
+        "reflect-type" => {
+            user.set_type(0, target.get_types().0);
+            user.set_type(1, target.get_types().1);
+        },
+        "soak" => {
+            target.set_type(0, enums::Types::Water);
+            target.set_type(1, enums::Types::Water);
         },
         // "conversion-2" => {
         // },
@@ -296,8 +376,6 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
         // },
         // "rage-powder" => {
         // },
-        // "soak" => {
-        // },
         // "simple-beam" => {
         // },
         // "entrainment" => {
@@ -309,8 +387,6 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
         // "shell-smash" => {
         // },
         // "quash" => {
-        // },
-        // "reflect-type" => {
         // },
         // "bestow" => {
         // },
@@ -328,11 +404,7 @@ pub fn unique(attack: &Technique, name: &str, move_type: enums::Types, mut user:
         // },
         // "spiky-shield" => {
         // },
-        // "powder" => {
-        // },
         // "happy-hour" => {
-        // },
-        // "celebrate" => {
         // },
         // "hold-hands" => {
         // },
