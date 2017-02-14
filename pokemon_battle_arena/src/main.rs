@@ -15,21 +15,14 @@ mod player;
 use player::Player;
 use player::PlayerType;
 use arena::Arena;
-use db::unique;
 use db::enums;
 
 fn main() {
     println!("");
     println!("Hello and Welcome to the Pokemon Battle Arena");
     println!("");
-    //testing();
-    //unique::test();
-    //unique::test_match("teleport");
-    unique::test2();
-
+    testing();
 }
-
-
 
 // This function is for testing. Pls uncommend before commiting!
 fn testing() {
