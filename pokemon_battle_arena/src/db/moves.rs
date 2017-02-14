@@ -115,7 +115,7 @@ impl Technique {
                 }
 
                 enums::MoveCategory::Heal => {
-                    let weather = arena.get_weather().clone();
+                    let weather = arena.get_current_weather().clone();
                     let mut user = get_user(flag, arena);
                     // Heal moves will fail if the user has maximum HP
                     if !(user.get_current().get_stat(&enums::Stats::Hp) ==
@@ -262,7 +262,54 @@ impl Technique {
                     }
                 }
 
-                enums::MoveCategory::WholeFieldEffect => {}
+                enums::MoveCategory::WholeFieldEffect => {
+                    let mut failure = true;
+                    if self.get_name() == String::from("haze") {
+                        {
+                            let mut target = get_target(flag, arena);
+                            resolve::haze(target);
+                        }
+                        {
+                            let mut user = get_user(flag, arena);
+                            resolve::haze(user);
+                        }
+                        failure = false;
+                    } else if self.get_name() == String::from("sandstorm") {
+                        failure = resolve::weather(arena, enums::Weather::Sandstorm);
+                    } else if self.get_name() == String::from("rain-dance") {
+                        failure = resolve::weather(arena, enums::Weather::Rain);
+                    } else if self.get_name() == String::from("sunny-day") {
+                        failure = resolve::weather(arena, enums::Weather::Sunlight);
+                    } else if self.get_name() == String::from("hail") {
+                        failure = resolve::weather(arena, enums::Weather::Hail);
+                    } else if self.get_name() == String::from("mud-sport") {
+                        failure = resolve::field_effects(arena, enums::FieldEffects::MudSport);
+                    } else if self.get_name() == String::from("water-sport") {
+                        failure = resolve::field_effects(arena, enums::FieldEffects::WaterSport);
+                    } else if self.get_name() == String::from("gravity") {
+                        failure = resolve::field_effects(arena, enums::FieldEffects::Gravity);
+                    } else if self.get_name() == String::from("ion-deluge") {
+                        failure = resolve::field_effects(arena, enums::FieldEffects::IonDeluge);
+                    } else if self.get_name() == String::from("fairy-lock") {
+                        failure = resolve::field_effects(arena, enums::FieldEffects::FairyLock);
+                    } else if self.get_name() == String::from("grassy-terrain") {
+                        failure = resolve::terrain(arena, enums::FieldEffects::GrassyTerrain);
+                    } else if self.get_name() == String::from("misty-terrain") {
+                        failure = resolve::terrain(arena, enums::FieldEffects::MistyTerrain);
+                    } else if self.get_name() == String::from("electric-terrain") {
+                        failure = resolve::terrain(arena, enums::FieldEffects::ElectricTerrain);
+                    } else if self.get_name() == String::from("trick-room") {
+                        failure = resolve::rooms(arena, enums::FieldEffects::TrickRoom);
+                    } else if self.get_name() == String::from("wonder-room") {
+                        failure = resolve::rooms(arena, enums::FieldEffects::WonderRoom);
+                    } else if self.get_name() == String::from("magic-room") {
+                        failure = resolve::rooms(arena, enums::FieldEffects::MagicRoom);
+                    }
+
+                    if failure {
+                        println!("Failed to resolve {}.", self.get_name());
+                    }
+                }
 
                 enums::MoveCategory::FieldEffect => {
                     // match self.get_name() {

@@ -28,12 +28,12 @@ fn main() {
 fn testing() {
     println!("Testing:");
     for entry in db::movedex::Movedex::new().get_entries() {
-        if entry.get_category() == enums::MoveCategory::FieldEffect {
+        if entry.get_category() == enums::MoveCategory::WholeFieldEffect {
             println!("{:?}", entry.get_name());
         }
     }
     // test_players();
-    // test_arena();
+    test_arena();
     // graphic::gui::draw_window();
 }
 
@@ -68,12 +68,14 @@ fn test_arena() {
                                &mut p2,
                                db::enums::Types::Normal,
                                db::enums::Weather::ClearSky);
-    println!("Player One: {:#?}", arena.get_player_one());
-    println!("Player Two: {:#?}", arena.get_player_two());
+    // println!("Player One: {:#?}", arena.get_player_one());
+    // println!("Player Two: {:#?}", arena.get_player_two());
     // Attacke erstellen und "Kampf"
     let movedex = db::movedex::Movedex::new();
-    let attack = movedex.move_by_id(151).unwrap();
-    println!("Attack: {}", attack.get_name());
+    let attack = movedex.move_by_id(1).unwrap();
+    let attack_haze = movedex.move_by_id(114).unwrap();
+    let attack_hail = movedex.move_by_id(257).unwrap();
+    println!("Attack: {}", attack_hail.get_name());
 
     println!("HP1 vorher: {}",
              arena.get_player_one().get_pokemon_list()[0]
@@ -85,6 +87,8 @@ fn test_arena() {
                  .get_stat(&db::enums::Stats::Hp));
 
     attack.resolve(&mut arena, 2);
+    attack_hail.resolve(&mut arena, 2);
+    attack_haze.resolve(&mut arena, 2);
     println!("HP1 nachher: {}",
              arena.get_player_one().get_pokemon_list()[0]
                  .get_current()
@@ -93,5 +97,13 @@ fn test_arena() {
              arena.get_player_two().get_pokemon_list()[0]
                  .get_current()
                  .get_stat(&db::enums::Stats::Hp));
-    println!("Player One: {:#?}", arena.get_player_one());
+    println!("Hash vorher: {:?}", arena.get_field_effects());
+    arena.validate_field_effects();
+    arena.validate_field_effects();
+    println!("Hash nach 2 Runden: {:?}", arena.get_field_effects());
+    arena.validate_field_effects();
+    arena.validate_field_effects();
+    arena.validate_field_effects();
+    println!("Hash am Ende: {:?}", arena.get_field_effects())
+    // println!("Player One: {:#?}", arena.get_player_one());
 }

@@ -6,7 +6,7 @@ use self::rand::{Rng, thread_rng};
 /// Enum for the pokemon/attack types.
 /// Can be assigned from i32 value.
 enum_from_primitive! {
-    #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash)]
+    #[derive(Debug, RustcDecodable, Clone, Eq, PartialEq, Hash, Copy)]
     pub enum Types {
         Normal = 1,
         Fighting = 2,
@@ -228,7 +228,7 @@ pub fn get_gender(gender_rate: i8) -> Gender {
 
 /// Makes it easier to acces the Stats directly
 enum_from_primitive! {
-    #[derive(Debug, Clone, PartialEq)]
+    #[derive(Debug, Clone, PartialEq, Copy)]
     pub enum Stats {
         Undefined = 0,
         Hp = 1,
@@ -243,7 +243,7 @@ enum_from_primitive! {
 }
 
 /// Weather enum for the arena.
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Copy)]
 pub enum Weather {
     ClearSky,
     Sunlight,
@@ -330,5 +330,39 @@ pub fn stat_to_string(stat: Stats) -> &'static str {
         Stats::Accuracy => "accuracy",
         Stats::Evasion => "evasion",
         _ => "",
+    }
+}
+
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Copy)]
+pub enum FieldEffects {
+    MudSport,
+    WaterSport,
+    Gravity,
+    TrickRoom,
+    WonderRoom,
+    MagicRoom,
+    IonDeluge,
+    GrassyTerrain,
+    MistyTerrain,
+    ElectricTerrain,
+    FairyLock,
+}
+
+impl FieldEffects {
+    /// Returns the maximum amount of turns the given FieldEffect lasts.
+    pub fn get_max_rounds(&self) -> u8 {
+        match *self {
+            FieldEffects::MudSport => 5,
+            FieldEffects::WaterSport => 5,
+            FieldEffects::Gravity => 5,
+            FieldEffects::TrickRoom => 5,
+            FieldEffects::WonderRoom => 5,
+            FieldEffects::MagicRoom => 5,
+            FieldEffects::IonDeluge => 1,
+            FieldEffects::GrassyTerrain => 5,
+            FieldEffects::MistyTerrain => 5,
+            FieldEffects::ElectricTerrain => 5,
+            FieldEffects::FairyLock => 2,
+        }
     }
 }
