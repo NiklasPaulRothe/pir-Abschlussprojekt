@@ -68,8 +68,13 @@ impl Technique {
                        !(attacker_clone.get_last_action().clone().unwrap() ==
                          Next::Move(self.clone(), 0)) {
                         let attacker = get_attacker(flag, arena);
+                        println!("{} prepared itself", user_clone.get_name());
                         attacker.set_last_action((Next::Move(self.clone(), 0)));
-                        attacker.set_next_move(Some(Next::Move(self.clone(), 0)))
+                        attacker.set_next_move(Some(Next::Move(self.clone(), 0)));
+                    } else if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
+                              attacker_clone.get_last_action().clone().unwrap() ==
+                              Next::Move(self.clone(), 0) {
+                        println!("{} has to recharge", user_clone.get_name());
                     } else {
                         let mut rng = thread_rng();
                         {
