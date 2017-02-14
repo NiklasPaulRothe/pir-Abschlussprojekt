@@ -2,21 +2,23 @@ extern crate csv;
 extern crate num;
 extern crate rustc_serialize;
 extern crate rand;
+extern crate regex;
 use super::pokemon_token;
 use super::enums;
 use super::resolve;
 use self::num::FromPrimitive;
 use self::rand::{Rng, thread_rng};
+use self::regex::Regex;
 use std::collections::HashMap;
-use player::Player;
+use std::cmp::Ordering;
 use arena::Arena;
-
+use player::Player;
 use super::movedex;
 use super::unique;
 use super::pokedex::Pokedex;
 
-///Struct that is a representation of a move a pokemon can learn. Contains everything that is
-///needed to calculate it's impact given a user and a target Pokemon.
+/// Struct that is a representation of a move a pokemon can learn. Contains everything that is
+/// needed to calculate it's impact given a user and a target Pokemon.
 #[derive(Debug, Clone, RustcDecodable)]
 pub struct Technique {
     attack_id: usize,
@@ -51,192 +53,323 @@ pub struct Technique {
 }
 
 impl Technique {
-    ///Matches over the category of a move and calls a specific method in resolve.rs for this
-    ///category. All calculation is done inside the method, therefore no return is needed.
-    pub fn resolve(&self, mut user: pokemon_token::PokemonToken,
-        mut targets: Vec<pokemon_token::PokemonToken>, attacker: Player, defender: Player, field: Arena) {
-        //if no target is provided push user as target, so that the loop afterwards works, also
-        //attacks that have no target usually affect the field or the user.
-        if targets.is_empty() {
-            targets.push(user.clone());
-        }
+    /// Matches over the category of a move and calls a specific method in resolve.rs for this
+    /// category. All calculation is done inside the method, therefore no return is needed.
+    pub fn resolve(&self, arena: &mut Arena, flag: u8) {
+        // First call the hits method to sort out missing moves.
+        let mut user_clone = get_user(flag, arena).clone();
+        let mut target_clone = get_target(flag, arena).clone();
+        let mut defender_clone = get_defender(flag, arena).clone();
+        let mut attacker_clone = get_attacker(flag, arena).clone();
+        if self.hits(&mut target_clone, &mut user_clone, &mut defender_clone) {
+            // Match over the category provides smaller samples that must be dealt with.
+            match self.get_category() {
 
-        //for loop that calls the resolve methods for every choosen target.
-        for target in targets.clone() {
-            //first call the hits method to sort out missing moves.
-            if self.hits(target.clone(), user.clone()) {
-                //match over the category provides smaller samples that must be dealt with.
-                match self.get_category() {
+                enums::MoveCategory::Damage => {
+                    let mut target = get_target(flag, arena);
+                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                }
 
-                    enums::MoveCategory::Damage => {
-                        let _ = resolve::deal_damage(self.clone(), user.clone(), target);
-                    },
+                enums::MoveCategory::Ailment => {
+                    let mut target = get_target(flag, arena);
+                    resolve::ailment(self.get_name(),
+                                     self.get_type(),
+                                     self.get_ailment(),
+                                     100,
+                                     user_clone,
+                                     &mut target,
+                                     &mut defender_clone);
+                }
 
-                    enums::MoveCategory::Ailment => {
-                        resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(), 100, target);
-                    },
+                enums::MoveCategory::NetGoodStats => {
+                    let mut target = get_user(flag, arena);
+                    if Regex::new(r"attack").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Attack,
+                                              &mut target,
+                                              &mut attacker_clone);
+                    }
+                    if Regex::new(r"defense").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Defense,
+                                              &mut target,
+                                              &mut attacker_clone);
+                    }
+                    if Regex::new(r"special-attack").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::SpecialAttack,
+                                              &mut target,
+                                              &mut attacker_clone);
+                    }
+                    if Regex::new(r"special-defense").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::SpecialDefense,
+                                              &mut target,
+                                              &mut attacker_clone);
+                    }
+                    if Regex::new(r"speed").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Speed,
+                                              &mut target,
+                                              &mut attacker_clone);
+                    }
+                    if Regex::new(r"accuracy").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Accuracy,
+                                              &mut target,
+                                              &mut attacker_clone);
+                    }
+                    if Regex::new(r"evasion").unwrap().is_match(&self.effect_long) {
+                        resolve::change_stats(self.stat_change_rate.unwrap(),
+                                              enums::Stats::Evasion,
+                                              &mut target,
+                                              &mut attacker_clone);
+                    }
+                }
 
-                    enums::MoveCategory::NetGoodStats => {},
-
-                    enums::MoveCategory::Heal => {
-                        //Heal moves will fail if the user has maximum HP
-                        if !(user.get_current().get_stat(enums::Stats::Hp) ==
-                            user.get_base().get_stat(enums::Stats::Hp)) {
-                            let mut value = 0;
-                            //Deal with moves that heal different amounts of HP for different
-                            //weather conditions.
-                            if (self.get_name() == String::from("moonlight")) ||
-                            (self.get_name() == String::from("synthesis")) ||
-                            (self.get_name() == String::from("morning-sun")) {
-                                match field.get_weather() {
-                                    enums::Weather::ClearSky => {
-                                        value = user.get_base().get_stat(enums::Stats::Hp) / 2;
-                                    },
-                                    enums::Weather::Sunlight => {
-                                        value = (user.get_base().get_stat(enums::Stats::Hp)
-                                         / 4) * 3;
-                                    },
-                                    _ => {
-                                        if self.get_name() == String::from("morning-sun") {
-                                            value = user.get_base().
-                                                get_stat(enums::Stats::Hp) / 4
-                                        } else {
-                                            value = user.get_base().
-                                                get_stat(enums::Stats::Hp) / 8
-                                        }
-                                    }
-                                };
-                                resolve::heal(target, value);
-                            } else if self.get_name() == String::from("heal-pulse") {
-                                resolve::heal(target, 50);
-                                //the use of swallow is bound to a former use of stockpile
-                            } else if self.get_name() == String::from("swallow") {
-                                //TODO: find a way to get a percentage according to the use of
-                                //stockpile in the rounds before
-                                resolve::heal(target, 25);
-                            //besides healing roost changes the type of pokemon with type
-                            //flying.
-                            } else if self.get_name() == String::from("roost") {
-                                //TODO: find a way to change type of user for one round
-                                if user.get_types().1 != enums::Types::Undefined &&
-                                user.get_types().0 == enums::Types::Flying {
-                                    user.set_type(0, enums::Types::Undefined);
-                                    user.add_end_flag(enums::EndOfTurn::RoostTypeOne);
-                                } else if user.get_types().1 == enums::Types::Flying {
-                                    user.set_type(1, enums::Types::Undefined);
-                                    user.add_end_flag(enums::EndOfTurn::RoostTypeTwo);
-                                } else if user.get_types().0 == enums::Types::Flying {
-                                    user.set_type(0, enums::Types::Normal);
-                                    user.add_end_flag(enums::EndOfTurn::RoostTypeOne)
+                enums::MoveCategory::Heal => {
+                    let weather = arena.get_weather().clone();
+                    let mut user = get_user(flag, arena);
+                    // Heal moves will fail if the user has maximum HP
+                    if !(user.get_current().get_stat(&enums::Stats::Hp) ==
+                         user.get_base().get_stat(&enums::Stats::Hp)) {
+                        let value: u16;
+                        // Deal with moves that heal different amounts of HP for different
+                        // weather conditions.
+                        if (self.get_name() == String::from("moonlight")) ||
+                           (self.get_name() == String::from("synthesis")) ||
+                           (self.get_name() == String::from("morning-sun")) {
+                            match weather {
+                                enums::Weather::ClearSky => {
+                                    value = user.get_base().get_stat(&enums::Stats::Hp) / 2;
                                 }
-                                resolve::heal(target, 50);
-                            } else {
-                                resolve::heal(user.clone(), 50);
+                                enums::Weather::Sunlight => {
+                                    value = (user.get_base().get_stat(&enums::Stats::Hp) / 4) * 3;
+                                }
+                                _ => {
+                                    if self.get_name() == String::from("morning-sun") {
+                                        value = user.get_base().get_stat(&enums::Stats::Hp) / 4
+                                    } else {
+                                        value = user.get_base().get_stat(&enums::Stats::Hp) / 8
+                                    }
+                                }
+                            };
+                            resolve::heal(&mut user, value);
+                        } else if self.get_name() == String::from("heal-pulse") {
+                            resolve::heal(&mut user, 50);
+                            // TShe use of swallow is bound to a former use of stockpile
+                        } else if self.get_name() == String::from("swallow") {
+                            // TODO: find a way to get a percentage according to the use of
+                            // stockpile in the rounds before
+                            resolve::heal(&mut user, 25);
+                            // Besides healing roost changes the type of pokemon with type
+                            // flying.
+                        } else if self.get_name() == String::from("roost") {
+                            // TODO: find a way to change type of user for one round
+                            if user.get_types().1 != enums::Types::Undefined &&
+                               user.get_types().0 == enums::Types::Flying {
+                                user.set_type(0, enums::Types::Undefined);
+                                user.add_end_flag(enums::EndOfTurn::RoostTypeOne);
+                            } else if user.get_types().1 == enums::Types::Flying {
+                                user.set_type(1, enums::Types::Undefined);
+                                user.add_end_flag(enums::EndOfTurn::RoostTypeTwo);
+                            } else if user.get_types().0 == enums::Types::Flying {
+                                user.set_type(0, enums::Types::Normal);
+                                user.add_end_flag(enums::EndOfTurn::RoostTypeOne)
                             }
-
-
+                            resolve::heal(&mut user, 50);
                         } else {
-                            println!("{} failed", self.get_name());
+                            resolve::heal(&mut user, 50);
                         }
-                    },
 
-                    enums::MoveCategory::DamageAndAilment => {
-                        resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                        resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(),
-                            self.get_effect_chance(), target);
-                    },
 
-                    //apart from the Math done
-                    //Swagger moves confuse the target and raise their stats. Important is that the
-                    //stats will be raised even when the target is already confused or can not be
-                    //confused due to other reasons, but it will not get confused if the stats can
-                    //not be raised anymore.
-                    enums::MoveCategory::Swagger => {
-                        if resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                            target.clone()) {
-                            resolve::ailment(self.get_name(), self.get_type(), self.get_ailment(),
-                             100, target);
-                        }
-                    },
+                    } else {
+                        println!("{} failed", self.get_name());
+                    }
+                }
 
-                    enums::MoveCategory::DamageAndLower => {
-                        let _ = resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                        let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                            target);
-                    },
+                enums::MoveCategory::DamageAndAilment => {
+                    let mut defender = get_defender(flag, arena).clone();
+                    let mut target = get_target(flag, arena);
+                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                    resolve::ailment(self.get_name(),
+                                     self.get_type(),
+                                     self.get_ailment(),
+                                     self.get_effect_chance(),
+                                     user_clone,
+                                     &mut target,
+                                     &mut defender);
+                }
 
-                    enums::MoveCategory::DamageAndRaise => {
-                        let _ = resolve::deal_damage(self.clone(), user.clone(), target.clone());
-                        let _ = resolve::change_stats(self.get_stat_change_rate(), self.get_stat(),
-                            target);
-                    },
+                // Swagger moves confuse the target and raise their stats. Important is that the
+                // stats will be raised even when the target is already confused or can not be
+                // confused due to other reasons, but it will not get confused if the stats can
+                // not be raised anymore.
+                enums::MoveCategory::Swagger => {
+                    let mut defender = get_defender(flag, arena).clone();
+                    let mut target = get_target(flag, arena);
+                    if resolve::change_stats(self.get_stat_change_rate(),
+                                             self.get_stat(),
+                                             &mut target,
+                                             &mut defender_clone) {
+                        resolve::ailment(self.get_name(),
+                                         self.get_type(),
+                                         self.get_ailment(),
+                                         100,
+                                         user_clone,
+                                         &mut target,
+                                         &mut defender);
+                    }
+                }
 
-                    //done apart from math for damage
-                    //First deals damage and afterwards heals themselve for a percentage of the
-                    //dealt damage.
-                    enums::MoveCategory::DamageAndHeal => {
-                        //dream eater can only be used if the target is asleep
-                        if self.get_name() == String::from("dream-eater")
-                        && !target.is_asleep() {
-                            println!("Dream Eater failed");
-                        } else {
-                            let mut value = resolve::deal_damage(self.clone(), user.clone(),
-                                target.clone());
+                enums::MoveCategory::DamageAndLower => {
+                    let mut target = get_target(flag, arena);
+                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                    resolve::change_stats(self.get_stat_change_rate(),
+                                          self.get_stat(),
+                                          &mut target,
+                                          &mut defender_clone);
+                }
+
+                enums::MoveCategory::DamageAndRaise => {
+                    let mut target = get_target(flag, arena);
+                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                    resolve::change_stats(self.get_stat_change_rate(),
+                                          self.get_stat(),
+                                          &mut target,
+                                          &mut attacker_clone);
+                }
+
+                // First deals damage and afterwards heals themselve for a percentage of the
+                // dealt damage.
+                enums::MoveCategory::DamageAndHeal => {
+                    // dream eater can only be used if the target is asleep
+                    if self.get_name() == "dream-eater" && !target_clone.is_asleep() {
+                        println!("Dream Eater failed");
+                    } else {
+                        let mut value: u16;
+                        {
+                            let mut target = get_target(flag, arena);
+                            value = resolve::deal_damage(&self,
+                                                         &mut user_clone,
+                                                         &mut target,
+                                                         &mut defender_clone);
                             match self.get_drain_percentage() {
                                 50 => value = value / 2,
                                 75 => value = (value / 4) * 3,
                                 _ => unreachable!(),
                             }
-                            resolve::heal(user.clone(), value);
                         }
-                    },
+                        let mut user = get_user(flag, arena);
+                        resolve::heal(&mut user, value);
+                    }
+                }
 
-                    //totally done
-                    //K.O. Attacks that instantly let the target faint if hitting. Besides low
-                    //accuracy every K.O. Attack has another requirement, that must be met for it
-                    //to work.
-                    enums::MoveCategory::Ohko => {
-                        if ((self.get_name() == String::from("guillotine") ||
-                            self.get_name() == String::from("sheer-cold")) &&
-                        user.get_level() >= target.get_level()) ||
-                        ((self.get_name() == String::from("horn-drill") ||
-                        self.get_name() == String::from("fissure")) &&
-                        user.get_current().get_stat(enums::Stats::Speed)
-                        >= target.get_current().get_stat(enums::Stats::Speed))  {
-                            resolve::ko_attack(target);
-                        } else {
-                            println!("{} was not affected by {}", target.get_name(),
-                                self.get_name());
-                        }
-                    },
+                // K.O. Attacks that instantly let the target faint if hitting. Besides low
+                // accuracy every K.O. Attack has another requirement, that must be met for it
+                // to work.
+                enums::MoveCategory::Ohko => {
+                    let mut target = get_target(flag, arena);
+                    if ((self.get_name() == String::from("guillotine") ||
+                         self.get_name() == String::from("sheer-cold")) &&
+                        user_clone.get_level() >= target.get_level()) ||
+                       ((self.get_name() == String::from("horn-drill") ||
+                         self.get_name() == String::from("fissure")) &&
+                        user_clone.get_current().get_stat(&enums::Stats::Speed) >=
+                        target.get_current().get_stat(&enums::Stats::Speed)) {
+                        resolve::ko_attack(&mut target);
+                    } else {
+                        println!("{} was not affected by {}",
+                                 target.get_name(),
+                                 self.get_name());
+                    }
+                }
 
-                    enums::MoveCategory::WholeFieldEffect => {},
+                enums::MoveCategory::WholeFieldEffect => {}
 
-                    enums::MoveCategory::FieldEffect => {},
+                enums::MoveCategory::FieldEffect => {
+                    let target_side = Regex::new(r"opposing").unwrap();
+                    if target_side.is_match(&self.effect_long) {
+                        resolve::field_effect(self, get_defender(flag, arena));
+                    } else {
+                        resolve::field_effect(self, get_attacker(flag, arena));
+                    }
+                }
 
-                    enums::MoveCategory::ForceSwitch => {
-                        if target.get_level() <= user.get_level() {
-                            resolve::switch_pokemon(defender.clone());
-                        } else {
-                            println!("It has no effect on {}", target.get_name());
-                        }
-                    },
-                    enums::MoveCategory::Unique => {
-                        unique::unique(self.clone(), self.get_name(), self.get_type(), user, target, attacker, defender, field);
-                    },
-                };
-            } else {
-                println!("{} missed {}", user.get_name(), target.get_name());
-            }
+                enums::MoveCategory::ForceSwitch => {
+                    let mut defender = &mut arena.get_player_two();
+                    if target_clone.get_level() <= user_clone.get_level() {
+                        resolve::switch_pokemon(&mut defender);
+                    } else {
+                        println!("It has no effect on {}", target_clone.get_name());
+                    }
+                }
+                enums::MoveCategory::Unique => {
+                    let mut target = get_target(flag, arena);
+                    unique::unique(&self,
+                                   self.get_name(), 
+                                   self.get_type(), 
+                                   user_clone, 
+                                   &mut target, 
+                                   &mut attacker_clone, 
+                                   &mut defender_clone, 
+                                   &mut arena);
+                }
+            };
+        } else {
+            println!("{} missed {}",
+                     user_clone.get_name(),
+                     target_clone.get_name());
         }
     }
 
-    pub fn hits(&self, user: pokemon_token::PokemonToken, target: pokemon_token::PokemonToken)
-        -> bool {
-        let mut probability = 100;
+    /// Checks if the attacking pokemon is hitting the enemy. Returns true if the target will be
+    /// hit by the user and false if not
+    pub fn hits(&self,
+                user: &mut pokemon_token::PokemonToken,
+                target: &mut pokemon_token::PokemonToken,
+                player: &mut Player)
+                -> bool {
+        // TODO: As soon as flags for semi invulnerability are added, they have to be taken mut
+        // account for hit calculation.
+        if self.get_flags().contains(&enums::MoveFlags::Protect) &&
+           target.get_resolve_flags().contains_key(&enums::Resolve::Protect) {
+            return false;
+        }
+        if !(self.get_name() == "mat-block" && player.get_switched()) {
+            return false;
+        }
+
+        if player.get_flags().contains_key(&enums::PlayerFlag::MatBlock) &&
+           !self.get_flags().contains(&enums::MoveFlags::Protect) {
+            return false;
+        }
+        if player.get_flags().contains_key(&enums::PlayerFlag::WideGuard) &&
+           (self.get_target() == enums::Target::AllOtherPokemon ||
+            self.get_target() == enums::Target::AllOpponents ||
+            self.get_target() == enums::Target::UserAndAllies ||
+            self.get_target() == enums::Target::AllPokemon) {
+            return false;
+        }
+        if target.get_resolve_flags().contains_key(&enums::Resolve::Telekinesis) &&
+           self.get_category() == enums::MoveCategory::Ohko {
+            return true;
+        }
+        let probability: u16;
         if self.accuracy.is_some() {
-            probability = self.accuracy.unwrap() * (user.get_current().get_stat(enums::Stats::Accuracy) /
-                target.get_current().get_stat(enums::Stats::Evasion))
+            if player.get_flags().contains_key(&enums::PlayerFlag::CraftyShield) &&
+               self.get_name() != "perish-song" &&
+               self.get_damage_class() == enums::DamageClass::Status {
+                return false;
+            }
+            let mut modifier = user.get_current().get_stat(&enums::Stats::Accuracy) /
+                               target.get_current().get_stat(&enums::Stats::Evasion);
+            if modifier < 33 {
+                modifier = 33;
+            }
+            probability = self.accuracy.unwrap() * modifier;
+        } else {
+            return true;
         }
         let mut rng = thread_rng();
         let random = rng.gen_range(0, 101);
@@ -246,18 +379,38 @@ impl Technique {
         false
     }
 
-    ///Takes the attacked Pokemon as an input besides the move and calculate from their types
-    ///how effective the move is. Returns an appropriate enum for further calculations.
-    pub fn get_effectiveness(&self, enemy: pokemon_token::PokemonToken) -> f32 {
+    // Getter Methods
+    //
+    /// Takes the attacked Pokemon as an input besides the move and calculate from their types
+    /// how effective the move is. Returns an appropriate enum for further calculations.
+    pub fn get_effectiveness(&self, mut enemy: pokemon_token::PokemonToken) -> f32 {
         let mut eff_count = 0;
         if self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().0) {
-            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().0)
-            .unwrap();
+            if !((enemy.get_types().0 == enums::Types::Ghost &&
+                  *self.clone().effectivity_map.unwrap().get(&enums::Types::Ghost).unwrap() ==
+                  -4) &&
+                 enemy.get_resolve_flags().contains_key(&enums::Resolve::NoTypeImmunity)) {
+                eff_count = eff_count +
+                            self.clone()
+                    .effectivity_map
+                    .unwrap()
+                    .get(&enemy.get_types().0)
+                    .unwrap();
+            }
         }
-        if enemy.get_types().1 != enums::Types::Undefined
-        && self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().1) {
-            eff_count = eff_count + self.clone().effectivity_map.unwrap().get(&enemy.get_types().1)
-            .unwrap();
+        if enemy.get_types().1 != enums::Types::Undefined &&
+           self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().1) {
+            if !((enemy.get_types().1 == enums::Types::Ghost &&
+                  *self.clone().effectivity_map.unwrap().get(&enums::Types::Ghost).unwrap() ==
+                  -4) &&
+                 enemy.get_resolve_flags().contains_key(&enums::Resolve::NoTypeImmunity)) {
+                eff_count = eff_count +
+                            self.clone()
+                    .effectivity_map
+                    .unwrap()
+                    .get(&enemy.get_types().1)
+                    .unwrap();
+            }
         }
         match eff_count {
             -2 => 0.25,
@@ -268,25 +421,25 @@ impl Technique {
             _ => 0.0,
         }
     }
-
+    /// Gets the id of the attack
     pub fn get_id(&self) -> usize {
         self.attack_id
     }
-
-    pub fn get_name(&self) -> String {
-        self.name.clone()
+    /// Gets the name of the attack
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
     // Takes a Vec<Technique> and returns a Vec<String> with the names of the techniques
     pub fn get_name_vec(technique: Vec<Technique>) -> Vec<String> {
         let mut output = Vec::new();
 
         for entry in technique {
-            output.push(entry.get_name());
+            output.push(String::from(entry.get_name()));
         }
 
         output
     }
-
+    /// Gets the type of the attack
     pub fn get_type(&self) -> enums::Types {
         let a_type: &str = &self.attack_type;
         match a_type {
@@ -311,23 +464,24 @@ impl Technique {
             _ => enums::Types::Undefined,
         }
     }
-
+    /// Gets the power of the attack. None if no damage can be applied
     pub fn get_power(&self) -> Option<u16> {
         self.power
     }
-
+    /// Gets the ap of the attack
     pub fn get_power_points(&self) -> Option<u8> {
         self.power_points
     }
-
+    /// Gets the accuracy of the attack
     pub fn get_accuracy(&self) -> Option<u16> {
         self.accuracy
     }
-
+    /// Gets the priority of the attack.
     pub fn get_priority(&self) -> i8 {
         self.priority
     }
 
+    /// Gets the possible targets which will be hit by using this attack
     pub fn get_target(&self) -> enums::Target {
         let tmp: &str = &self.target;
         match tmp {
@@ -348,7 +502,7 @@ impl Technique {
             _ => unreachable!(),
         }
     }
-
+    /// Gets the damage class of the attack
     pub fn get_damage_class(&self) -> enums::DamageClass {
         let tmp: &str = &self.damage_class;
         match tmp {
@@ -358,22 +512,22 @@ impl Technique {
             _ => unreachable!(),
         }
     }
-
+    /// Gets a short description of the attack effect
     pub fn get_short_effect(&self) -> String {
         self.effect_short.clone()
     }
-
+    /// Gets a long description of the attack effect
     pub fn get_long_effect(&self) -> String {
         self.effect_long.clone()
     }
-
+    /// Gets the chance an effect will hit
     pub fn get_effect_chance(&self) -> u8 {
         if self.effect_chance.is_some() {
             return self.effect_chance.unwrap();
         }
         100
     }
-
+    /// Gets the category of the attack. (e.g. heal, damage...)
     pub fn get_category(&self) -> enums::MoveCategory {
         let tmp: &str = &self.category;
         match tmp {
@@ -394,7 +548,7 @@ impl Technique {
             _ => unreachable!(),
         }
     }
-
+    /// Gets the possible ailment caused by the attack
     pub fn get_ailment(&self) -> enums::Ailment {
         let tmp: &str = &self.ailment;
         match tmp {
@@ -421,97 +575,155 @@ impl Technique {
             _ => unreachable!(),
         }
     }
-
+    /// Gets the min amount of hits the attack can do (e.g. Double Kick with two)
     pub fn get_min_hits(&self) -> u8 {
         if self.min_hits.is_some() {
             return self.min_hits.unwrap();
         }
         1
     }
-
+    /// Gets the max amount of hits the attack can do (e.g. Double Kick with two)
     pub fn get_max_hits(&self) -> u8 {
         if self.max_hits.is_some() {
             return self.max_hits.unwrap();
         }
         1
     }
-
+    /// Gets the mininum duration of the attack used in rounds
     pub fn get_min_turn(&self) -> u8 {
         if self.min_turns.is_some() {
             return self.min_turns.unwrap();
         }
         1
     }
-
+    /// Gets the maximum duration of the attack used in rounds
     pub fn get_max_turns(&self) -> u8 {
         if self.max_turns.is_some() {
             return self.max_turns.unwrap();
         }
         1
     }
-
+    /// Gets the drain percentage
     pub fn get_drain_percentage(&self) -> i8 {
         self.drain_percentage
     }
-
+    /// Gets the healing percentage
     pub fn get_healing_percentage(&self) -> i8 {
         self.healing_percentage
     }
-
+    /// Gets the chance for a critical hit
     pub fn get_crit_rate(&self) -> u8 {
         self.crit_rate
     }
-
+    /// Gets the chance the additional ailment will hit
     pub fn get_ailment_chance(&self) -> u8 {
         self.ailment_chance
     }
-
+    /// Gets the chance the enemy pokemon will flinch
     pub fn get_flinch_chance(&self) -> u8 {
         self.flinch_chance
     }
-
+    /// Gets the chance that the attack causes stat changes
     pub fn get_stat_chance(&self) -> u8 {
         self.stat_chance
     }
-
+    /// Gets the description of attack readable by the user of the program
     pub fn get_description(&self) -> String {
         self.description.clone()
     }
-
+    /// Gets the stat that will be changed by the attack
     pub fn get_stat(&self) -> enums::Stats {
-        if self.stat.is_some(){
+        if self.stat.is_some() {
             return enums::Stats::from_i32(self.stat.unwrap()).unwrap();
         }
         enums::Stats::from_i32(0).unwrap()
     }
-
+    /// Gets the multiplier stage a stat will be changed with
     pub fn get_stat_change_rate(&self) -> i8 {
         if self.stat_change_rate.is_some() {
             return self.stat_change_rate.unwrap();
         }
         0
     }
-
+    /// Gets the effectivity map
     pub fn get_effectivity_map(&self) -> HashMap<enums::Types, i8> {
         self.clone().effectivity_map.unwrap()
     }
-
+    /// Gets the style of the attack
     pub fn get_flags(&self) -> Vec<enums::MoveFlags> {
         if self.move_flags.is_some() {
             return self.move_flags.clone().unwrap();
         }
         Vec::new()
     }
-
+    /// Sets the effectivity map
     pub fn set_effectivity_map(&mut self, map: HashMap<enums::Types, i8>) {
         self.effectivity_map = Some(map);
     }
-
+    /// Sets the move flags
     pub fn set_flags(&mut self, flag: Vec<enums::MoveFlags>) {
         self.move_flags = Some(flag);
     }
+}
 
-    pub fn set_power(&self, factor: u16) -> Option<u16> {
-        self.power = self.power+factor as u16;
+impl Ord for Technique {
+    fn cmp(&self, other: &Technique) -> Ordering {
+        self.attack_id.cmp((&other.attack_id))
+    }
+}
+
+impl PartialOrd for Technique {
+    fn partial_cmp(&self, other: &Technique) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for Technique {
+    fn eq(&self, other: &Technique) -> bool {
+        self.attack_id == other.attack_id
+    }
+}
+
+impl Eq for Technique {}
+
+/// Helper function which will get the mutable reference of the targets pokemon out of an arena
+fn get_target<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
+    match target {
+        1 => {
+            let current = arena.get_player_one().get_current();
+            &mut arena.get_player_one().get_pokemon_list()[current]
+        }
+        _ => {
+            let current = arena.get_player_two().get_current();
+            &mut arena.get_player_two().get_pokemon_list()[current]
+        }
+    }
+}
+
+/// Helper function which will get the mutable reference of the users pokemon out of an arena
+fn get_user<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
+    match target {
+        2 => {
+            let current = arena.get_player_one().get_current();
+            &mut arena.get_player_one().get_pokemon_list()[current]
+        }
+        _ => {
+            let current = arena.get_player_two().get_current();
+            &mut arena.get_player_two().get_pokemon_list()[current]
+        }
+    }
+}
+
+fn get_attacker<'a>(target: u8, arena: &'a mut Arena) -> &'a mut Player {
+    match target {
+        1 => arena.get_player_one(),
+        _ => arena.get_player_two(),
+    }
+}
+
+fn get_defender<'a>(target: u8, arena: &'a mut Arena) -> &'a mut Player {
+    match target {
+        1 => arena.get_player_two(),
+        _ => arena.get_player_one(),
     }
 }

@@ -3,3 +3,6 @@ target/
 
 # Sublime files
 *.sublime-*
+
+# Backup files
+*.rs.bk

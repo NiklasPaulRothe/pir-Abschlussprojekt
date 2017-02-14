@@ -5,29 +5,33 @@ pub mod ki;
 use arena;
 use db::pokemon_token::PokemonToken;
 use db::pokedex::*;
-use db::{enums, moves};
+use std::collections::HashMap;
+use db::{moves, enums};
 
-
-/// The Player Trait must be implemented by every sort of human players or ai´s
-
-#[derive(Clone)]
+/// The Player type represents if the Player is a Human or a specific Ai to call different funcions
+/// for e.g. choosing Pokemon
+#[derive(Clone, Debug)]
 pub enum PlayerType {
     Human,
     SimpleAi,
 }
 
-#[derive(Clone)]
+/// The Player struct represents a Player and holds his Type (Human, Ai...), a list of his pokemon,
+/// the amount of pokemon, his currently fighting pokemon and the next_move he wants to make
+#[derive(Clone, Debug)]
 pub struct Player {
     player: PlayerType,
     pokemon_list: Vec<PokemonToken>,
     pokemon_count: usize,
     current: usize,
-    next_move: Option<moves::Technique>,
+    next_move: Option<(moves::Technique, u8)>,
+    flags: HashMap<enums::PlayerFlag, u8>,
+    last_move: Option<(moves::Technique, AttackSlot)>,
+    switched: bool,
 }
 
 impl Player {
-    //
-    // Constuctor
+    // Constructor
     //
     /// Takes an array with pokemon id´s and the PlayerType and returns a player
     pub fn new_by_id(input: &[usize], player_type: PlayerType) -> Self {
@@ -43,15 +47,17 @@ impl Player {
             pokemon_count: len,
             current: 0,
             next_move: None,
+            flags: HashMap::new(),
+            last_move: None,
+            switched: false,
         }
     }
 
-    //
-    // Getter Methods
+    // Getter methods
     //
     /// Returns the list of pokemon choosen by the player
-    pub fn get_pokemon_list(&self) -> &Vec<PokemonToken> {
-        &self.pokemon_list
+    pub fn get_pokemon_list(&mut self) -> &mut Vec<PokemonToken> {
+        &mut self.pokemon_list
     }
     /// Returns the currently fighting pokemon
     pub fn get_current(&self) -> usize {
@@ -62,15 +68,20 @@ impl Player {
         self.pokemon_count
     }
     /// Returns the amount of pokemon with atleast one hp
-    pub fn get_alive_count(&self) -> usize {
-        self.pokemon_list.iter().filter(|x| x.get_current().get_stat(enums::Stats::Hp) != 0)
-            .count()
+    pub fn get_alive_count(&mut self) -> usize {
+        let mut alive = 0;
+        for i in 0..self.pokemon_list.len() {
+            if self.pokemon_list[i].get_current().get_stat(&enums::Stats::Hp) == 0 {
+                alive += 1;
+            }
+        }
+        alive
     }
-    /// Returns a Vec with the id´s from the pokemon which are alive
-    pub fn get_alive_list(&self) -> Vec<usize> {
+    /// Returns a Vec with the id´s in the player model from the pokemon which are alive
+    pub fn get_alive_list(&mut self) -> Vec<usize> {
         let mut vec = Vec::new();
         for i in 0..self.pokemon_list.len() {
-            if self.pokemon_list[i].get_current().get_stat(enums::Stats::Hp) != 0 {
+            if self.get_pokemon_list()[i].get_current().get_stat(&enums::Stats::Hp) != 0 {
                 vec.push(i);
             }
         }
@@ -82,16 +93,27 @@ impl Player {
             &AttackSlot::One => self.pokemon_list[self.current].clone().get_move_one().unwrap(),
             &AttackSlot::Two => self.pokemon_list[self.current].clone().get_move_two().unwrap(),
             &AttackSlot::Three => self.pokemon_list[self.current].clone().get_move_three().unwrap(),
-            &AttackSlot::Four =>  self.pokemon_list[self.current].clone().get_move_four().unwrap(),
+            &AttackSlot::Four => self.pokemon_list[self.current].clone().get_move_four().unwrap(),
         }
     }
     /// Gets the next attack from the Player. Returns none if no Technique is selected
-    pub fn get_next_move(&self) -> Option<moves::Technique> {
+    pub fn get_next_move(&self) -> Option<(moves::Technique, u8)> {
         self.next_move.clone()
     }
+    /// Gets the last move with the Slot. Returns None if the last move wasn´t an attack
+    pub fn get_last_move(&self) -> Option<(moves::Technique, AttackSlot)> {
+        self.last_move.clone()
+    }
 
-    //
-    // Setter Methods
+    pub fn get_flags(&mut self) -> &mut HashMap<enums::PlayerFlag, u8> {
+        &mut self.flags
+    }
+
+    pub fn get_switched(&mut self) -> bool {
+        self.switched
+    }
+
+    // Setter methods
     //
     /// Sets the current value (e.g. after a pokemon swap)
     /// Given values should be between 1 and the maximum amount of pokemon you have
@@ -99,10 +121,20 @@ impl Player {
         self.current = new;
     }
     /// Sets a next move to the Player
-    pub fn set_next_move(&mut self, next: Option<moves::Technique>) {
+    pub fn set_next_move(&mut self, next: Option<(moves::Technique, u8)>) {
         self.next_move = next;
     }
-    //
+    pub fn add_flag(&mut self, flag: enums::PlayerFlag) {
+        if !self.flags.contains_key(&flag) {
+            self.flags.insert(flag, 0);
+        } else {
+            println!("It has no effect");
+        }
+    }
+    /// Sets the last move the attacking pokemon made with the Slot in which it is saved
+    pub fn set_last_move(&mut self, last: Option<(moves::Technique, AttackSlot)>) {
+        self.last_move = last;
+    }
     // Other
     //
     pub fn attack_or_swap(&self) -> arena::to_ui::Move {
@@ -114,17 +146,10 @@ impl Player {
 }
 
 /// An enum which represents the AttackSlot to match with it
+#[derive(Debug, Clone)]
 pub enum AttackSlot {
     One,
     Two,
     Three,
     Four,
 }
-
-
-//Ignore this section, it's only a note for me which work needs to be done:
-
-//moves: TODOs in resolve_effect method (2x Heal), is_asleep methode für PokemonToken
-
-//TODO Artur: hits in moves.rs, change stats + deal damage in resolve.rs, Methode zum errechnen
-//der stats in stats.rs
