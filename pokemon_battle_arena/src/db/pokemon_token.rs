@@ -91,6 +91,9 @@ impl PokemonToken {
     pub fn get_level(&self) -> u16 {
         self.level
     }
+    pub fn get_weight(&self) -> u16 {
+        self.weight
+    }
     /// Gets the current gender
     pub fn get_gender(&self) -> enums::Gender {
         self.gender.clone()
