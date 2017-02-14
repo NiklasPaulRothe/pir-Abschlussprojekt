@@ -26,7 +26,7 @@ impl<'a> super::Arena<'a> {
         match self.get_player_one()
             .get_next_move()
             .expect("Unexpected error! This field of player one shouldn`t be None at this point.") {
-            Next::Move(technique, _) => {
+            Next::Move(technique) => {
                 if technique.get_id() == 228 {
                     match self.get_player_one()
                         .get_next_move()
@@ -55,7 +55,7 @@ impl<'a> super::Arena<'a> {
                     .get_next_move()
                     .expect("Unexpected error! This field of player one shouldn`t be None at \
                              this point.") {
-                    Next::Move(technique, _) => {
+                    Next::Move(technique) => {
                         if technique.get_id() == 228 {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
