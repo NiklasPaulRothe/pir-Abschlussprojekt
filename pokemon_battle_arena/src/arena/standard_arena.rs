@@ -14,7 +14,7 @@ impl<'a> super::Arena<'a> {
     /// the players to know what to do in this round.
     /// Important: All next_move variables must contain a Some() entry. If the function is called
     /// and atleast one variable is holding a None, this function will panic!
-    pub fn fight(&mut self, window: &graphic::gui::App) {
+    pub fn fight(&mut self, window: &mut graphic::gui::App) {
         // This flag is used to show that the round is "over" earlier as aspected.
         // This can be happen if pursuit was used or both pokemons are swapped.
         let mut end_of_fight = false;
@@ -202,7 +202,7 @@ impl<'a> super::Arena<'a> {
 fn call_resolve(arena: &mut super::Arena,
                 attack: moves::Technique,
                 player: enums::Player,
-                window: &graphic::gui::App) {
+                window: &mut graphic::gui::App) {
     let message_switch;
     // Get the current pokemon
     let current_one = arena.get_player_one().get_current();
@@ -225,23 +225,52 @@ fn call_resolve(arena: &mut super::Arena,
 
     // Handles confusion and infatuation. If nothing is stops attack, the attack will be resolved
     if confusion(arena, player) {
-        // TODO Damage for confusion
-        // 40-power typeless physical attack
-        println!("{} is confused!", message_switch);
+        match player {
+            enums::Player::One => {
+                let mut pkmn = arena.get_player_one().get_pokemon_list()[current_one].clone();
+                let damage = ((((2.0 * pkmn.get_level() as f32 + 10.0) / 250.0) *
+                               pkmn.get_current().get_stat(&enums::Stats::Attack) as f32 /
+                               pkmn.get_current().get_stat(&enums::Stats::Defense) as
+                               f32 * 40.0 + 2.0)) as u16;
+                arena.get_player_one().get_pokemon_list()[current_one]
+                    .get_current()
+                    .set_stats(enums::Stats::Hp, damage);
+            }
+            enums::Player::Two => {
+                let mut pkmn = arena.get_player_two().get_pokemon_list()[current_two].clone();
+                let damage = ((((2.0 * pkmn.get_level() as f32 + 10.0) / 250.0) *
+                               pkmn.get_current().get_stat(&enums::Stats::Attack) as f32 /
+                               pkmn.get_current().get_stat(&enums::Stats::Defense) as
+                               f32 * 40.0 + 2.0)) as u16;
+                arena.get_player_two().get_pokemon_list()[current_two]
+                    .get_current()
+                    .set_stats(enums::Stats::Hp, damage);
+            }
+        }
+        window.set_battle_text(message_switch + " is confused and hitted himself!");
     } else if infatuation(arena, player) {
-        println!("{} has the infatuation effect!", message_switch);
+        window.set_battle_text(message_switch +  " has the infatuation effect!");
     } else {
+        match player {
+            enums::Player::One => {
+                window.set_battle_text(message_one.clone() + " uses " + attack.get_name())
+            }
+            enums::Player::Two => {
+                window.set_battle_text(message_two.clone() + " uses " + attack.get_name())
+            }
+        }
         attack.resolve(arena, player, window);
+
     }
 
     // Swaps the pokemon if its dead
     if dead_one {
-        println!("{} is dead!", message_one);        
+        window.set_battle_text(message_one.clone() + "is defeated!");
         let new = window.get_changed_pokemon(player);
         arena.get_player_one().set_current(new);
     }
     if dead_two {
-        println!("{} is dead!", message_two);        
+        window.set_battle_text(message_one.clone() + "is defeated!");
         let new = window.get_changed_pokemon(player);
         arena.get_player_two().set_current(new);
     }
