@@ -53,20 +53,20 @@ pub fn unique(attack: &Technique,
             println!("teleport");
         }
         "mimic" => {
-            let attack = movedex.move_by_id(defender.get_last_move().unwrap().0.get_id())
+            let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
                 .unwrap();
-            attack.resolve(arena, 1);
+            attack.resolve(arena, enums::Player::One);
         }
         "focus-energy" => {}
         "metronome" => {
             let random = rng.gen_range(1, 616);
             let attack = movedex.move_by_id(random).unwrap();
-            attack.resolve(arena, 1);
+            attack.resolve(arena, enums::Player::One);
         }
         "mirror-move" => {
-            let attack = movedex.move_by_id(defender.get_last_move().unwrap().0.get_id())
+            let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
                 .unwrap();
-            attack.resolve(arena, 1);
+            attack.resolve(arena, enums::Player::One);
         }
         "nature-power" => {
             match arena.get_current_effect().0 {
@@ -75,7 +75,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "tri-attack" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -84,7 +84,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "air-slash" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -93,7 +93,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "earth_power" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -102,7 +102,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "power_gem" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -111,7 +111,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "lava_plume" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -120,7 +120,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "hydro_pump" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -129,7 +129,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "energy-ball" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -138,7 +138,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "thunderbolt" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -147,7 +147,7 @@ pub fn unique(attack: &Technique,
                         if entry.get_name() == "ice_beam" {
                             let attack = movedex.move_by_id(entry.get_id())
                                 .unwrap();
-                            attack.resolve(arena, 1);
+                            attack.resolve(arena, enums::Player::One);
                         }
                     }
                 }
@@ -157,6 +157,7 @@ pub fn unique(attack: &Technique,
         // "transform" => {
         // },
         "splash" => {
+            //ob flag für gravity gesetz ist
             if arena.get_current_effect().0 == enums::Types::Flying {
                 println!("The attack can not be used because {:?} is activated.",
                          enums::Types::Flying);
@@ -188,98 +189,125 @@ pub fn unique(attack: &Technique,
             // target.decrement_ap();
         }
         "sleep-talk" => {
-            struct AllMoves {
-                one: String,
-                two: String,
-                three: String,
-                four: String,
-            }
-            // let one: String;;
-            let mut moves = AllMoves {
-                one: "".to_string(),
-                two: "".to_string(),
-                three: "".to_string(),
-                four: "".to_string(),
-            };
             if user.is_asleep() {
+                //let mut name_vec = Vec::new();
+                let mut id_vec = Vec::new();
                 if attacker.get_attack(&player::AttackSlot::One).get_name() != "sleep-talk" {
-                    // moves.one = attacker.get_attack(&player::AttackSlot::One).get_name();
-                    moves.one =
-                        attacker.get_attack(&player::AttackSlot::One).get_name().to_string();
+                    //name_vec.push(attacker.get_attack(&player::AttackSlot::One).get_name().to_string());
+                    id_vec.push(attacker.get_attack(&player::AttackSlot::One).get_id());
                 }
                 if attacker.get_attack(&player::AttackSlot::Two).get_name() != "sleep-talk" {
-                    moves.two =
-                        attacker.get_attack(&player::AttackSlot::Two).get_name().to_string();
+                    //name_vec.push(attacker.get_attack(&player::AttackSlot::One).get_name().to_string());
+                    id_vec.push(attacker.get_attack(&player::AttackSlot::Two).get_id());
                 }
                 if attacker.get_attack(&player::AttackSlot::Three).get_name() != "sleep-talk" {
-                    moves.three =
-                        attacker.get_attack(&player::AttackSlot::Three).get_name().to_string();
+                    //name_vec.push(attacker.get_attack(&player::AttackSlot::One).get_name().to_string());
+                    id_vec.push(attacker.get_attack(&player::AttackSlot::Three).get_id());
                 }
                 if attacker.get_attack(&player::AttackSlot::Four).get_name() != "sleep-talk" {
-                    moves.four =
-                        attacker.get_attack(&player::AttackSlot::Four).get_name().to_string();
+                    //name_vec.push(attacker.get_attack(&player::AttackSlot::One).get_name().to_string());
+                    id_vec.push(attacker.get_attack(&player::AttackSlot::Four).get_id());
                 }
-
-                let mut random = rng.gen_range(1, 4);
-                loop {
-                    match random {
-                        1 => {
-                            if moves.one == "".to_string() {
-                                random = rng.gen_range(2, 4);
-                            } else {
-                                let attack =
-                                    movedex.move_by_id(attacker.get_attack(&player::AttackSlot::One)
-                                            .get_id())
-                                        .unwrap();
-                                attack.resolve(arena, 1);
-                                break;
-                            }
-                        }
-                        2 => {
-                            if moves.two == "".to_string() {
-                                random = rng.gen_range(1, 4);
-                            } else {
-                                let attack =
-                                    movedex.move_by_id(attacker.get_attack(&player::AttackSlot::Two)
-                                            .get_id())
-                                        .unwrap();
-                                attack.resolve(arena, 1);
-                                break;
-                            }
-                        }
-                        3 => {
-                            if moves.three == "".to_string() {
-                                random = rng.gen_range(1, 4);
-                            } else {
-                                let attack = movedex.move_by_id(attacker.get_attack(
-                                                    &player::AttackSlot::Three).get_id()).unwrap();
-                                attack.resolve(arena, 1);
-                                break;
-                            }
-                        }
-                        4 => {
-                            if moves.four == "".to_string() {
-                                random = rng.gen_range(1, 3);
-                            } else {
-                                let attack = movedex.move_by_id(attacker.get_attack(
-                                                    &player::AttackSlot::Four).get_id()).unwrap();
-                                attack.resolve(arena, 1);
-                                break;
-                            }
-                        }
-                        _ => {
-                            random = rng.gen_range(1, 4);
-                        }
-                    }
-                }
+                let random = rng.gen_range(0, id_vec.len());
+                //let x: &[usize] = &id_vec;
+                let attack = movedex.move_by_id(id_vec[random]).unwrap();
+                attack.resolve(arena, enums::Player::One);
             }
         }
+        // "sleep-talk_old" => {
+        //     struct AllMoves {
+        //         one: String,
+        //         two: String,
+        //         three: String,
+        //         four: String,
+        //     }
+        //     // let one: String;;
+        //     let mut moves = AllMoves {
+        //         one: "".to_string(),
+        //         two: "".to_string(),
+        //         three: "".to_string(),
+        //         four: "".to_string(),
+        //     };
+        //     if user.is_asleep() {
+        //         if attacker.get_attack(&player::AttackSlot::One).get_name() != "sleep-talk" {
+        //             // moves.one = attacker.get_attack(&player::AttackSlot::One).get_name();
+        //             moves.one =
+        //                 attacker.get_attack(&player::AttackSlot::One).get_name().to_string();
+        //         }
+        //         if attacker.get_attack(&player::AttackSlot::Two).get_name() != "sleep-talk" {
+        //             moves.two =
+        //                 attacker.get_attack(&player::AttackSlot::Two).get_name().to_string();
+        //         }
+        //         if attacker.get_attack(&player::AttackSlot::Three).get_name() != "sleep-talk" {
+        //             moves.three =
+        //                 attacker.get_attack(&player::AttackSlot::Three).get_name().to_string();
+        //         }
+        //         if attacker.get_attack(&player::AttackSlot::Four).get_name() != "sleep-talk" {
+        //             moves.four =
+        //                 attacker.get_attack(&player::AttackSlot::Four).get_name().to_string();
+        //         }
+
+        //         let mut random = rng.gen_range(1, 4);
+        //         loop {
+        //             match random {
+        //                 1 => {
+        //                     if moves.one == "".to_string() {
+        //                         random = rng.gen_range(2, 4);
+        //                     } else {
+        //                         let attack =
+        //                             movedex.move_by_id(attacker.get_attack(&player::AttackSlot::One)
+        //                                     .get_id())
+        //                                 .unwrap();
+        //                         attack.resolve(arena, 1);
+        //                         break;
+        //                     }
+        //                 }
+        //                 2 => {
+        //                     if moves.two == "".to_string() {
+        //                         random = rng.gen_range(1, 4);
+        //                     } else {
+        //                         let attack =
+        //                             movedex.move_by_id(attacker.get_attack(&player::AttackSlot::Two)
+        //                                     .get_id())
+        //                                 .unwrap();
+        //                         attack.resolve(arena, 1);
+        //                         break;
+        //                     }
+        //                 }
+        //                 3 => {
+        //                     if moves.three == "".to_string() {
+        //                         random = rng.gen_range(1, 4);
+        //                     } else {
+        //                         let attack = movedex.move_by_id(attacker.get_attack(
+        //                                             &player::AttackSlot::Three).get_id()).unwrap();
+        //                         attack.resolve(arena, 1);
+        //                         break;
+        //                     }
+        //                 }
+        //                 4 => {
+        //                     if moves.four == "".to_string() {
+        //                         random = rng.gen_range(1, 3);
+        //                     } else {
+        //                         let attack = movedex.move_by_id(attacker.get_attack(
+        //                                             &player::AttackSlot::Four).get_id()).unwrap();
+        //                         attack.resolve(arena, 1);
+        //                         break;
+        //                     }
+        //                 }
+        //                 _ => {
+        //                     random = rng.gen_range(1, 4);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         "celebrate" => {
             println!("{:?}",
                      user.get_name() + "disappears and then rises out of a birthday" +
                      "present that falls into the picture from above.");
         }
         "powder" => {
+            //resolv in db enams
             if target.get_types().0 == enums::Types::Grass ||
                target.get_types().1 == enums::Types::Grass {
                 println!("{:?} has no effect on  Pokemon type plants", name);
