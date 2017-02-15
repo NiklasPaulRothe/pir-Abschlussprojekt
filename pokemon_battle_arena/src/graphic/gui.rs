@@ -43,12 +43,15 @@ enum Mode {
 ///     sel_pkmn:       currently selected pokemon and its index in the team
 #[derive(Clone)]
 pub struct App {
+    // UI
     screen: Screen,
     sub_screen: Screen,
     label_color: conrod::Color,
     bg_color: conrod::Color,
     button_color: conrod::Color,
     border_color: conrod::Color,
+
+    // Variables
     pokedex: db::pokedex::Pokedex,
     pkmn_team: Vec<db::pokemon_token::PokemonToken>,
     sel_pkmn: (Option<db::pokemon_token::PokemonToken>, Option<usize>),
@@ -182,7 +185,7 @@ impl App {
                         .label("Play")
                         .label_color(app.label_color)
                         .middle_of(ids.canvas)
-                        .w_h(BUTTON_W, BUTTON_H)
+                        .w_h(BUTTON_W * 2.0, BUTTON_H * 2.0)
                         .set(ids.button_play, ui)
                         .was_clicked() {
                         println!("Play");
@@ -197,7 +200,7 @@ impl App {
                         .label("Options")
                         .label_color(app.label_color)
                         .down_from(ids.button_play, 0.0)
-                        .w_h(BUTTON_W, BUTTON_H)
+                        .w_h(BUTTON_W * 2.0, BUTTON_H * 2.0)
                         .set(ids.button_options, ui)
                         .was_clicked() {
                         app.screen = Screen::Options;
@@ -213,7 +216,7 @@ impl App {
                         .label("Exit")
                         .label_color(app.label_color)
                         .down_from(ids.button_options, 0.0)
-                        .w_h(BUTTON_W, BUTTON_H)
+                        .w_h(BUTTON_W * 2.0, BUTTON_H * 2.0)
                         .set(ids.button_exit, ui)
                         .was_clicked() {
                         ::std::process::exit(0);
@@ -233,7 +236,7 @@ impl App {
                         .label("Singleplayer")
                         .label_color(app.label_color)
                         .middle_of(ids.canvas)
-                        .w_h(BUTTON_W, BUTTON_H)
+                        .w_h(BUTTON_W * 2.0, BUTTON_H * 2.0)
                         .set(ids.button_sp, ui)
                         .was_clicked() {
                         println!("Singleplayer");
@@ -249,7 +252,7 @@ impl App {
                         .label("Multiplayer")
                         .label_color(app.label_color)
                         .down_from(ids.button_sp, 0.0)
-                        .w_h(BUTTON_W, BUTTON_H)
+                        .w_h(BUTTON_W * 2.0, BUTTON_H * 2.0)
                         .set(ids.button_mp, ui)
                         .was_clicked() {
                         println!("Multiplayer");
@@ -266,7 +269,7 @@ impl App {
                         .label("Back")
                         .label_color(app.label_color)
                         .down_from(ids.button_mp, 0.0)
-                        .w_h(BUTTON_W, BUTTON_H)
+                        .w_h(BUTTON_W * 2.0, BUTTON_H * 2.0)
                         .set(ids.button_back, ui)
                         .was_clicked() {
                         println!("Back");
@@ -283,7 +286,7 @@ impl App {
                         .label("Back")
                         .label_color(app.label_color)
                         .down_from(ids.button_mp, 0.0)
-                        .w_h(BUTTON_W, BUTTON_H)
+                        .w_h(BUTTON_W * 2.0, BUTTON_H * 2.0)
                         .set(ids.button_back, ui)
                         .was_clicked() {
                         println!("Back");
@@ -982,25 +985,29 @@ impl App {
 
                             match app.player.clone() {
                                 Player::One => {
-                                    println!("0done {:?}", app.done);
                                     let player = arena.get_player_one();
-                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_one().unwrap();
+                                    let att = player.clone()
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
+                                        .clone()
+                                        .get_move_one()
+                                        .unwrap();
                                     player.set_next_move(Some(player::Next::Move(att)));
                                     app.player = Player::Two;
-                                    println!("0player {:?}", app.player);
                                 }
                                 Player::Two => {
-                                    println!("1done {:?}", app.done);
                                     app.done = true;
-                                    let player = arena.get_player_one();
-                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_one().unwrap();
+                                    let player = arena.get_player_two();
+                                    let att = player.clone()
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
+                                        .clone()
+                                        .get_move_one()
+                                        .unwrap();
                                     player.set_next_move(Some(player::Next::Move(att)));
                                     app.player = Player::One;
-                                    println!("1player {:?}", app.player);
                                 }
                             }
-                            println!("2done {:?}", app.done);
-                            println!("2player {:?}", app.player);
                         }
 
                         if widget::Button::new()
@@ -1017,14 +1024,24 @@ impl App {
                             match app.player.clone() {
                                 Player::One => {
                                     let player = arena.get_player_one();
-                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_two().unwrap();
+                                    let att = player.clone()
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
+                                        .clone()
+                                        .get_move_two()
+                                        .unwrap();
                                     player.set_next_move(Some(player::Next::Move(att)));
                                     app.player = Player::Two;
                                 }
                                 Player::Two => {
                                     app.done = true;
-                                    let player = arena.get_player_one();
-                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_two().unwrap();
+                                    let player = arena.get_player_two();
+                                    let att = player.clone()
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
+                                        .clone()
+                                        .get_move_two()
+                                        .unwrap();
                                     player.set_next_move(Some(player::Next::Move(att)));
                                     app.player = Player::One;
                                 }
@@ -1045,14 +1062,24 @@ impl App {
                             match app.player.clone() {
                                 Player::One => {
                                     let player = arena.get_player_one();
-                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_three().unwrap();
+                                    let att = player.clone()
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
+                                        .clone()
+                                        .get_move_three()
+                                        .unwrap();
                                     player.set_next_move(Some(player::Next::Move(att)));
                                     app.player = Player::Two;
                                 }
                                 Player::Two => {
                                     app.done = true;
-                                    let player = arena.get_player_one();
-                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_three().unwrap();
+                                    let player = arena.get_player_two();
+                                    let att = player.clone()
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
+                                        .clone()
+                                        .get_move_three()
+                                        .unwrap();
                                     player.set_next_move(Some(player::Next::Move(att)));
                                     app.player = Player::One;
                                 }
@@ -1073,14 +1100,24 @@ impl App {
                             match app.player.clone() {
                                 Player::One => {
                                     let player = arena.get_player_one();
-                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_four().unwrap();
+                                    let att = player.clone()
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
+                                        .clone()
+                                        .get_move_four()
+                                        .unwrap();
                                     player.set_next_move(Some(player::Next::Move(att)));
                                     app.player = Player::Two;
                                 }
                                 Player::Two => {
                                     app.done = true;
-                                    let player = arena.get_player_one();
-                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_four().unwrap();
+                                    let player = arena.get_player_two();
+                                    let att = player.clone()
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
+                                        .clone()
+                                        .get_move_four()
+                                        .unwrap();
                                     player.set_next_move(Some(player::Next::Move(att)));
                                     app.player = Player::One;
                                 }
@@ -1088,8 +1125,8 @@ impl App {
                         }
                     }
 
-                    if app.done { 
-                        print!("fight: ");
+                    if app.done {
+                        println!("fight: ");
                         arena.fight(app);
                         println!();
                         app.done = false;
@@ -1097,19 +1134,17 @@ impl App {
                 }
 
                 if let Screen::Switch = app.screen {
-                    app.set_battle_text("Hey".to_string());
-
                     let (mut events, _) = widget::ListSelect::single(6, 650.0 / 6.0)
                         .w_h(200.0, 650.0)
                         .mid_left_with_margin_on(ids.canvas, 25.0)
                         .set(ids.slist_team, ui);
 
-                        let mut player = match app.player {
-                            Player::One => arena.get_player_one(),
-                            Player::Two => arena.get_player_two(),
-                        };
-                        let mut player_list = player.clone();
-                        let pkmn_list = player_list.get_pokemon_list();
+                    let mut player = match app.player {
+                        Player::One => arena.get_player_one(),
+                        Player::Two => arena.get_player_two(),
+                    };
+                    let mut player_list = player.clone();
+                    let pkmn_list = player_list.get_pokemon_list();
 
                     // Handle the `ListSelect`s events.
                     while let Some(event) = events.next(ui, |i| {
@@ -1144,12 +1179,14 @@ impl App {
                                     match app.player {
                                         Player::One => {
                                             app.changed_pkmn_p1 = selection;
-                                            player.set_next_move(Some(player::Next::Switch(player::PokemonSlot::One)));
+                                            player.set_next_move(Some(
+                                                player::Next::Switch(player::PokemonSlot::One)));
                                             app.screen = Screen::Battle;
                                         }
                                         Player::Two => {
                                             app.changed_pkmn_p2 = selection;
-                                            player.set_next_move(Some(player::Next::Switch(player::PokemonSlot::One)));
+                                            player.set_next_move(Some(
+                                                player::Next::Switch(player::PokemonSlot::One)));
                                             app.screen = Screen::Battle;
                                         }
                                     }
