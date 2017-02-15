@@ -393,17 +393,25 @@ impl Technique {
                      user_clone.get_name(),
                      target_clone.get_name());
         }
-        let attacker = get_attacker(flag, arena);
-        if self.get_flags().contains(&enums::MoveFlags::Charge) &&
-           attacker.get_last_action().0 == Next::Move(self.clone()) {
-            attacker.set_last_action((Next::Move(self.clone()), 1))
-        } else if self.get_min_turn() > 1 && attacker.get_last_action().1 < self.get_max_turns() &&
-                  attacker.get_last_action().0 == Next::Move(self.clone()) {
-            let turns = attacker.get_last_action().1 + 1;
-            attacker.set_last_action((Next::Move(self.clone()), turns));
-        } else {
-            attacker.set_last_action((Next::Move(self.clone()), 0));
-            attacker.set_last_move(Some(self.clone()));
+        {
+            let attacker = get_attacker(flag, arena);
+            if self.get_flags().contains(&enums::MoveFlags::Charge) &&
+               attacker.get_last_action().0 == Next::Move(self.clone()) {
+                attacker.set_last_action((Next::Move(self.clone()), 1))
+            } else if self.get_min_turn() > 1 &&
+                      attacker.get_last_action().1 < self.get_max_turns() &&
+                      attacker.get_last_action().0 == Next::Move(self.clone()) {
+                let turns = attacker.get_last_action().1 + 1;
+                attacker.set_last_action((Next::Move(self.clone()), turns));
+            } else {
+                attacker.set_last_action((Next::Move(self.clone()), 0));
+                attacker.set_last_move(Some(self.clone()));
+
+            }
+        }
+        let target = get_target(flag, arena);
+        if target.get_current().get_stat(&enums::Stats::Hp) > 2000 {
+            target.get_current().set_stats(enums::Stats::Hp, 0);
         }
     }
 
