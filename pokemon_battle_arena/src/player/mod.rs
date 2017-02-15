@@ -49,9 +49,7 @@ impl PokemonSlot {
             _ => None,
         }
     }
-}
-
-impl PokemonSlot {
+    /// Gets the int to the AttackSlot
     pub fn get_int(&self) -> usize {
         match *self {
             PokemonSlot::One => 1,
