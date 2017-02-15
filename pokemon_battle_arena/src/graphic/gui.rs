@@ -60,6 +60,7 @@ pub struct App {
     done: bool,
     changed_pkmn_p1: usize,
     changed_pkmn_p2: usize,
+    battle_text: String,
 }
 
 impl App {
@@ -85,6 +86,7 @@ impl App {
             done: false,
             changed_pkmn_p1: 0,
             changed_pkmn_p2: 0,
+            battle_text: String::new(),
         }
     }
 
@@ -103,8 +105,8 @@ impl App {
         }
     }
 
-    pub fn get_team(&mut self) -> Vec<db::pokemon_token::PokemonToken> {
-        self.clone().pkmn_team
+    pub fn set_battle_text(&mut self, text: String) {
+        self.battle_text = text;
     }
 
     pub fn draw_window<'a>(&mut self) {
@@ -789,6 +791,15 @@ impl App {
                         .bottom_left_of(ids.canvas)
                         .set(ids.bg_text, ui);
 
+                    widget::Text::new(&app.battle_text)
+                        .color(app.label_color)
+                        .middle_of(ids.bg_text)
+                        .align_text_left()
+                        .font_size(15)
+                        .padded_wh_of(ids.bg_text, 20.0)
+                        .line_spacing(2.5)
+                        .set(ids.text_battle, ui);
+
                     // BG Pokemon1
                     widget::Canvas::new()
                         .color(conrod::color::LIGHT_BLUE)
@@ -1086,6 +1097,8 @@ impl App {
                 }
 
                 if let Screen::Switch = app.screen {
+                    app.set_battle_text("Hey".to_string());
+
                     let (mut events, _) = widget::ListSelect::single(6, 650.0 / 6.0)
                         .w_h(200.0, 650.0)
                         .mid_left_with_margin_on(ids.canvas, 25.0)
@@ -1189,6 +1202,7 @@ widget_ids! {
         // === text ===
         text_sel_pkmn,
         text_test,
+        text_battle,
 
         tab_whatdo,
         tab_pokemon,
