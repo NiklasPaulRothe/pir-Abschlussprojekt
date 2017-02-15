@@ -28,11 +28,11 @@ fn main() {
 fn testing() {
 
     println!("Testing:");
-    for entry in db::movedex::Movedex::new().get_entries() {
-        if entry.get_category() == enums::MoveCategory::WholeFieldEffect {
-            println!("{:?}", entry.get_name());
-        }
-    }
+    // for entry in db::movedex::Movedex::new().get_entries() {
+    //     if entry.get_category() == enums::MoveCategory::WholeFieldEffect {
+    //         println!("{:?}", entry.get_name());
+    //     }
+    // }
     // test_players();
     test_arena();
     // let mut window = graphic::gui::App::new();

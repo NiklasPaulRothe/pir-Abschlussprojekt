@@ -7,6 +7,7 @@ use player::Player;
 
 /// The Arena struct holds the weather and the type of the arena aswell as the references at the
 /// two players
+#[derive(Debug)]
 pub struct Arena<'a> {
     default_effect: enums::Types,
     current_effect: (enums::Types, u8),
