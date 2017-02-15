@@ -249,7 +249,7 @@ fn call_resolve(arena: &mut super::Arena,
         }
         window.set_battle_text(message_switch + " is confused and hitted himself!");
     } else if infatuation(arena, player) {
-        window.set_battle_text(message_switch +  " has the infatuation effect!");
+        window.set_battle_text(message_switch + " has the infatuation effect!");
     } else {
         match player {
             enums::Player::One => {
@@ -277,6 +277,7 @@ fn call_resolve(arena: &mut super::Arena,
 
 }
 
+/// Handles the end of turn flags
 fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &graphic::gui::App) {
     let current_one = arena.get_player_one().get_current();
     let current_two = arena.get_player_two().get_current();
@@ -290,6 +291,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
     };
     for i in map.iter() {
         match *i.0 {
+            // Absorbs HP of the pokemon
             enums::EndOfTurn::LeechSeed => {
                 match player {
                     enums::Player::One => {
@@ -371,6 +373,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     }
                 }
             }
+            // After four rounds the pokemon will die
             enums::EndOfTurn::PerishSong => {
                 match player {
                     enums::Player::One => {
@@ -403,6 +406,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     }
                 }
             }
+            // Pokemon will fall asleep in the next round
             enums::EndOfTurn::Yawn => {
                 match player {
                     enums::Player::One => {
@@ -443,6 +447,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     }
                 }
             }
+            // Changing the flying type at position one
             enums::EndOfTurn::RoostTypeOne => {
                 match player {
                     enums::Player::One => {
@@ -470,6 +475,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
 
                 }
             }
+            // Changing the flying type at position two
             enums::EndOfTurn::RoostTypeTwo => {
                 match player {
                     enums::Player::One => {
@@ -497,6 +503,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
 
                 }
             }
+            // Pokemon gets damage at the end of each round
             enums::EndOfTurn::Trap => {
                 match player {
                     enums::Player::One => {
@@ -535,6 +542,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     }
                 }
             }
+            // Pokemon get hp at the end of every round
             enums::EndOfTurn::Ingrain => {
                 match player {
                     enums::Player::One => {
