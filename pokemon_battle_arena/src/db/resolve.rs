@@ -37,7 +37,7 @@ pub fn deal_damage(attack: &Technique,
     // get power for the move, calculate if it has a variable value
     let power: u16;
     if attack.get_power().is_none() {
-        power = get_power(attack, user, target);
+        power = get_power(attack, user, target, &mut window);
     } else {
         power = attack.get_power().unwrap();
     }
@@ -64,6 +64,7 @@ pub fn deal_damage(attack: &Technique,
         _ => true,
     };
     if critical {
+        window.set_battle_text("Critical Hit".to_string());
         damage = (damage as f32 * 1.5) as u16;
     }
     let current = target.get_current().get_stat(&enums::Stats::Hp);
@@ -78,7 +79,8 @@ pub fn ailment(name: &str,
                effect_chance: u8,
                user: PokemonToken,
                target: &mut PokemonToken,
-               player: &mut Player) {
+               player: &mut Player,
+               window: &mut graphic::gui::App) {
     let mut rng = thread_rng();
     let random = rng.gen_range(0, 101);
     // Only works if the effect chance of the move is met.
@@ -91,7 +93,7 @@ pub fn ailment(name: &str,
         if (target.get_types().0 == enums::Types::Grass ||
             target.get_types().1 == enums::Types::Grass) &&
            (powder.is_match(tmp) || spore.is_match(tmp)) {
-            println!("{} was not affected by {}", target.get_name(), name);
+            window.set_battle_text(target.get_name() + " was not affected by " + name);
         } else {
             // Categorize the moves by the ailment they cause. Ailments usually automatically fail
             // if the target already was hit by a move that caused the same ailment and still
@@ -109,31 +111,34 @@ pub fn ailment(name: &str,
                                 let base = target.get_base().clone();
                                 target.get_current().set_stats(enums::Stats::Speed,
                                                                base.get_stat(&enums::Stats::Speed) /
-                                                               2)
+                                                               2);
+                                window.set_battle_text(target.get_name() + " was paralysed.");
                             } else {
-                                println!("{} was not affected by {}", target.get_name(), name);
+                                window.set_battle_text(target.get_name() + " was not affected by " +
+                                                     name);
                             }
                         } else {
-                            println!("{} is already {}",
-                                     target.get_name(),
-                                     enums::print_non_volatile(target.get_non_volatile().0));
+                            window.set_battle_text(target.get_name() + " is already " +
+                                                 &enums::print_non_volatile(target.get_non_volatile()
+                                    .0));
                         }
                     } else {
-                        println!("{} was protected", target.get_name());
+                        window.set_battle_text(target.get_name() + " was protected.");
                     }
                 }
 
                 enums::Ailment::Sleep => {
                     if !player.get_flags().contains_key(&enums::PlayerFlag::Safeguard) {
                         if target.get_non_volatile().0 == enums::NonVolatile::Undefined {
+                            window.set_battle_text(target.get_name() + " slept in.");
                             target.set_non_volatile(enums::NonVolatile::Sleep)
                         } else {
-                            println!("{} is already {}",
-                                     target.get_name(),
-                                     enums::print_non_volatile(target.get_non_volatile().0));
+                            window.set_battle_text(target.get_name() + " is already " +
+                                                 &enums::print_non_volatile(target.get_non_volatile()
+                                    .0));
                         }
                     } else {
-                        println!("{} was protected", target.get_name());
+                        window.set_battle_text(target.get_name() + " was protected.");
                     }
                 }
 
@@ -144,12 +149,13 @@ pub fn ailment(name: &str,
                         if (target.get_types().0 == enums::Types::Ice ||
                             target.get_types().1 == enums::Types::Ice) &&
                            move_type == enums::Types::Ice {
-                            println!("{} could not be freezed", target.get_name());
+                            window.set_battle_text(target.get_name() + " could not be freezed.");
                         } else {
                             target.set_non_volatile(enums::NonVolatile::Freeze);
+                            window.set_battle_text(target.get_name() + " was freezed.");
                         }
                     } else {
-                        println!("{} was protected", target.get_name());
+                        window.set_battle_text(target.get_name() + " was protected.");
                     }
                 }
 
@@ -158,12 +164,13 @@ pub fn ailment(name: &str,
                         // Fire types can not be burned (seems logical).
                         if target.get_types().0 == enums::Types::Fire ||
                            target.get_types().1 == enums::Types::Fire {
-                            println!("{} could not be burned", target.get_name());
+                            window.set_battle_text(target.get_name() + " could not be burned.");
                         } else {
                             target.set_non_volatile(enums::NonVolatile::Burn);
+                            window.set_battle_text(target.get_name() + " was burned.");
                         }
                     } else {
-                        println!("{} was protected", target.get_name());
+                        window.set_battle_text(target.get_name() + " was protected.");
                     }
                 }
 
@@ -174,16 +181,18 @@ pub fn ailment(name: &str,
                            target.get_types().0 == enums::Types::Steel ||
                            target.get_types().1 == enums::Types::Poison ||
                            target.get_types().1 == enums::Types::Steel {
-                            println!("{} could not be poisoned", target.get_name());
+                            window.set_battle_text(target.get_name() + " could not be poisoned.");
                         } else {
                             if name == "toxic" {
                                 target.set_non_volatile(enums::NonVolatile::BadPoison);
+                                window.set_battle_text(target.get_name() + " was badly poisoned.");
                             } else {
                                 target.set_non_volatile(enums::NonVolatile::Poison);
+                                window.set_battle_text(target.get_name() + " was poisoned.");
                             }
                         }
                     } else {
-                        println!("{} was protected", target.get_name());
+                        window.set_battle_text(target.get_name() + " was protected.");
                     }
                 }
 
@@ -192,7 +201,8 @@ pub fn ailment(name: &str,
                     // are a plant parasite...)
                     if target.get_types().0 == enums::Types::Grass ||
                        target.get_types().1 == enums::Types::Grass {
-                        println!("{} was not affected by Leech Seed", target.get_name());
+                        window.set_battle_text(target.get_name() +
+                                               " was not affected by Leech Seed.");
                     } else {
                         target.add_end_flag(enums::EndOfTurn::LeechSeed);
                     }
@@ -203,7 +213,7 @@ pub fn ailment(name: &str,
                     // the user. Does not reset the counter if used again, therefore Pokemon, that
                     // are already under the effect of Perish Song are not influenced
                     if target.get_end_of_turn_flags().contains_key(&enums::EndOfTurn::PerishSong) {
-                        println!("{} is already doomed", target.get_name());
+                        window.set_battle_text(target.get_name() + " is already doomed.");
                     } else {
                         target.add_end_flag(enums::EndOfTurn::PerishSong);
                     }
@@ -212,7 +222,7 @@ pub fn ailment(name: &str,
                 enums::Ailment::Yawn => {
                     if target.get_end_of_turn_flags().contains_key(&enums::EndOfTurn::Yawn) ||
                        target.get_non_volatile().0 == enums::NonVolatile::Sleep {
-                        println!("{} was not affected by Yawn", target.get_name());
+                        window.set_battle_text(target.get_name() + " was not affected by Yawn.");
                     } else {
                         target.add_end_flag(enums::EndOfTurn::Yawn);
                     }
@@ -230,7 +240,7 @@ pub fn ailment(name: &str,
                             target.add_fight_flag(enums::Fighting::Confusion);
                         }
                     } else {
-                        println!("{} was protected", target.get_name());
+                        window.set_battle_text(target.get_name() + " was protected.");
                     }
                 }
 
@@ -270,7 +280,7 @@ pub fn ailment(name: &str,
                        target.get_gender() != user.get_gender() {
                         target.add_fight_flag(enums::Fighting::Infatuation);
                     } else {
-                        println!("{} was not affected by Attract", target.get_name());
+                        window.set_battle_text(target.get_name() + " was not affected by attract.");
                     }
                 }
 
@@ -290,7 +300,8 @@ pub fn ailment(name: &str,
 pub fn change_stats(stages: i8,
                     stat: enums::Stats,
                     target: &mut PokemonToken,
-                    defender: &mut Player)
+                    defender: &mut Player,
+                    window: &mut graphic::gui::App)
                     -> bool {
     if defender.get_flags().contains_key(&enums::PlayerFlag::Mist) {
         return false;
@@ -374,9 +385,8 @@ pub fn change_stats(stages: i8,
         return true;
     } else {
         if stage < -6 {
-            println!("{}s {} cannot be lowered anymore",
-                     target.get_name(),
-                     enums::stat_to_string(stat));
+            window.set_battle_text(target.get_name() + "s " + enums::stat_to_string(stat) +
+                                   " can not be lowered anymore");
         }
     }
     return false;
@@ -448,7 +458,7 @@ fn get_stages(stat: enums::Stats, target: &mut PokemonToken) -> i8 {
 
 // Heals the targets HP by the provided value, or, if this would raise the HP above the base stat,
 // to their base HP.
-pub fn heal(target: &mut PokemonToken, value: u16) {
+pub fn heal(target: &mut PokemonToken, value: u16, window: &mut graphic::gui::App) {
     if !target.get_resolve_flags().contains_key(&enums::Resolve::HealBlock) {
         if value + target.get_current().get_stat(&enums::Stats::Hp) >=
            target.get_base().get_stat(&enums::Stats::Hp) {
@@ -460,7 +470,7 @@ pub fn heal(target: &mut PokemonToken, value: u16) {
                                            (current.get_stat(&enums::Stats::Hp) + value));
         }
     } else {
-        println!("{} could not be healed", target.get_name());
+        window.set_battle_text(target.get_name() + " could not be healed.");
     }
 }
 
@@ -584,7 +594,11 @@ pub fn field_effect(attack: &Technique, player: &mut Player) {
 }
 
 /// Returns the power for a move with variable value
-pub fn get_power(attack: &Technique, user: &mut PokemonToken, target: &mut PokemonToken) -> u16 {
+pub fn get_power(attack: &Technique,
+                 user: &mut PokemonToken,
+                 target: &mut PokemonToken,
+                 mut window: &mut graphic::gui::App)
+                 -> u16 {
     let mut rng = thread_rng();
     match attack.get_name() {
         "sonic-boom" => {
@@ -593,7 +607,7 @@ pub fn get_power(attack: &Technique, user: &mut PokemonToken, target: &mut Pokem
                 let current = target.get_current().get_stat(&enums::Stats::Hp);
                 target.get_current().set_stats(enums::Stats::Hp, current - 20);
             } else {
-                println!("It has no effect on {}", target.get_name());
+                window.set_battle_text("It has no effect on ".to_string() + &target.get_name());
             }
             0
         }
@@ -617,7 +631,7 @@ pub fn get_power(attack: &Technique, user: &mut PokemonToken, target: &mut Pokem
                 let current = target.get_current().get_stat(&enums::Stats::Hp);
                 target.get_current().set_stats(enums::Stats::Hp, current - user.get_level());
             } else {
-                println!("It has no effect on {}", target.get_name());
+                window.set_battle_text("It has no effect on ".to_string() + &target.get_name());
             }
             0
         }
@@ -632,7 +646,7 @@ pub fn get_power(attack: &Technique, user: &mut PokemonToken, target: &mut Pokem
                 let current = target.get_current().get_stat(&enums::Stats::Hp);
                 target.get_current().set_stats(enums::Stats::Hp, current - user.get_level());
             } else {
-                println!("It has no effect on {}", target.get_name());
+                window.set_battle_text("It has no effect on ".to_string() + &target.get_name());
             }
             0
         }
@@ -653,7 +667,7 @@ pub fn get_power(attack: &Technique, user: &mut PokemonToken, target: &mut Pokem
                 let current = target.get_current().get_stat(&enums::Stats::Hp);
                 target.get_current().set_stats(enums::Stats::Hp, current - current / 2);
             } else {
-                println!("It has no effect on {}", target.get_name());
+                window.set_battle_text("It has no effect on ".to_string() + &target.get_name());
             }
             0
         }
@@ -687,7 +701,7 @@ pub fn get_power(attack: &Technique, user: &mut PokemonToken, target: &mut Pokem
                 71...81 => 120,
                 _ => {
                     let value = target.get_base().get_stat(&enums::Stats::Hp) / 4;
-                    heal(target, value);
+                    heal(target, value, &mut window);
                     0
                 }
             }
