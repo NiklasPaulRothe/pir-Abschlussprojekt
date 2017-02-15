@@ -14,6 +14,7 @@ use std::collections::HashMap;
 use std::cmp::Ordering;
 use arena::Arena;
 use player::{Player, Next};
+use graphic;
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.
@@ -53,7 +54,7 @@ pub struct Technique {
 impl Technique {
     /// Matches over the category of a move and calls a specific method in resolve.rs for this
     /// category. All calculation is done inside the method, therefore no return is needed.
-    pub fn resolve(&self, arena: &mut Arena, flag: enums::Player) {
+    pub fn resolve(&self, arena: &mut Arena, flag: enums::Player, window: &graphic::gui::App) {
         // First call the hits method to sort out missing moves.
         let mut user_clone = get_user(flag, arena).clone();
         let mut target_clone = get_target(flag, arena).clone();
