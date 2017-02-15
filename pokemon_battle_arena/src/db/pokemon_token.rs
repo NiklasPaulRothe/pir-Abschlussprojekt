@@ -222,7 +222,7 @@ impl PokemonToken {
     }
     /// Checks if the pokemon is alive
     pub fn is_alive(&mut self) -> bool {
-        self.get_current().get_stat(&enums::Stats::Hp) <= 0
+        self.get_current().get_stat(&enums::Stats::Hp) > 0
     }
     /// Decrements the AP
     pub fn decrement_ap(&mut self) {

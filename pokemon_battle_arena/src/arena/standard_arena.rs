@@ -37,7 +37,7 @@ impl<'a> super::Arena<'a> {
                         Next::Switch(_) => {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            call_resolve(self, technique, enums::Player::Two);
+                            call_resolve(self, technique, enums::Player::Two, window);
                             // let slot =
                             //     self.get_player_one().get_attack_slot(technique.clone())
                             //         .unwrap();
@@ -61,7 +61,7 @@ impl<'a> super::Arena<'a> {
                         if technique.get_id() == 228 {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            call_resolve(self, technique, enums::Player::One);
+                            call_resolve(self, technique, enums::Player::One, window);
                             // let slot =
                             //     self.get_player_two().get_attack_slot(technique.clone())
                             //         .unwrap();
@@ -116,7 +116,7 @@ impl<'a> super::Arena<'a> {
         if self.get_player_one().get_next_move().is_none() &&
            self.get_player_two().get_next_move().is_some() {
             match self.get_player_two().get_next_move().unwrap() {
-                Next::Move(x) => call_resolve(self, x, enums::Player::Two),
+                Next::Move(x) => call_resolve(self, x, enums::Player::Two, window),
                 _ => {}
             }
             end_of_fight = true;
@@ -125,7 +125,7 @@ impl<'a> super::Arena<'a> {
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_some() {
             match self.get_player_one().get_next_move().unwrap() {
-                Next::Move(x) => call_resolve(self, x, enums::Player::One),
+                Next::Move(x) => call_resolve(self, x, enums::Player::One, window),
                 _ => {}
             }
             end_of_fight = true;
@@ -172,21 +172,21 @@ impl<'a> super::Arena<'a> {
             // The attack with the higher Priority starts
             //
             if one_prio > two_prio {
-                call_resolve(self, one_attack, enums::Player::One);
-                call_resolve(self, two_attack, enums::Player::Two);
+                call_resolve(self, one_attack, enums::Player::One, window);
+                call_resolve(self, two_attack, enums::Player::Two, window);
             } else if one_prio < two_prio {
-                call_resolve(self, two_attack, enums::Player::Two);
-                call_resolve(self, one_attack, enums::Player::One);
+                call_resolve(self, two_attack, enums::Player::Two, window);
+                call_resolve(self, one_attack, enums::Player::One, window);
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
                 //
                 if one_speed >= two_speed {
-                    call_resolve(self, one_attack, enums::Player::One);
-                    call_resolve(self, two_attack, enums::Player::Two);
+                    call_resolve(self, one_attack, enums::Player::One, window);
+                    call_resolve(self, two_attack, enums::Player::Two, window);
                 } else {
-                    call_resolve(self, two_attack, enums::Player::Two);
-                    call_resolve(self, one_attack, enums::Player::One);
+                    call_resolve(self, two_attack, enums::Player::Two, window);
+                    call_resolve(self, one_attack, enums::Player::One, window);
                 }
             }
         }
@@ -199,15 +199,42 @@ impl<'a> super::Arena<'a> {
     }
 }
 
-fn call_resolve(arena: &mut super::Arena, attack: moves::Technique, player: enums::Player) {
+fn call_resolve(arena: &mut super::Arena,
+                attack: moves::Technique,
+                player: enums::Player,
+                window: &graphic::gui::App) {
+    let message;
+    let current;
+    let dead;
+    match player {
+        enums::Player::One => {
+            current = arena.get_player_one().get_current();
+            message = arena.get_player_one().get_pokemon_list()[current].get_name();
+            dead = !arena.get_player_one().get_pokemon_list()[current].is_alive();
+        }
+        enums::Player::Two => {
+            current = arena.get_player_two().get_current();
+            message = arena.get_player_two().get_pokemon_list()[current].get_name();
+            dead = !arena.get_player_one().get_pokemon_list()[current].is_alive();
+        }
+    }
+
     if confusion(arena, player) {
         // TODO Damage for confusion
         // 40-power typeless physical attack
-        println!("Pokemon is confused!");
+        println!("{} is confused!", message);
     } else if infatuation(arena, player) {
-        println!("Pokemon has the infatuation effect!");
+        println!("{} has the infatuation effect!", message);
     } else {
         attack.resolve(arena, player);
+    }
+    if dead {
+        println!("{} is dead!", message);
+        let new = window.get_changed_pokemon(player);
+        match player {
+            enums::Player::One => arena.get_player_one().set_current(new),
+            enums::Player::Two => arena.get_player_two().set_current(new),
+        }
     }
 
 }
