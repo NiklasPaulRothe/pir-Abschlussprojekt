@@ -34,6 +34,23 @@ pub enum PokemonSlot {
     Five,
     Six,
 }
+
+impl PokemonSlot {
+    /// matches a usize and returns an PokemonSlot if the fiven usize is between one and six
+    /// Returns none if no PokemonSlot is available for the given usize
+    pub fn get_slot_name(input: usize) -> Option<Self> {
+        match input {
+            1 => Some(PokemonSlot::One),
+            2 => Some(PokemonSlot::Two),
+            3 => Some(PokemonSlot::Three),
+            4 => Some(PokemonSlot::Four),
+            5 => Some(PokemonSlot::Five),
+            6 => Some(PokemonSlot::Six),
+            _ => None,
+        }
+    }
+}
+
 impl PokemonSlot {
     pub fn get_int(&self) -> usize {
         match *self {
