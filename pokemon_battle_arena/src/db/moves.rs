@@ -64,6 +64,7 @@ impl Technique {
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
+                    // Set only the last action if move needs to be charged or recharged
                     if attacker_clone.get_last_action().0 != Next::None {
                         if self.get_flags().contains(&enums::MoveFlags::Charge) &&
                            !(attacker_clone.get_last_action().clone() ==
@@ -83,9 +84,11 @@ impl Technique {
                         }
                     }
                     let mut rng = thread_rng();
+                    // scope to destroy target afterwards, otherwise flinch could not be resolved
                     {
                         let mut target = get_target(flag, arena);
                         let mut frequency = 1;
+                        // multiple hits of one attack will be resolved one by one
                         if self.min_hits.is_some() {
                             frequency =
                                 rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
@@ -97,6 +100,7 @@ impl Technique {
                                                  &mut defender_clone);
                         }
                     }
+                    // resolve flinch chance if available
                     if self.flinch_chance > 0 &&
                        rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
                         get_defender(flag, arena).set_next_move(Some(Next::Flinch));
@@ -118,6 +122,9 @@ impl Technique {
 
                 enums::MoveCategory::NetGoodStats => {
                     let mut target = get_user(flag, arena);
+                    // in long effect the stats that should be in- or decreased are given, this
+                    // makes it possible to get matches with a regex. Several if statements are
+                    // needed, because it is possible to influence more than one stat.
                     if Regex::new(r"attack").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::Attack,
@@ -224,7 +231,6 @@ impl Technique {
                 }
 
                 enums::MoveCategory::DamageAndAilment => {
-                    let mut defender = get_defender(flag, arena).clone();
                     let mut target = get_target(flag, arena);
                     resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
                     resolve::ailment(self.get_name(),
@@ -233,7 +239,7 @@ impl Technique {
                                      self.get_effect_chance(),
                                      user_clone,
                                      &mut target,
-                                     &mut defender);
+                                     &mut defender_clone);
                 }
 
                 // Swagger moves confuse the target and raise their stats. Important is that the
@@ -393,6 +399,8 @@ impl Technique {
                      user_clone.get_name(),
                      target_clone.get_name());
         }
+        // sets the last action to the action that was really executed in the last turn and the last
+        // move, which is the last actions that counts in terms of moves like mimic
         {
             let attacker = get_attacker(flag, arena);
             if self.get_flags().contains(&enums::MoveFlags::Charge) &&
@@ -409,6 +417,7 @@ impl Technique {
 
             }
         }
+        // handles a case in which the HP of a target are set to a value less than 0
         let target = get_target(flag, arena);
         if target.get_current().get_stat(&enums::Stats::Hp) > 2000 {
             target.get_current().set_stats(enums::Stats::Hp, 0);
@@ -424,6 +433,8 @@ impl Technique {
                 -> bool {
         // TODO: As soon as flags for semi invulnerability are added, they have to be taken mut
         // account for hit calculation.
+
+        // first resolve special cases in which certain moves will always fail or hit
         if self.get_flags().contains(&enums::MoveFlags::Protect) &&
            target.get_resolve_flags().contains_key(&enums::Resolve::Protect) {
             return false;
