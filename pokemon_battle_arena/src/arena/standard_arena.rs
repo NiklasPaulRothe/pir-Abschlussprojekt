@@ -198,43 +198,52 @@ impl<'a> super::Arena<'a> {
         // TODO: All kind of effect like sleep, paralysis, poison... arent handled yet.
     }
 }
-
+/// Resolving if the resolve method must be called and after that if the pokemon is dead
 fn call_resolve(arena: &mut super::Arena,
                 attack: moves::Technique,
                 player: enums::Player,
                 window: &graphic::gui::App) {
-    let message;
-    let current;
-    let dead;
+    let message_switch;
+    // Get the current pokemon
+    let current_one = arena.get_player_one().get_current();
+    let current_two = arena.get_player_two().get_current();
+    // Get the names of the current pokemon
+    let message_one = arena.get_player_one().get_pokemon_list()[current_one].get_name();
+    let message_two = arena.get_player_two().get_pokemon_list()[current_two].get_name();
+    // Checks if the pokemon are dead
+    let dead_one = !arena.get_player_one().get_pokemon_list()[current_one].is_alive();
+    let dead_two = !arena.get_player_two().get_pokemon_list()[current_two].is_alive();
+    // Sets the message_switch for following handles
     match player {
         enums::Player::One => {
-            current = arena.get_player_one().get_current();
-            message = arena.get_player_one().get_pokemon_list()[current].get_name();
-            dead = !arena.get_player_one().get_pokemon_list()[current].is_alive();
+            message_switch = message_one.clone();
         }
         enums::Player::Two => {
-            current = arena.get_player_two().get_current();
-            message = arena.get_player_two().get_pokemon_list()[current].get_name();
-            dead = !arena.get_player_one().get_pokemon_list()[current].is_alive();
+            message_switch = message_two.clone();
         }
     }
 
+    // Handles confusion and infatuation. If nothing is stops attack, the attack will be resolved
     if confusion(arena, player) {
         // TODO Damage for confusion
         // 40-power typeless physical attack
-        println!("{} is confused!", message);
+        println!("{} is confused!", message_switch);
     } else if infatuation(arena, player) {
-        println!("{} has the infatuation effect!", message);
+        println!("{} has the infatuation effect!", message_switch);
     } else {
-        attack.resolve(arena, player);
+        attack.resolve(arena, player, window);
     }
-    if dead {
-        println!("{} is dead!", message);
+
+    // Swaps the pokemon if its dead
+    if dead_one {
+        println!("{} is dead!", message_one);        
         let new = window.get_changed_pokemon(player);
-        match player {
-            enums::Player::One => arena.get_player_one().set_current(new),
-            enums::Player::Two => arena.get_player_two().set_current(new),
-        }
+        arena.get_player_one().set_current(new);
+    }
+    if dead_two {
+        println!("{} is dead!", message_two);        
+        let new = window.get_changed_pokemon(player);
+        arena.get_player_two().set_current(new);
     }
 
 }
