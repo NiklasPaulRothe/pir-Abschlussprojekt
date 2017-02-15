@@ -306,7 +306,7 @@ pub fn change_stats(stages: i8,
         // if target is paralysed the current speed value is set to half of it's value.
         let mut modifier = 1.0;
         if target.get_non_volatile().0 == enums::NonVolatile::Paralysis &&
-           stat == enums::Stats::Paralysis {
+           stat == enums::Stats::Speed {
             modifier = 0.5;
         }
         let base = target.get_base().get_stat(&stat) as f32;
@@ -382,8 +382,7 @@ pub fn change_stats(stages: i8,
 
 fn get_stages(stat: enums::Stats, target: &mut PokemonToken) -> i8 {
     let mut current = target.get_current().get_stat(&stat);
-    if target.get_non_volatile().0 == enums::NonVolatile::Paralysis &&
-       stat == enums::Stats::Paralysis {
+    if target.get_non_volatile().0 == enums::NonVolatile::Paralysis && stat == enums::Stats::Speed {
         current = current * 2;
     }
     match stat {
