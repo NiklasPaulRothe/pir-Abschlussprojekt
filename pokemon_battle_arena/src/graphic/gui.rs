@@ -1,5 +1,6 @@
 extern crate find_folder;
 extern crate conrod;
+extern crate multi_input;
 
 use conrod::backend::piston::{self, Window, WindowEvents, OpenGL};
 use conrod::backend::piston::event::UpdateEvent;
@@ -8,6 +9,7 @@ use db;
 use db::enums::Player;
 use player;
 use arena;
+use self::multi_input::*;
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
@@ -110,6 +112,19 @@ impl App {
 
     pub fn set_battle_text(&mut self, text: String) {
         self.battle_text = text;
+        let mut manager = RawInputManager::new().unwrap();
+        manager.register_devices(DeviceType::Mice);
+        loop {
+            if let Some(event) = manager.get_event(){
+                match event{
+                    RawEvent::MouseButtonEvent(_,  MouseButton::Left, State::Pressed)
+                        => break,
+                    _ => (),
+                }   
+                println!("{:?}", event);
+            }
+        }
+        println!("Finishing");
     }
 
     pub fn draw_window<'a>(&mut self) {
@@ -550,7 +565,7 @@ impl App {
                                     // each button with the respective attack name as label
                                     let button = widget::Button::new()
                                         .border(1.0)
-                                        .border_color(app.border_color)
+                                        .border_color(app.button_color)
                                         .color(app.bg_color)
                                         .label(label)
                                         .label_color(app.label_color);
@@ -595,8 +610,8 @@ impl App {
 
                         if widget::Button::new()
                             .border(4.0)
-                            .border_color(app.border_color)
-                            .color(app.button_color)
+                            .border_color(app.button_color)
+                            .color(app.bg_color)
                             .label(&label1)
                             .label_color(app.label_color)
                             .left_from(ids.button_att2, 0.0)
@@ -612,8 +627,8 @@ impl App {
 
                         if widget::Button::new()
                             .border(4.0)
-                            .border_color(app.border_color)
-                            .color(app.button_color)
+                            .border_color(app.button_color)
+                            .color(app.bg_color)
                             .label(&label2)
                             .label_color(app.label_color)
                             .top_right_with_margin_on(ids.bg_att_sel, 0.0)
@@ -628,8 +643,8 @@ impl App {
 
                         if widget::Button::new()
                             .border(4.0)
-                            .border_color(app.border_color)
-                            .color(app.button_color)
+                            .border_color(app.button_color)
+                            .color(app.bg_color)
                             .label(&label3)
                             .label_color(app.label_color)
                             .down_from(ids.button_att1, 0.0)
@@ -644,8 +659,8 @@ impl App {
 
                         if widget::Button::new()
                             .border(4.0)
-                            .border_color(app.border_color)
-                            .color(app.button_color)
+                            .border_color(app.button_color)
+                            .color(app.bg_color)
                             .label(&label4)
                             .label_color(app.label_color)
                             .right_from(ids.button_att3, 0.0)
@@ -662,7 +677,8 @@ impl App {
                     // Button to add selected Pokemon to team
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Select")
                         .label_color(app.label_color)
                         .left_from(ids.button_fight, 75.0)
@@ -690,7 +706,8 @@ impl App {
                     // Button to remove selected Pokemon from team
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Remove")
                         .label_color(app.label_color)
                         .right_from(ids.button_back, 75.0)
@@ -709,7 +726,8 @@ impl App {
                     // Back-Button
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Back")
                         .label_color(app.label_color)
                         .bottom_left_with_margins_on(ids.canvas, 35.0, 255.0)
@@ -725,7 +743,8 @@ impl App {
                         (Mode::Singleplayer, _) => {
                             if widget::Button::new()
                                 .border(1.0)
-                                .color(app.bg_color)
+                                .border_color(app.border_color)
+                                .color(app.button_color)
                                 .label("Fight")
                                 .label_color(app.label_color)
                                 .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
@@ -744,7 +763,8 @@ impl App {
                         (Mode::Multiplayer, Player::One) => {
                             if widget::Button::new()
                                 .border(1.0)
-                                .color(app.bg_color)
+                                .border_color(app.border_color)
+                                .color(app.button_color)
                                 .label("Player Two")
                                 .label_color(app.label_color)
                                 .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
@@ -765,7 +785,8 @@ impl App {
                         (Mode::Multiplayer, Player::Two) => {
                             if widget::Button::new()
                                 .border(1.0)
-                                .color(app.bg_color)
+                                .border_color(app.border_color)
+                                .color(app.button_color)
                                 .label("Fight")
                                 .label_color(app.label_color)
                                 .bottom_right_with_margins_on(ids.canvas, 35.0, 255.0)
@@ -794,6 +815,7 @@ impl App {
                         .bottom_left_of(ids.canvas)
                         .set(ids.bg_text, ui);
 
+                    // Battle Text
                     widget::Text::new(&app.battle_text)
                         .color(app.label_color)
                         .middle_of(ids.bg_text)
