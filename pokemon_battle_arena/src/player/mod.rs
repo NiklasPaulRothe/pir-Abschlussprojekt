@@ -10,7 +10,7 @@ use db::{self, moves, enums};
 
 /// The Player type represents if the Player is a Human or a specific Ai to call different funcions
 /// for e.g. choosing Pokemon
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum PlayerType {
     Human,
     SimpleAi,
@@ -73,6 +73,20 @@ impl Player {
     // Constructor
     //
     /// Takes an array with pokemon id´s and the PlayerType and returns a player
+    pub fn new() -> Self {
+        Player {
+            player: PlayerType::Human,
+            pokemon_list: Vec::new(),
+            pokemon_count: 0,
+            current: 0,
+            next_move: None,
+            flags: HashMap::new(),
+            last_move: None,
+            last_action: (Next::None, 0),
+            switched: false,
+        }
+    }
+
     pub fn new_by_id(input: &[usize], player_type: PlayerType) -> Self {
         let mut pokemon = Vec::new();
         let len = input.len();
@@ -216,6 +230,15 @@ impl Player {
     pub fn set_switched(&mut self, stat: bool) {
         self.switched = stat;
     }
+
+    pub fn set_player_type(&mut self, player_type: PlayerType) {
+        self.player = player_type;
+    }
+
+    pub fn set_pokemon_list(&mut self, list: Vec<PokemonToken>) {
+        self.pokemon_list = list;
+    }
+
     // Other
     //
     pub fn attack_or_swap(&self) -> arena::to_ui::Move {

@@ -5,14 +5,16 @@ use conrod::backend::piston::{self, Window, WindowEvents, OpenGL};
 use conrod::backend::piston::event::UpdateEvent;
 use conrod::{widget, Borderable, Colorable, Labelable, Positionable, Sizeable, Widget};
 use db;
+use db::enums::Player;
 use player;
+use arena;
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
 const BUTTON_W: f64 = 150.0;
 const BUTTON_H: f64 = 30.0;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Screen {
     Title,
     Play,
@@ -31,11 +33,6 @@ enum Mode {
     Multiplayer,
 }
 
-#[derive(Clone)]
-enum Player {
-    PlayerOne,
-    PlayerTwo,
-}
 
 /// App struct, which contains important data
 ///     screen:         screen that gets drawn
@@ -50,35 +47,44 @@ pub struct App {
     sub_screen: Screen,
     label_color: conrod::Color,
     bg_color: conrod::Color,
+    button_color: conrod::Color,
+    border_color: conrod::Color,
     pokedex: db::pokedex::Pokedex,
     pkmn_team: Vec<db::pokemon_token::PokemonToken>,
     sel_pkmn: (Option<db::pokemon_token::PokemonToken>, Option<usize>),
     movedex: db::movedex::Movedex,
     techs: Option<Vec<db::moves::Technique>>,
     pkmn_moves: Vec<db::moves::Technique>,
-    player1: Option<player::Player>,
-    player2: Option<player::Player>,
     player: Player,
     mode: Mode,
+    done: bool,
+    changed_pkmn_p1: usize,
+    changed_pkmn_p2: usize,
 }
 
 impl App {
     pub fn new() -> Self {
         App {
+            // UI
             screen: Screen::Title,
             sub_screen: Screen::None,
             label_color: conrod::color::BLACK,
             bg_color: conrod::color::WHITE,
+            button_color: conrod::color::LIGHT_GREY,
+            border_color: conrod::color::DARK_GREY,
+
+            // Variables
             pokedex: db::pokedex::Pokedex::new(),
             pkmn_team: Vec::new(),
             sel_pkmn: (None, None),
             movedex: db::movedex::Movedex::new(),
             techs: None,
             pkmn_moves: Vec::new(),
-            player1: None,
-            player2: None,
-            player: Player::PlayerOne,
+            player: Player::One,
             mode: Mode::Singleplayer,
+            done: false,
+            changed_pkmn_p1: 0,
+            changed_pkmn_p2: 0,
         }
     }
 
@@ -91,14 +97,17 @@ impl App {
     }
 
     pub fn get_changed_pokemon(&self, player: db::enums::Player) -> usize {
-        2
+        match player {
+            Player::One => self.changed_pkmn_p1,
+            Player::Two => self.changed_pkmn_p2,
+        }
     }
 
     pub fn get_team(&mut self) -> Vec<db::pokemon_token::PokemonToken> {
         self.clone().pkmn_team
     }
 
-    pub fn draw_window(&mut self) {
+    pub fn draw_window<'a>(&mut self) {
         // Construct the window.
         let mut window: Window = piston::window::WindowSettings::new("PokemonBattleArena",
                                                                      [WIDTH, HEIGHT])
@@ -134,6 +143,12 @@ impl App {
         let image_map = conrod::image::Map::new();
 
         let app = self;
+        let mut player1 = player::Player::new();
+        let mut player2 = player::Player::new();
+        let mut arena = arena::Arena::new(&mut player1,
+                                          &mut player2,
+                                          db::enums::Types::Normal,
+                                          db::enums::Weather::ClearSky);
 
         // Poll events from the window.
         while let Some(event) = window.next_event(&mut events) {
@@ -160,7 +175,8 @@ impl App {
                     // Shows Play-Screen when clicked
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Play")
                         .label_color(app.label_color)
                         .middle_of(ids.canvas)
@@ -174,7 +190,8 @@ impl App {
                     // Options button
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Options")
                         .label_color(app.label_color)
                         .down_from(ids.button_play, 0.0)
@@ -189,7 +206,8 @@ impl App {
                     // closes the window
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Exit")
                         .label_color(app.label_color)
                         .down_from(ids.button_options, 0.0)
@@ -208,7 +226,8 @@ impl App {
                     // Singleplayer button
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Singleplayer")
                         .label_color(app.label_color)
                         .middle_of(ids.canvas)
@@ -221,10 +240,10 @@ impl App {
                     }
 
                     // Multiplayer button
-                    // not implemented yet
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Multiplayer")
                         .label_color(app.label_color)
                         .down_from(ids.button_sp, 0.0)
@@ -240,7 +259,8 @@ impl App {
                     // returns to previous screen
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Back")
                         .label_color(app.label_color)
                         .down_from(ids.button_mp, 0.0)
@@ -256,7 +276,8 @@ impl App {
                 if let Screen::Options = app.screen {
                     if widget::Button::new()
                         .border(1.0)
-                        .color(app.bg_color)
+                        .border_color(app.border_color)
+                        .color(app.button_color)
                         .label("Back")
                         .label_color(app.label_color)
                         .down_from(ids.button_mp, 0.0)
@@ -308,8 +329,8 @@ impl App {
                                 // each button with the respective pokemon name as label
                                 let button = widget::Button::new()
                                     .border(1.0)
-                                    .border_color(conrod::color::WHITE)
-                                    .color(conrod::color::LIGHT_GREY)
+                                    .border_color(app.bg_color)
+                                    .color(app.button_color)
                                     .label(label)
                                     .label_color(app.label_color);
                                 item.set(button, ui);
@@ -364,8 +385,8 @@ impl App {
                                 // each list item is a button with `label` as label
                                 let button = widget::Button::new()
                                     .border(1.0)
-                                    .border_color(conrod::color::WHITE)
-                                    .color(conrod::color::LIGHT_GREY)
+                                    .border_color(app.bg_color)
+                                    .color(app.button_color)
                                     .label(&label)
                                     .label_color(app.label_color);
                                 item.set(button, ui);
@@ -502,8 +523,6 @@ impl App {
                             .scrollbar_next_to()
                             .w_h(200.0, 320.0)
                             .mid_left_with_margin_on(ids.bg_att_sel, 0.0)
-                            // .x_y(-285.0, 100.0)
-                            // .middle_of(ids.bg_att_sel)
                             .scrollbar_width(15.0)
                             .set(ids.slist_att, ui);
 
@@ -526,8 +545,8 @@ impl App {
                                     // each button with the respective attack name as label
                                     let button = widget::Button::new()
                                         .border(1.0)
-                                        .border_color(conrod::color::LIGHT_GREY)
-                                        .color(conrod::color::WHITE)
+                                        .border_color(app.border_color)
+                                        .color(app.bg_color)
                                         .label(label)
                                         .label_color(app.label_color);
                                     item.set(button, ui);
@@ -571,8 +590,8 @@ impl App {
 
                         if widget::Button::new()
                             .border(4.0)
-                            .border_color(conrod::color::LIGHT_GREY)
-                            .color(app.bg_color)
+                            .border_color(app.border_color)
+                            .color(app.button_color)
                             .label(&label1)
                             .label_color(app.label_color)
                             .left_from(ids.button_att2, 0.0)
@@ -588,8 +607,8 @@ impl App {
 
                         if widget::Button::new()
                             .border(4.0)
-                            .border_color(conrod::color::LIGHT_GREY)
-                            .color(app.bg_color)
+                            .border_color(app.border_color)
+                            .color(app.button_color)
                             .label(&label2)
                             .label_color(app.label_color)
                             .top_right_with_margin_on(ids.bg_att_sel, 0.0)
@@ -604,8 +623,8 @@ impl App {
 
                         if widget::Button::new()
                             .border(4.0)
-                            .border_color(conrod::color::LIGHT_GREY)
-                            .color(app.bg_color)
+                            .border_color(app.border_color)
+                            .color(app.button_color)
                             .label(&label3)
                             .label_color(app.label_color)
                             .down_from(ids.button_att1, 0.0)
@@ -620,8 +639,8 @@ impl App {
 
                         if widget::Button::new()
                             .border(4.0)
-                            .border_color(conrod::color::LIGHT_GREY)
-                            .color(app.bg_color)
+                            .border_color(app.border_color)
+                            .color(app.button_color)
                             .label(&label4)
                             .label_color(app.label_color)
                             .right_from(ids.button_att3, 0.0)
@@ -696,6 +715,7 @@ impl App {
                         app.screen = Screen::Play;
                     }
 
+                    // Show different button depending on what follows
                     match (app.mode.clone(), app.player.clone()) {
                         (Mode::Singleplayer, _) => {
                             if widget::Button::new()
@@ -708,18 +728,15 @@ impl App {
                                 .set(ids.button_fight, ui)
                                 .was_clicked() {
                                 println!("Fight");
-                                app.player1 =
-                                    Some(player::Player::new_by_pokemon(app.pkmn_team.clone(),
-                                                                        player::PlayerType::Human));
-                                app.player2 =
-                                    Some(player::Player::new_by_id(&[1, 2, 3, 4, 5, 6],
-                                                                   player::PlayerType::SimpleAi));
-                                println!("{:#?}", app.player1);
-                                println!("{:#?}", app.player2);
+
+                                arena.get_player_one().set_pokemon_list(app.pkmn_team.clone());
+                                arena.get_player_two().set_pokemon_list(app.pkmn_team.clone());
+
+                                app.player = Player::One;
                                 app.screen = Screen::Battle;
                             }
                         }
-                        (Mode::Multiplayer, Player::PlayerOne) => {
+                        (Mode::Multiplayer, Player::One) => {
                             if widget::Button::new()
                                 .border(1.0)
                                 .color(app.bg_color)
@@ -730,18 +747,17 @@ impl App {
                                 .set(ids.button_fight, ui)
                                 .was_clicked() {
                                 println!("Player Two");
-                                app.player1 =
-                                    Some(player::Player::new_by_pokemon(app.pkmn_team.clone(),
-                                                                        player::PlayerType::Human));
-                                println!("{:#?}", app.player1);
+
+                                arena.get_player_one().set_pokemon_list(app.pkmn_team.clone());
+
                                 app.pkmn_team = Vec::new();
                                 app.sel_pkmn = (None, None);
                                 app.techs = None;
-                                app.player = Player::PlayerTwo;
+                                app.player = Player::Two;
                                 app.screen = Screen::ChooseTeam;
                             }
                         }
-                        (Mode::Multiplayer, Player::PlayerTwo) => {
+                        (Mode::Multiplayer, Player::Two) => {
                             if widget::Button::new()
                                 .border(1.0)
                                 .color(app.bg_color)
@@ -752,10 +768,10 @@ impl App {
                                 .set(ids.button_fight, ui)
                                 .was_clicked() {
                                 println!("Fight");
-                                app.player2 =
-                                    Some(player::Player::new_by_pokemon(app.pkmn_team.clone(),
-                                                                        player::PlayerType::Human));
-                                println!("{:?}", app.player2);
+
+                                arena.get_player_two().set_pokemon_list(app.pkmn_team.clone());
+
+                                app.player = Player::One;
                                 app.screen = Screen::Battle;
                             }
                         }
@@ -769,8 +785,8 @@ impl App {
                     widget::Canvas::new()
                         .color(conrod::color::LIGHT_ORANGE)
                         .border(2.0)
-                        .w_h(WIDTH as f64, 240.0)
-                        .mid_bottom_with_margin_on(ids.canvas, 0.0)
+                        .w_h(WIDTH as f64 - 350.0, 240.0)
+                        .bottom_left_of(ids.canvas)
                         .set(ids.bg_text, ui);
 
                     // BG Pokemon1
@@ -791,79 +807,347 @@ impl App {
 
                     // BG What to do next
                     widget::Canvas::new()
-                        .color(conrod::color::TRANSPARENT)
-                        .border(0.0)
+                        .color(conrod::color::LIGHT_GREEN)
+                        .border(2.0)
                         .w_h(350.0, 240.0)
-                        .mid_right_of(ids.bg_text)
+                        .bottom_right_of(ids.canvas)
                         .set(ids.bg_whatdo, ui);
 
-                    // ===== Tabs to decide what to do =====
-                    widget::Tabs::new(&[(ids.tab_pokemon, "Pokémon"), (ids.tab_fight, "Fight")])
-                        .w_h(200.0, 240.0)
-                        .starting_canvas(ids.tab_fight)
-                        .border(3.0)
-                        .border_color(conrod::color::DARK_GREY)
-                        .color(conrod::color::LIGHT_GREY)
-                        .label_color(app.label_color)
-                        .layout_vertically()
-                        .bar_thickness(350.0)
-                        .pad_top(-120.0)
-                        .pad_bottom(120.0)
-                        .pad_left(1280.0)
-                        .pad_right(200.0)
-                        .x_y(390.0, -360.0)
-                        .set(ids.tab_whatdo, ui);
-
-                    // ===== Attack selection =====
                     if widget::Button::new()
                         .border(2.0)
                         .color(app.bg_color)
-                        .label("Att1")
+                        .label("Fight")
                         .label_color(app.label_color)
-                        .top_left_with_margins_on(ids.tab_fight, 120.0, -815.0)
-                        .w_h(465.0, 120.0)
-                        .set(ids.button_att1, ui)
+                        .mid_top_of(ids.bg_whatdo)
+                        .w_h(350.0, 120.0)
+                        .set(ids.button_att, ui)
                         .was_clicked() {
-                        println!("Att Button 1");
+                        println!("Battle_Fight");
+                        if let Screen::BattleAttack = app.sub_screen {
+                            app.sub_screen = Screen::None;
+                        } else {
+                            app.sub_screen = Screen::BattleAttack;
+                        }
                     }
 
                     if widget::Button::new()
                         .border(2.0)
                         .color(app.bg_color)
-                        .label("Att2")
+                        .label("Pokémon")
                         .label_color(app.label_color)
-                        .right_from(ids.button_att1, 0.0)
-                        .w_h(465.0, 120.0)
-                        .set(ids.button_att2, ui)
+                        .down_from(ids.button_att, 0.0)
+                        .w_h(350.0, 120.0)
+                        .set(ids.button_switch, ui)
                         .was_clicked() {
-                        println!("Att Button 2");
+                        println!("Pokémon");
+                        app.screen = Screen::Switch;
                     }
 
-                    if widget::Button::new()
-                        .border(2.0)
-                        .color(app.bg_color)
-                        .label("Att3")
-                        .label_color(app.label_color)
-                        .down_from(ids.button_att1, 0.0)
-                        .w_h(465.0, 120.0)
-                        .set(ids.button_att3, ui)
-                        .was_clicked() {
-                        println!("Att Button 3");
+                    if let Screen::BattleAttack = app.sub_screen {
+                        let label1 = match app.player.clone() {
+                            Player::One => {
+                                let player = arena.get_player_one();
+
+                                match player.clone()
+                                        .clone()
+                                        .get_pokemon_list()
+                                          [player.clone().get_current()]
+                                    .clone()
+                                    .get_move_one() {
+                                    Some(att) => att.get_name().to_string(),
+                                    None => "".to_string(),
+                                }
+                            }
+                            Player::Two => {
+                                let player = arena.get_player_two();
+
+                                match player.clone()
+                                        .clone()
+                                        .get_pokemon_list()
+                                          [player.clone().get_current()]
+                                    .clone()
+                                    .get_move_one() {
+                                    Some(att) => att.get_name().to_string(),
+                                    None => "".to_string(),
+                                }
+                            }
+                        };
+                        let label2 = match app.player.clone() {
+                            Player::One => {
+                                let player = arena.get_player_one();
+
+                                match player.clone()
+                                        .clone()
+                                        .get_pokemon_list()
+                                          [player.clone().get_current()]
+                                    .clone()
+                                    .get_move_two() {
+                                    Some(att) => att.get_name().to_string(),
+                                    None => "".to_string(),
+                                }
+                            }
+                            Player::Two => {
+                                let player = arena.get_player_two();
+
+                                match player.clone()
+                                        .clone()
+                                        .get_pokemon_list()
+                                          [player.clone().get_current()]
+                                    .clone()
+                                    .get_move_two() {
+                                    Some(att) => att.get_name().to_string(),
+                                    None => "".to_string(),
+                                }
+                            }
+                        };
+                        let label3 = match app.player.clone() {
+                            Player::One => {
+                                let player = arena.get_player_one();
+
+                                match player.clone()
+                                        .clone()
+                                        .get_pokemon_list()
+                                          [player.clone().get_current()]
+                                    .clone()
+                                    .get_move_three() {
+                                    Some(att) => att.get_name().to_string(),
+                                    None => "".to_string(),
+                                }
+                            }
+                            Player::Two => {
+                                let player = arena.get_player_two();
+
+                                match player.clone()
+                                        .clone()
+                                        .get_pokemon_list()
+                                          [player.clone().get_current()]
+                                    .clone()
+                                    .get_move_three() {
+                                    Some(att) => att.get_name().to_string(),
+                                    None => "".to_string(),
+                                }
+                            }
+                        };
+                        let label4 = match app.player.clone() {
+                            Player::One => {
+                                let player = arena.get_player_one();
+
+                                match player.clone()
+                                        .clone()
+                                        .get_pokemon_list()
+                                          [player.clone().get_current()]
+                                    .clone()
+                                    .get_move_four() {
+                                    Some(att) => att.get_name().to_string(),
+                                    None => "".to_string(),
+                                }
+                            }
+                            Player::Two => {
+                                let player = arena.get_player_two();
+
+                                match player.clone()
+                                        .clone()
+                                        .get_pokemon_list()
+                                          [player.clone().get_current()]
+                                    .clone()
+                                    .get_move_four() {
+                                    Some(att) => att.get_name().to_string(),
+                                    None => "".to_string(),
+                                }
+                            }
+                        };
+
+                        // ===== Attack selection =====
+                        if widget::Button::new()
+                            .border(2.0)
+                            .color(app.bg_color)
+                            .label(&label1)
+                            .label_color(app.label_color)
+                            .top_left_of(ids.bg_text)
+                            .w_h(465.0, 120.0)
+                            .set(ids.button_att1, ui)
+                            .was_clicked() {
+                            println!("Attack 1");
+
+                            match app.player.clone() {
+                                Player::One => {
+                                    println!("0done {:?}", app.done);
+                                    let player = arena.get_player_one();
+                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_one().unwrap();
+                                    player.set_next_move(Some(player::Next::Move(att)));
+                                    app.player = Player::Two;
+                                    println!("0player {:?}", app.player);
+                                }
+                                Player::Two => {
+                                    println!("1done {:?}", app.done);
+                                    app.done = true;
+                                    let player = arena.get_player_one();
+                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_one().unwrap();
+                                    player.set_next_move(Some(player::Next::Move(att)));
+                                    app.player = Player::One;
+                                    println!("1player {:?}", app.player);
+                                }
+                            }
+                            println!("2done {:?}", app.done);
+                            println!("2player {:?}", app.player);
+                        }
+
+                        if widget::Button::new()
+                            .border(2.0)
+                            .color(app.bg_color)
+                            .label(&label2)
+                            .label_color(app.label_color)
+                            .right_from(ids.button_att1, 0.0)
+                            .w_h(465.0, 120.0)
+                            .set(ids.button_att2, ui)
+                            .was_clicked() {
+                            println!("Attack 2");
+
+                            match app.player.clone() {
+                                Player::One => {
+                                    let player = arena.get_player_one();
+                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_two().unwrap();
+                                    player.set_next_move(Some(player::Next::Move(att)));
+                                    app.player = Player::Two;
+                                }
+                                Player::Two => {
+                                    app.done = true;
+                                    let player = arena.get_player_one();
+                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_two().unwrap();
+                                    player.set_next_move(Some(player::Next::Move(att)));
+                                    app.player = Player::One;
+                                }
+                            }
+                        }
+
+                        if widget::Button::new()
+                            .border(2.0)
+                            .color(app.bg_color)
+                            .label(&label3)
+                            .label_color(app.label_color)
+                            .down_from(ids.button_att1, 0.0)
+                            .w_h(465.0, 120.0)
+                            .set(ids.button_att3, ui)
+                            .was_clicked() {
+                            println!("Attack 3");
+
+                            match app.player.clone() {
+                                Player::One => {
+                                    let player = arena.get_player_one();
+                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_three().unwrap();
+                                    player.set_next_move(Some(player::Next::Move(att)));
+                                    app.player = Player::Two;
+                                }
+                                Player::Two => {
+                                    app.done = true;
+                                    let player = arena.get_player_one();
+                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_three().unwrap();
+                                    player.set_next_move(Some(player::Next::Move(att)));
+                                    app.player = Player::One;
+                                }
+                            }
+                        }
+
+                        if widget::Button::new()
+                            .border(2.0)
+                            .color(app.bg_color)
+                            .label(&label4)
+                            .label_color(app.label_color)
+                            .right_from(ids.button_att3, 0.0)
+                            .w_h(465.0, 120.0)
+                            .set(ids.button_att4, ui)
+                            .was_clicked() {
+                            println!("Attack 4");
+
+                            match app.player.clone() {
+                                Player::One => {
+                                    let player = arena.get_player_one();
+                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_four().unwrap();
+                                    player.set_next_move(Some(player::Next::Move(att)));
+                                    app.player = Player::Two;
+                                }
+                                Player::Two => {
+                                    app.done = true;
+                                    let player = arena.get_player_one();
+                                    let att = player.clone().get_pokemon_list()[player.clone().get_current()].clone().get_move_four().unwrap();
+                                    player.set_next_move(Some(player::Next::Move(att)));
+                                    app.player = Player::One;
+                                }
+                            }
+                        }
                     }
 
-                    if widget::Button::new()
-                        .border(2.0)
-                        .color(app.bg_color)
-                        .label("Att4")
-                        .label_color(app.label_color)
-                        .right_from(ids.button_att3, 0.0)
-                        .w_h(465.0, 120.0)
-                        .set(ids.button_att4, ui)
-                        .was_clicked() {
-                        println!("Att Button 4");
+                    if app.done { 
+                        print!("fight: ");
+                        arena.fight(app);
+                        println!();
+                        app.done = false;
                     }
+                }
 
-                    // ===== Pokemon Switch Buttons =====
+                if let Screen::Switch = app.screen {
+                    let (mut events, _) = widget::ListSelect::single(6, 650.0 / 6.0)
+                        .w_h(200.0, 650.0)
+                        .mid_left_with_margin_on(ids.canvas, 25.0)
+                        .set(ids.slist_team, ui);
+
+                        let mut player = match app.player {
+                            Player::One => arena.get_player_one(),
+                            Player::Two => arena.get_player_two(),
+                        };
+                        let mut player_list = player.clone();
+                        let pkmn_list = player_list.get_pokemon_list();
+
+                    // Handle the `ListSelect`s events.
+                    while let Some(event) = events.next(ui, |i| {
+                        ::std::collections::HashSet::<usize>::new().contains(&i)
+                    }) {
+                        use conrod::widget::list_select::Event;
+
+                        match event {
+                            // For the `Item` events we instantiate the `List`'s items.
+                            Event::Item(item) => {
+                                // `label` is either the name of the pokemon (if available)
+                                // or - (if not)
+                                let label = if pkmn_list.len() > item.i {
+                                    pkmn_list.clone()[item.i].get_name()
+                                } else {
+                                    "".to_string()
+                                };
+
+                                // each list item is a button with `label` as label
+                                let button = widget::Button::new()
+                                    .border(1.0)
+                                    .border_color(app.bg_color)
+                                    .color(app.button_color)
+                                    .label(&label)
+                                    .label_color(app.label_color);
+                                item.set(button, ui);
+                            }
+
+                            Event::Selection(selection) => {
+                                println!("selected index (Team): {:?}", selection);
+                                if selection < pkmn_list.len() {
+                                    match app.player {
+                                        Player::One => {
+                                            app.changed_pkmn_p1 = selection;
+                                            player.set_next_move(Some(player::Next::Switch(player::PokemonSlot::One)));
+                                            app.screen = Screen::Battle;
+                                        }
+                                        Player::Two => {
+                                            app.changed_pkmn_p2 = selection;
+                                            player.set_next_move(Some(player::Next::Switch(player::PokemonSlot::One)));
+                                            app.screen = Screen::Battle;
+                                        }
+                                    }
+                                } else {
+                                    println!("Error: No Pokemon here");
+                                }
+                            }
+                            // Do nothing for every other event
+                            _ => {}
+                        }
+                    }
                 }
             });
 
@@ -920,10 +1204,11 @@ widget_ids! {
         button_fight,
         button_select,
         button_remove,
+        button_att,
         button_att1,
         button_att2,
         button_att3,
         button_att4,
-        button_swap,
+        button_switch,
     }
 }
