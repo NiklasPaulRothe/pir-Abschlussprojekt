@@ -33,14 +33,21 @@ pub fn deal_damage(attack: &Technique,
         attack_stat = enums::Stats::SpecialAttack;
         defense_stat = enums::Stats::SpecialDefense;
     }
-    let mut damage = 0;
-    if attack.get_power().is_some() {
-        let modifier = stab * attack.get_effectiveness(target.clone()) * random;
-        damage = ((((2.0 * user.get_level() as f32 + 10.0) / 250.0) *
-                   user.get_current().get_stat(&attack_stat) as f32 /
-                   target.get_current().get_stat(&defense_stat) as f32 *
-                   attack.get_power().unwrap() as f32 + 2.0) * modifier) as u16;
+    let power: u16;
+    if attack.get_power().is_none() {
+        power = get_power(attack, user, target);
+    } else {
+        power = attack.get_power().unwrap();
     }
+    if power == 0 {
+        return 0;
+    }
+    let modifier = stab * attack.get_effectiveness(target.clone()) * random;
+    let mut damage = ((((2.0 * user.get_level() as f32 + 10.0) / 250.0) *
+                       user.get_current().get_stat(&attack_stat) as f32 /
+                       target.get_current().get_stat(&defense_stat) as f32 *
+                       power as f32 + 2.0) * modifier) as u16;
+
     if attack.get_damage_class() == enums::DamageClass::Physical &&
        player.get_flags().contains_key(&enums::PlayerFlag::Reflect) {
         damage = damage / 2;
@@ -291,66 +298,7 @@ pub fn change_stats(stages: i8,
     if defender.get_flags().contains_key(&enums::PlayerFlag::Mist) {
         return false;
     }
-    let mut current = target.get_current().get_stat(&stat);
-    if target.get_non_volatile().0 == enums::NonVolatile::Paralysis {
-        current = current * 2;
-    }
-    let stage = match stat {
-        enums::Stats::Accuracy => {
-            match (current as f32 / target.get_base().get_stat(&stat) as f32) * 100.0 {
-                0.0...34.0 => -6,
-                34.0...38.0 => -5,
-                38.0...43.0 => -4,
-                43.0...51.0 => -3,
-                51.0...61.0 => -2,
-                61.0...76.0 => -1,
-                76.0...101.0 => 0,
-                101.0...134.0 => 1,
-                134.0...166.0 => 2,
-                166.0...201.0 => 3,
-                201.0...234.0 => 4,
-                234.0...267.0 => 5,
-                267.0...301.0 => 6,
-                _ => 0,
-            }
-        }
-        enums::Stats::Evasion => {
-            match (current as f32 / target.get_base().get_stat(&stat) as f32) * 100.0 {
-                0.0...34.0 => 6,
-                34.0...38.0 => 5,
-                38.0...43.0 => 4,
-                43.0...51.0 => 3,
-                51.0...61.0 => 2,
-                61.0...76.0 => 1,
-                76.0...101.0 => 0,
-                101.0...134.0 => -1,
-                134.0...166.0 => -2,
-                166.0...201.0 => -3,
-                201.0...234.0 => -4,
-                234.0...267.0 => -5,
-                267.0...301.0 => -6,
-                _ => 0,
-            }
-        }
-        _ => {
-            match (current as f32 / target.get_base().get_stat(&stat) as f32) * 100.0 {
-                0.0...26.0 => -6,
-                26.0...29.0 => -5,
-                29.0...34.0 => -4,
-                34.0...41.0 => -3,
-                41.0...50.0 => -2,
-                50.0...67.0 => -1,
-                67.0...101.0 => 0,
-                101.0...151.0 => 1,
-                151.0...201.0 => 2,
-                201.0...251.0 => 3,
-                251.0...301.0 => 4,
-                301.0...351.0 => 5,
-                351.0...401.0 => 6,
-                _ => 0,
-            }
-        }
-    };
+    let stage = get_stages(stat, target);
     println!("{:?}", stage);
     if !(stage <= -6 && stage >= 6) {
         let mut new_stage = stage + stages;
@@ -432,6 +380,69 @@ pub fn change_stats(stages: i8,
         }
     }
     return false;
+}
+
+fn get_stages(stat: enums::Stats, target: &mut PokemonToken) -> i8 {
+    let mut current = target.get_current().get_stat(&stat);
+    if target.get_non_volatile().0 == enums::NonVolatile::Paralysis {
+        current = current * 2;
+    }
+    match stat {
+        enums::Stats::Accuracy => {
+            match (current as f32 / target.get_base().get_stat(&stat) as f32) * 100.0 {
+                0.0...34.0 => -6,
+                34.0...38.0 => -5,
+                38.0...43.0 => -4,
+                43.0...51.0 => -3,
+                51.0...61.0 => -2,
+                61.0...76.0 => -1,
+                76.0...101.0 => 0,
+                101.0...134.0 => 1,
+                134.0...166.0 => 2,
+                166.0...201.0 => 3,
+                201.0...234.0 => 4,
+                234.0...267.0 => 5,
+                267.0...301.0 => 6,
+                _ => 0,
+            }
+        }
+        enums::Stats::Evasion => {
+            match (current as f32 / target.get_base().get_stat(&stat) as f32) * 100.0 {
+                0.0...34.0 => 6,
+                34.0...38.0 => 5,
+                38.0...43.0 => 4,
+                43.0...51.0 => 3,
+                51.0...61.0 => 2,
+                61.0...76.0 => 1,
+                76.0...101.0 => 0,
+                101.0...134.0 => -1,
+                134.0...166.0 => -2,
+                166.0...201.0 => -3,
+                201.0...234.0 => -4,
+                234.0...267.0 => -5,
+                267.0...301.0 => -6,
+                _ => 0,
+            }
+        }
+        _ => {
+            match (current as f32 / target.get_base().get_stat(&stat) as f32) * 100.0 {
+                0.0...26.0 => -6,
+                26.0...29.0 => -5,
+                29.0...34.0 => -4,
+                34.0...41.0 => -3,
+                41.0...50.0 => -2,
+                50.0...67.0 => -1,
+                67.0...101.0 => 0,
+                101.0...151.0 => 1,
+                151.0...201.0 => 2,
+                201.0...251.0 => 3,
+                251.0...301.0 => 4,
+                301.0...351.0 => 5,
+                351.0...401.0 => 6,
+                _ => 0,
+            }
+        }
+    }
 }
 
 
@@ -568,4 +579,242 @@ pub fn field_effect(attack: &Technique, player: &mut Player) {
         _ => {}
     }
 
+}
+
+
+pub fn get_power(attack: &Technique, user: &mut PokemonToken, target: &mut PokemonToken) -> u16 {
+    let mut rng = thread_rng();
+    match attack.get_name() {
+        "sonic-boom" => {
+            if target.get_types().1 != enums::Types::Ghost &&
+               target.get_types().0 != enums::Types::Ghost {
+                let current = target.get_current().get_stat(&enums::Stats::Hp);
+                target.get_current().set_stats(enums::Stats::Hp, current - 20);
+            } else {
+                println!("It has no effect on {}", target.get_name());
+            }
+            0
+        }
+        "low-kick" => {
+            match user.get_weight() {
+                0...10 => 20,
+                10...25 => 40,
+                25...50 => 60,
+                50...100 => 80,
+                100...200 => 100,
+                _ => 120,
+            }
+        }
+        "counter" => {
+            // need a way to get the last attack that hits the pokemon and if it was in this round
+            0
+        }
+        "seismic-toss" => {
+            if target.get_types().1 != enums::Types::Ghost &&
+               target.get_types().0 != enums::Types::Ghost {
+                let current = target.get_current().get_stat(&enums::Stats::Hp);
+                target.get_current().set_stats(enums::Stats::Hp, current - user.get_level());
+            } else {
+                println!("It has no effect on {}", target.get_name());
+            }
+            0
+        }
+        "dragon-rage" => {
+            let current = target.get_current().get_stat(&enums::Stats::Hp);
+            target.get_current().set_stats(enums::Stats::Hp, current - 40);
+            0
+        }
+        "night-shade" => {
+            if target.get_types().1 != enums::Types::Normal &&
+               target.get_types().0 != enums::Types::Normal {
+                let current = target.get_current().get_stat(&enums::Stats::Hp);
+                target.get_current().set_stats(enums::Stats::Hp, current - user.get_level());
+            } else {
+                println!("It has no effect on {}", target.get_name());
+            }
+            0
+        }
+        "bide" => {
+            // see counter
+            0
+        }
+        "psywave" => {
+            let current = target.get_current().get_stat(&enums::Stats::Hp);
+            target.get_current()
+                .set_stats(enums::Stats::Hp,
+                           current - (user.get_level() as f32 * rng.gen_range(0.5, 1.5)) as u16);
+            0
+        }
+        "super-fang" => {
+            if target.get_types().1 != enums::Types::Ghost &&
+               target.get_types().0 != enums::Types::Ghost {
+                let current = target.get_current().get_stat(&enums::Stats::Hp);
+                target.get_current().set_stats(enums::Stats::Hp, current - current / 2);
+            } else {
+                println!("It has no effect on {}", target.get_name());
+            }
+            0
+        }
+        "flail" => {
+            match target.get_current().get_stat(&enums::Stats::Hp) as f32 /
+                  target.get_base().get_stat(&enums::Stats::Hp) as f32 {
+                0.0...4.17 => 200,
+                4.17...10.42 => 150,
+                10.42...20.83 => 100,
+                20.83...35.42 => 80,
+                35.42...68.75 => 40,
+                _ => 20,
+            }
+        }
+        "reversal" => {
+            match target.get_current().get_stat(&enums::Stats::Hp) as f32 /
+                  target.get_base().get_stat(&enums::Stats::Hp) as f32 {
+                0.0...4.17 => 200,
+                4.17...10.42 => 150,
+                10.42...20.83 => 100,
+                20.83...35.42 => 80,
+                35.42...68.75 => 40,
+                _ => 20,
+            }
+        }
+        "return" => 50,
+        "present" => {
+            match rng.gen_range(0, 101) {
+                0...41 => 40,
+                41...71 => 80,
+                71...81 => 120,
+                _ => {
+                    let value = target.get_base().get_stat(&enums::Stats::Hp) / 4;
+                    heal(target, value);
+                    0
+                }
+            }
+        }
+        "frustration" => 50,
+        "magnitude" => {
+            match rng.gen_range(0, 101) {
+                0...6 => 10,
+                6...16 => 30,
+                16...36 => 50,
+                63...66 => 70,
+                66...86 => 90,
+                86...96 => 110,
+                _ => 150,
+            }
+        }
+        "mirror-coat" => {
+            // see counter
+            0
+        }
+        "beat-up" => user.get_current().get_stat(&enums::Stats::Attack) / 10 + 5,
+        "spit-up" => {
+            // can be changed as soon as stockpile is completely implemented
+            0
+        }
+        "endeavor" => {
+            target.get_current().set_stats(enums::Stats::Hp,
+                                           user.get_current().get_stat(&enums::Stats::Hp));
+            0
+        }
+        "gyro-ball" => {
+            25 *
+            (target.get_current().get_stat(&enums::Stats::Speed) /
+             user.get_current().get_stat(&enums::Stats::Speed))
+        }
+        "natural-gift" => {
+            // Right now it is not possible to hold a berry
+            0
+        }
+        "metal-burst" => {
+            // see counter
+            0
+        }
+        "fling" => {
+            // Right now it is not possible to hold a item
+            0
+        }
+        "trump-card" => {
+            // PP not implemented right now, therefore we just use an average value for now
+            60
+        }
+        "wring-out" => {
+            1 +
+            120 *
+            (target.get_current().get_stat(&enums::Stats::Hp) /
+             target.get_base().get_stat(&enums::Stats::Hp))
+        }
+        "me-first" => {
+            // see counter
+            0
+        }
+        "punishment" => {
+            let mut stages = Vec::new();
+            stages.push(get_stages(enums::Stats::Attack, target));
+            stages.push(get_stages(enums::Stats::Defense, target));
+            stages.push(get_stages(enums::Stats::SpecialAttack, target));
+            stages.push(get_stages(enums::Stats::SpecialDefense, target));
+            stages.push(get_stages(enums::Stats::Speed, target));
+            stages.push(get_stages(enums::Stats::Accuracy, target));
+            stages.push(get_stages(enums::Stats::Evasion, target));
+            let mut increase = 0;
+            for entry in stages {
+                if entry > 0 {
+                    increase = increase + entry;
+                }
+            }
+            60 + (20 * increase) as u16
+        }
+        "grass-knot" => {
+            match target.get_weight() {
+                0...10 => 20,
+                10...25 => 40,
+                25...50 => 60,
+                50...100 => 80,
+                100...200 => 100,
+                _ => 120,
+            }
+        }
+        "crush-grip" => {
+            1 +
+            120 *
+            (target.get_current().get_stat(&enums::Stats::Hp) /
+             target.get_base().get_stat(&enums::Stats::Hp))
+        }
+        "heavy-slam" => {
+            match user.get_weight() as f32 / target.get_weight() as f32 * 100.0 {
+                0.0...20.1 => 120,
+                20.1...25.1 => 100,
+                25.1...33.4 => 80,
+                33.4...50.1 => 60,
+                _ => 40,
+            }
+        }
+        "electro-ball" => {
+            match user.get_current().get_stat(&enums::Stats::Speed) as f32 /
+                  target.get_current().get_stat(&enums::Stats::Speed) as f32 {
+                0.0...25.1 => 150,
+                25.1...33.4 => 120,
+                33.4...50.1 => 80,
+                _ => 60,
+            }
+        }
+        "final-gambit" => {
+            let user_current = user.get_current().get_stat(&enums::Stats::Hp);
+            let current = target.get_current().get_stat(&enums::Stats::Hp);
+            target.get_current().set_stats(enums::Stats::Hp, current - user_current);
+            user.get_current().set_stats(enums::Stats::Hp, 0);
+            0
+        }
+        "heat-crash" => {
+            match user.get_weight() as f32 / target.get_weight() as f32 * 100.0 {
+                0.0...20.1 => 120,
+                20.1...25.1 => 100,
+                25.1...33.4 => 80,
+                33.4...50.1 => 60,
+                _ => 40,
+            }
+        }
+        _ => 0,
+
+    }
 }

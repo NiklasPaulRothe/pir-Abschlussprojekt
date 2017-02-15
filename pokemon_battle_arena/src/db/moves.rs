@@ -15,11 +15,6 @@ use std::cmp::Ordering;
 use arena::Arena;
 use player::{Player, Next};
 
-// use super::movedex;
-use super::unique;
-// use super::pokedex::Pokedex;
-
-
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.
 #[derive(Debug, Clone, RustcDecodable)]
@@ -58,7 +53,7 @@ pub struct Technique {
 impl Technique {
     /// Matches over the category of a move and calls a specific method in resolve.rs for this
     /// category. All calculation is done inside the method, therefore no return is needed.
-    pub fn resolve(&self, arena: &mut Arena, flag: u8) {
+    pub fn resolve(&self, arena: &mut Arena, flag: enums::Player) {
         // First call the hits method to sort out missing moves.
         let mut user_clone = get_user(flag, arena).clone();
         let mut target_clone = get_target(flag, arena).clone();
@@ -69,6 +64,24 @@ impl Technique {
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
+                    if attacker_clone.get_last_action().0 != Next::None {
+                        if self.get_flags().contains(&enums::MoveFlags::Charge) &&
+                           !(attacker_clone.get_last_action().clone() ==
+                             (Next::Move(self.clone()), 0)) {
+                            let attacker = get_attacker(flag, arena);
+                            println!("{} prepares itself", user_clone.get_name());
+                            attacker.set_last_action(((Next::Move(self.clone()), 0)));
+                            attacker.set_next_move(Some(Next::Move(self.clone())));
+                            return;
+                        } else if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
+                                  attacker_clone.get_last_action().clone() ==
+                                  (Next::Move(self.clone()), 0) {
+                            let attacker = get_attacker(flag, arena);
+                            println!("{} has to recharge", user_clone.get_name());
+                            attacker.set_last_action((Next::Move(self.clone()), 1));
+                            return;
+                        }
+                    }
                     let mut rng = thread_rng();
                     {
                         let mut target = get_target(flag, arena);
@@ -87,7 +100,9 @@ impl Technique {
                     if self.flinch_chance > 0 &&
                        rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
                         get_defender(flag, arena).set_next_move(Some(Next::Flinch));
+                        println!("{} has flinched", target_clone.get_name());
                     }
+
                 }
 
                 enums::MoveCategory::Ailment => {
@@ -371,22 +386,24 @@ impl Technique {
                         println!("It has no effect on {}", target_clone.get_name());
                     }
                 }
-                enums::MoveCategory::Unique => {
-                    //let mut target = get_target(flag, arena);
-                    unique::unique(&self,
-                                   self.get_name(), 
-                                   self.get_type(), 
-                                   user_clone, 
-                                   target_clone, 
-                                   &mut attacker_clone, 
-                                   &mut defender_clone,
-                                   arena);
-                }
+                enums::MoveCategory::Unique => {}
             };
         } else {
             println!("{} missed {}",
                      user_clone.get_name(),
                      target_clone.get_name());
+        }
+        let attacker = get_attacker(flag, arena);
+        if self.get_flags().contains(&enums::MoveFlags::Charge) &&
+           attacker.get_last_action().0 == Next::Move(self.clone()) {
+            attacker.set_last_action((Next::Move(self.clone()), 1))
+        } else if self.get_min_turn() > 1 && attacker.get_last_action().1 < self.get_max_turns() &&
+                  attacker.get_last_action().0 == Next::Move(self.clone()) {
+            let turns = attacker.get_last_action().1 + 1;
+            attacker.set_last_action((Next::Move(self.clone()), turns));
+        } else {
+            attacker.set_last_action((Next::Move(self.clone()), 0));
+            attacker.set_last_move(Some(self.clone()));
         }
     }
 
@@ -753,13 +770,15 @@ impl PartialEq for Technique {
 impl Eq for Technique {}
 
 /// Helper function which will get the mutable reference of the targets pokemon out of an arena
-fn get_target<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
+fn get_target<'a>(target: enums::Player,
+                  arena: &'a mut Arena)
+                  -> &'a mut pokemon_token::PokemonToken {
     match target {
-        1 => {
+        enums::Player::One => {
             let current = arena.get_player_one().get_current();
             &mut arena.get_player_one().get_pokemon_list()[current]
         }
-        _ => {
+        enums::Player::Two => {
             let current = arena.get_player_two().get_current();
             &mut arena.get_player_two().get_pokemon_list()[current]
         }
@@ -767,29 +786,31 @@ fn get_target<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::Po
 }
 
 /// Helper function which will get the mutable reference of the users pokemon out of an arena
-fn get_user<'a>(target: u8, arena: &'a mut Arena) -> &'a mut pokemon_token::PokemonToken {
+fn get_user<'a>(target: enums::Player,
+                arena: &'a mut Arena)
+                -> &'a mut pokemon_token::PokemonToken {
     match target {
-        2 => {
+        enums::Player::Two => {
             let current = arena.get_player_one().get_current();
             &mut arena.get_player_one().get_pokemon_list()[current]
         }
-        _ => {
+        enums::Player::One => {
             let current = arena.get_player_two().get_current();
             &mut arena.get_player_two().get_pokemon_list()[current]
         }
     }
 }
 
-fn get_attacker<'a>(target: u8, arena: &'a mut Arena) -> &'a mut Player {
+fn get_attacker<'a>(target: enums::Player, arena: &'a mut Arena) -> &'a mut Player {
     match target {
-        1 => arena.get_player_one(),
-        _ => arena.get_player_two(),
+        enums::Player::One => arena.get_player_one(),
+        enums::Player::Two => arena.get_player_two(),
     }
 }
 
-fn get_defender<'a>(target: u8, arena: &'a mut Arena) -> &'a mut Player {
+fn get_defender<'a>(target: enums::Player, arena: &'a mut Arena) -> &'a mut Player {
     match target {
-        1 => arena.get_player_two(),
-        _ => arena.get_player_one(),
+        enums::Player::One => arena.get_player_two(),
+        enums::Player::Two => arena.get_player_one(),
     }
 }

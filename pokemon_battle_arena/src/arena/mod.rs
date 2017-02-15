@@ -99,7 +99,4 @@ impl<'a> Arena<'a> {
             self.current_weather = (self.default_weather, 0);
         }
     }
-    /// Checks if the current weather is there for 5 rounds. If not the round counter is increased
-    /// If yes, the default weather is set again
-    pub fn validate_weather_effects(&mut self) {}
 }

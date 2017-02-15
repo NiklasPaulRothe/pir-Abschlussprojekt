@@ -6,7 +6,7 @@ use arena;
 use db::pokemon_token::PokemonToken;
 use db::pokedex::*;
 use std::collections::HashMap;
-use db::{moves, enums};
+use db::{self, moves, enums};
 
 /// The Player type represents if the Player is a Human or a specific Ai to call different funcions
 /// for e.g. choosing Pokemon
@@ -16,11 +16,42 @@ pub enum PlayerType {
     SimpleAi,
 }
 
-#[derive(Clone, Debug)]
+/// An enum which represents the AttackSlot to match with it
+#[derive(Debug, Clone, Copy)]
+pub enum AttackSlot {
+    One,
+    Two,
+    Three,
+    Four,
+}
+/// An enum representing the PokemonSlot
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum PokemonSlot {
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+}
+impl PokemonSlot {
+    pub fn get_int(&self) -> usize {
+        match *self {
+            PokemonSlot::One => 1,
+            PokemonSlot::Two => 2,
+            PokemonSlot::Three => 3,
+            PokemonSlot::Four => 4,
+            PokemonSlot::Five => 5,
+            PokemonSlot::Six => 6,
+        }
+    }
+}
+#[derive(Clone, Debug, PartialEq)]
 pub enum Next {
-    Move(moves::Technique, u8),
-    Switch,
+    Switch(PokemonSlot),
+    Move(moves::Technique),
     Flinch,
+    None,
 }
 
 /// The Player struct represents a Player and holds his Type (Human, Ai...), a list of his pokemon,
@@ -33,7 +64,8 @@ pub struct Player {
     current: usize,
     next_move: Option<Next>,
     flags: HashMap<enums::PlayerFlag, u8>,
-    last_move: Option<(moves::Technique, AttackSlot)>,
+    last_move: Option<moves::Technique>,
+    last_action: (Next, u8),
     switched: bool,
 }
 
@@ -56,10 +88,26 @@ impl Player {
             next_move: None,
             flags: HashMap::new(),
             last_move: None,
+            last_action: (Next::None, 0),
             switched: false,
         }
     }
 
+    pub fn new_by_pokemon(pokemon: Vec<db::pokemon_token::PokemonToken>,
+                          player_type: PlayerType)
+                          -> Self {
+        Player {
+            player: player_type,
+            pokemon_list: pokemon.clone(),
+            pokemon_count: pokemon.len(),
+            current: 0,
+            next_move: None,
+            flags: HashMap::new(),
+            last_move: None,
+            last_action: (Next::None, 0),
+            switched: false,
+        }
+    }
     // Getter methods
     //
     /// Returns the list of pokemon choosen by the player
@@ -88,7 +136,7 @@ impl Player {
     pub fn get_alive_list(&mut self) -> Vec<usize> {
         let mut vec = Vec::new();
         for i in 0..self.pokemon_list.len() {
-            if self.get_pokemon_list()[i].get_current().get_stat(&enums::Stats::Hp) != 0 {
+            if self.pokemon_list[i].is_alive() {
                 vec.push(i);
             }
         }
@@ -103,13 +151,30 @@ impl Player {
             &AttackSlot::Four => self.pokemon_list[self.current].clone().get_move_four().unwrap(),
         }
     }
+    /// Checks if an attack is in the Attackslots and returns the Slot
+    pub fn get_attack_slot(&mut self, attack: moves::Technique) -> Option<AttackSlot> {
+        if self.get_attack(&AttackSlot::One) == attack {
+            return Some(AttackSlot::One);
+        } else if self.get_attack(&AttackSlot::Two) == attack {
+            return Some(AttackSlot::Two);
+        } else if self.get_attack(&AttackSlot::Three) == attack {
+            return Some(AttackSlot::Three);
+        } else if self.get_attack(&AttackSlot::Four) == attack {
+            return Some(AttackSlot::Four);
+        }
+        None
+    }
     /// Gets the next attack from the Player. Returns none if no Technique is selected
     pub fn get_next_move(&self) -> Option<Next> {
         self.next_move.clone()
     }
     /// Gets the last move with the Slot. Returns None if the last move wasn´t an attack
-    pub fn get_last_move(&self) -> Option<(moves::Technique, AttackSlot)> {
+    pub fn get_last_move(&self) -> Option<moves::Technique> {
         self.last_move.clone()
+    }
+
+    pub fn get_last_action(&self) -> &(Next, u8) {
+        &self.last_action
     }
 
     pub fn get_flags(&mut self) -> &mut HashMap<enums::PlayerFlag, u8> {
@@ -139,8 +204,17 @@ impl Player {
         }
     }
     /// Sets the last move the attacking pokemon made with the Slot in which it is saved
-    pub fn set_last_move(&mut self, last: Option<(moves::Technique, AttackSlot)>) {
+    pub fn set_last_move(&mut self, last: Option<moves::Technique>) {
         self.last_move = last;
+    }
+
+    /// Sets the last action
+    pub fn set_last_action(&mut self, last: (Next, u8)) {
+        self.last_action = last;
+    }
+    /// Sets the switched flag with a bool
+    pub fn set_switched(&mut self, stat: bool) {
+        self.switched = stat;
     }
     // Other
     //
@@ -150,13 +224,4 @@ impl Player {
             PlayerType::SimpleAi => arena::to_ui::ui_move(),
         }
     }
-}
-
-/// An enum which represents the AttackSlot to match with it
-#[derive(Debug, Clone)]
-pub enum AttackSlot {
-    One,
-    Two,
-    Three,
-    Four,
 }

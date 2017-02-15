@@ -91,6 +91,9 @@ impl PokemonToken {
     pub fn get_level(&self) -> u16 {
         self.level
     }
+    pub fn get_weight(&self) -> u16 {
+        self.weight
+    }
     /// Gets the current gender
     pub fn get_gender(&self) -> enums::Gender {
         self.gender.clone()
@@ -150,34 +153,22 @@ impl PokemonToken {
     /// Getter function for move one. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_one(self) -> Option<moves::Technique> {
-        if let Some(x) = self.move_one {
-            return Some(x.0);
-        }
-        None
+        self.move_one.map(|x| x.0)
     }
     /// Getter function for move two. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_two(self) -> Option<moves::Technique> {
-        if let Some(x) = self.move_two {
-            return Some(x.0);
-        }
-        None
+        self.move_two.map(|x| x.0)
     }
     /// Getter function for move three. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_three(self) -> Option<moves::Technique> {
-        if let Some(x) = self.move_three {
-            return Some(x.0);
-        }
-        None
+        self.move_three.map(|x| x.0)
     }
     /// Getter function for move four. If the move is set, the function returns it, if not,
     /// it returns None
     pub fn get_move_four(self) -> Option<moves::Technique> {
-        if let Some(x) = self.move_four {
-            return Some(x.0);
-        }
-        None
+        self.move_four.map(|x| x.0)
     }
     // Setter methods
     //
@@ -225,9 +216,13 @@ impl PokemonToken {
     pub fn add_fight_flag(&mut self, flag: enums::Fighting) {
         self.fight_flags.insert(flag, 0);
     }
-    /// Checks of the pokemon is asleep
+    /// Checks if the pokemon is asleep
     pub fn is_asleep(&self) -> bool {
         self.non_volatile_status.0 == enums::NonVolatile::Sleep
+    }
+    /// Checks if the pokemon is alive
+    pub fn is_alive(&mut self) -> bool {
+        self.get_current().get_stat(&enums::Stats::Hp) <= 0
     }
     /// Decrements the AP
     pub fn decrement_ap(&mut self) {
