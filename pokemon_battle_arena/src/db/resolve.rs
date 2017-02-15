@@ -8,13 +8,15 @@ use arena::Arena;
 use self::rand::{Rng, thread_rng};
 use self::regex::Regex;
 use player::Player;
+use graphic;
 
 /// Resolves moves that simply deals damage to the opponent, or the damage part of more complex
 /// moves
 pub fn deal_damage(attack: &Technique,
                    user: &mut PokemonToken,
                    target: &mut PokemonToken,
-                   player: &mut Player)
+                   player: &mut Player,
+                   mut window: &mut graphic::gui::App)
                    -> u16 {
     let mut stab = 1.0;
     let mut rng = thread_rng();
@@ -42,7 +44,7 @@ pub fn deal_damage(attack: &Technique,
     if power == 0 {
         return 0;
     }
-    let modifier = stab * attack.get_effectiveness(target.clone()) * random;
+    let modifier = stab * attack.get_effectiveness(target.clone(), &mut window) * random;
     let mut damage = ((((2.0 * user.get_level() as f32 + 10.0) / 250.0) *
                        user.get_current().get_stat(&attack_stat) as f32 /
                        target.get_current().get_stat(&defense_stat) as f32 *
