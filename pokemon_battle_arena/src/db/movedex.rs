@@ -51,16 +51,16 @@ impl Movedex {
                 let move_tmp = self.move_by_id(move_id);
                 // ifs are needed to exclude unimplemented moves from the list
                 if move_tmp.clone().is_some() &&
-                   move_tmp.clone().unwrap().get_name() == "counter" &&
-                   move_tmp.clone().unwrap().get_name() == "bide" &&
-                   move_tmp.clone().unwrap().get_name() == "mirror-coat" &&
-                   move_tmp.clone().unwrap().get_name() == "spit-up" &&
-                   move_tmp.clone().unwrap().get_name() == "natural-gift" &&
-                   move_tmp.clone().unwrap().get_name() == "metal-burst" &&
-                   move_tmp.clone().unwrap().get_name() == "fling" &&
-                   move_tmp.clone().unwrap().get_name() == "trump-card" &&
-                   move_tmp.clone().unwrap().get_name() == "me-first" &&
-                   move_tmp.unwrap().get_category() == enums::MoveCategory::Unique {
+                   !(move_tmp.clone().unwrap().get_name() == "counter" ||
+                     move_tmp.clone().unwrap().get_name() == "bide" ||
+                     move_tmp.clone().unwrap().get_name() == "mirror-coat" ||
+                     move_tmp.clone().unwrap().get_name() == "spit-up" ||
+                     move_tmp.clone().unwrap().get_name() == "natural-gift" ||
+                     move_tmp.clone().unwrap().get_name() == "metal-burst" ||
+                     move_tmp.clone().unwrap().get_name() == "fling" ||
+                     move_tmp.clone().unwrap().get_name() == "trump-card" ||
+                     move_tmp.clone().unwrap().get_name() == "me-first" ||
+                     move_tmp.unwrap().get_category() == enums::MoveCategory::Unique) {
                     new_dex.push(self.move_by_id(move_id).unwrap());
                 }
             }
