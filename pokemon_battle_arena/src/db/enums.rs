@@ -153,12 +153,14 @@ pub enum EndOfTurn {
     Ingrain,
 }
 
+/// Flags that need to be resolved before attacking
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub enum Fighting {
     Confusion,
     Infatuation,
 }
 
+/// Flags that have a influence when resolving attacks.
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub enum Resolve {
     NoTypeImmunity,
@@ -167,11 +169,13 @@ pub enum Resolve {
     Protect,
 }
 
+/// Flags that have a influence when choosing a move.
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub enum Choose {
     Torment,
 }
 
+/// Flags that influence one side of the field.
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub enum PlayerFlag {
     // lowers speed of Pokemon that are switched in.

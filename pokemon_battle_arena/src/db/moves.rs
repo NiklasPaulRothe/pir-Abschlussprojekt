@@ -14,6 +14,7 @@ use std::collections::HashMap;
 use std::cmp::Ordering;
 use arena::Arena;
 use player::{Player, Next};
+use graphic;
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.
@@ -53,7 +54,7 @@ pub struct Technique {
 impl Technique {
     /// Matches over the category of a move and calls a specific method in resolve.rs for this
     /// category. All calculation is done inside the method, therefore no return is needed.
-    pub fn resolve(&self, arena: &mut Arena, flag: enums::Player) {
+    pub fn resolve(&self, arena: &mut Arena, flag: enums::Player, window: &mut graphic::gui::App) {
         // First call the hits method to sort out missing moves.
         let mut user_clone = get_user(flag, arena).clone();
         let mut target_clone = get_target(flag, arena).clone();
@@ -64,12 +65,14 @@ impl Technique {
             match self.get_category() {
 
                 enums::MoveCategory::Damage => {
+                    // Set only the last action if move needs to be charged or recharged
                     if attacker_clone.get_last_action().0 != Next::None {
                         if self.get_flags().contains(&enums::MoveFlags::Charge) &&
                            !(attacker_clone.get_last_action().clone() ==
                              (Next::Move(self.clone()), 0)) {
                             let attacker = get_attacker(flag, arena);
-                            println!("{} prepares itself", user_clone.get_name());
+                            window.set_battle_text(user_clone.get_name().to_string() +
+                                                   " prepared itself");
                             attacker.set_last_action(((Next::Move(self.clone()), 0)));
                             attacker.set_next_move(Some(Next::Move(self.clone())));
                             return;
@@ -77,30 +80,39 @@ impl Technique {
                                   attacker_clone.get_last_action().clone() ==
                                   (Next::Move(self.clone()), 0) {
                             let attacker = get_attacker(flag, arena);
-                            println!("{} has to recharge", user_clone.get_name());
+                            window.set_battle_text(user_clone.get_name() + " has to recharge");
                             attacker.set_last_action((Next::Move(self.clone()), 1));
                             return;
                         }
                     }
                     let mut rng = thread_rng();
+                    // scope to destroy target afterwards, otherwise flinch could not be resolved
                     {
                         let mut target = get_target(flag, arena);
                         let mut frequency = 1;
+                        // multiple hits of one attack will be resolved one by one
                         if self.min_hits.is_some() {
                             frequency =
                                 rng.gen_range(self.min_hits.unwrap(), self.max_hits.unwrap());
                         }
+                        let name: &str = &target.get_name();
+                        window.set_battle_text(user_clone.get_name() + " hits " + name);
+                        window.set_battle_text(self.get_name().to_string() + " hits " +
+                                               &frequency.to_string() +
+                                               " times");
                         for _ in 0..frequency {
                             resolve::deal_damage(&self,
                                                  &mut user_clone,
                                                  &mut target,
-                                                 &mut defender_clone);
+                                                 &mut defender_clone,
+                                                 window);
                         }
                     }
+                    // resolve flinch chance if available
                     if self.flinch_chance > 0 &&
                        rng.gen_range(0.0, 100.1) <= self.flinch_chance as f32 {
                         get_defender(flag, arena).set_next_move(Some(Next::Flinch));
-                        println!("{} has flinched", target_clone.get_name());
+                        window.set_battle_text(target_clone.get_name() + " flinched.");
                     }
 
                 }
@@ -118,6 +130,9 @@ impl Technique {
 
                 enums::MoveCategory::NetGoodStats => {
                     let mut target = get_user(flag, arena);
+                    // in long effect the stats that should be in- or decreased are given, this
+                    // makes it possible to get matches with a regex. Several if statements are
+                    // needed, because it is possible to influence more than one stat.
                     if Regex::new(r"attack").unwrap().is_match(&self.effect_long) {
                         resolve::change_stats(self.stat_change_rate.unwrap(),
                                               enums::Stats::Attack,
@@ -217,23 +232,28 @@ impl Technique {
                             resolve::heal(&mut user, 50);
                         }
 
-
+                        window.set_battle_text(user_clone.get_name() + " heals " +
+                                               &target_clone.get_name())
                     } else {
                         println!("{} failed", self.get_name());
                     }
                 }
 
                 enums::MoveCategory::DamageAndAilment => {
-                    let mut defender = get_defender(flag, arena).clone();
                     let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                    window.set_battle_text(user_clone.get_name() + " hits " + &target.get_name());
+                    resolve::deal_damage(&self,
+                                         &mut user_clone,
+                                         &mut target,
+                                         &mut defender_clone,
+                                         window);
                     resolve::ailment(self.get_name(),
                                      self.get_type(),
                                      self.get_ailment(),
                                      self.get_effect_chance(),
                                      user_clone,
                                      &mut target,
-                                     &mut defender);
+                                     &mut defender_clone);
                 }
 
                 // Swagger moves confuse the target and raise their stats. Important is that the
@@ -259,7 +279,13 @@ impl Technique {
 
                 enums::MoveCategory::DamageAndLower => {
                     let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                    window.set_battle_text(user_clone.get_name() + " hits " +
+                                           &target_clone.get_name());
+                    resolve::deal_damage(&self,
+                                         &mut user_clone,
+                                         &mut target,
+                                         &mut defender_clone,
+                                         window);
                     resolve::change_stats(self.get_stat_change_rate(),
                                           self.get_stat(),
                                           &mut target,
@@ -268,7 +294,13 @@ impl Technique {
 
                 enums::MoveCategory::DamageAndRaise => {
                     let mut target = get_target(flag, arena);
-                    resolve::deal_damage(&self, &mut user_clone, &mut target, &mut defender_clone);
+                    window.set_battle_text(user_clone.get_name() + " hits " +
+                                           &target_clone.get_name());
+                    resolve::deal_damage(&self,
+                                         &mut user_clone,
+                                         &mut target,
+                                         &mut defender_clone,
+                                         window);
                     resolve::change_stats(self.get_stat_change_rate(),
                                           self.get_stat(),
                                           &mut target,
@@ -285,10 +317,13 @@ impl Technique {
                         let mut value: u16;
                         {
                             let mut target = get_target(flag, arena);
+                            window.set_battle_text(user_clone.get_name() + " hits " +
+                                                   &target_clone.get_name());
                             value = resolve::deal_damage(&self,
                                                          &mut user_clone,
                                                          &mut target,
-                                                         &mut defender_clone);
+                                                         &mut defender_clone,
+                                                         window);
                             match self.get_drain_percentage() {
                                 50 => value = value / 2,
                                 75 => value = (value / 4) * 3,
@@ -297,6 +332,7 @@ impl Technique {
                         }
                         let mut user = get_user(flag, arena);
                         resolve::heal(&mut user, value);
+                        window.set_battle_text(user.get_name() + " absorbed HP");
                     }
                 }
 
@@ -389,10 +425,10 @@ impl Technique {
                 enums::MoveCategory::Unique => {}
             };
         } else {
-            println!("{} missed {}",
-                     user_clone.get_name(),
-                     target_clone.get_name());
+            window.set_battle_text(user_clone.get_name() + " misses " + &target_clone.get_name());
         }
+        // sets the last action to the action that was really executed in the last turn and the last
+        // move, which is the last actions that counts in terms of moves like mimic
         {
             let attacker = get_attacker(flag, arena);
             if self.get_flags().contains(&enums::MoveFlags::Charge) &&
@@ -409,6 +445,7 @@ impl Technique {
 
             }
         }
+        // handles a case in which the HP of a target are set to a value less than 0
         let target = get_target(flag, arena);
         if target.get_current().get_stat(&enums::Stats::Hp) > 2000 {
             target.get_current().set_stats(enums::Stats::Hp, 0);
@@ -424,6 +461,8 @@ impl Technique {
                 -> bool {
         // TODO: As soon as flags for semi invulnerability are added, they have to be taken mut
         // account for hit calculation.
+
+        // first resolve special cases in which certain moves will always fail or hit
         if self.get_flags().contains(&enums::MoveFlags::Protect) &&
            target.get_resolve_flags().contains_key(&enums::Resolve::Protect) {
             return false;
@@ -474,7 +513,10 @@ impl Technique {
     //
     /// Takes the attacked Pokemon as an input besides the move and calculate from their types
     /// how effective the move is. Returns an appropriate enum for further calculations.
-    pub fn get_effectiveness(&self, mut enemy: pokemon_token::PokemonToken) -> f32 {
+    pub fn get_effectiveness(&self,
+                             mut enemy: pokemon_token::PokemonToken,
+                             window: &mut graphic::gui::App)
+                             -> f32 {
         let mut eff_count = 0;
         if self.clone().effectivity_map.unwrap().contains_key(&enemy.get_types().0) {
             if !((enemy.get_types().0 == enums::Types::Ghost &&
@@ -509,7 +551,10 @@ impl Technique {
             0 => 1.0,
             1 => 2.0,
             2 => 4.0,
-            _ => 0.0,
+            _ => {
+                window.set_battle_text(enemy.get_name() + " is immune");
+                0.0
+            }
         }
     }
     /// Gets the id of the attack

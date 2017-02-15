@@ -14,7 +14,7 @@ impl<'a> super::Arena<'a> {
     /// the players to know what to do in this round.
     /// Important: All next_move variables must contain a Some() entry. If the function is called
     /// and atleast one variable is holding a None, this function will panic!
-    pub fn fight(&mut self, window: &graphic::gui::App) {
+    pub fn fight(&mut self, mut window: &mut graphic::gui::App) {
         // This flag is used to show that the round is "over" earlier as aspected.
         // This can be happen if pursuit was used or both pokemons are swapped.
         let mut end_of_fight = false;
@@ -37,7 +37,7 @@ impl<'a> super::Arena<'a> {
                         Next::Switch(_) => {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            call_resolve(self, technique, enums::Player::Two);
+                            call_resolve(self, technique, enums::Player::Two, &mut window);
                             // let slot =
                             //     self.get_player_one().get_attack_slot(technique.clone())
                             //         .unwrap();
@@ -61,7 +61,7 @@ impl<'a> super::Arena<'a> {
                         if technique.get_id() == 228 {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            call_resolve(self, technique, enums::Player::One);
+                            call_resolve(self, technique, enums::Player::One, &mut window);
                             // let slot =
                             //     self.get_player_two().get_attack_slot(technique.clone())
                             //         .unwrap();
@@ -116,7 +116,7 @@ impl<'a> super::Arena<'a> {
         if self.get_player_one().get_next_move().is_none() &&
            self.get_player_two().get_next_move().is_some() {
             match self.get_player_two().get_next_move().unwrap() {
-                Next::Move(x) => call_resolve(self, x, enums::Player::Two),
+                Next::Move(x) => call_resolve(self, x, enums::Player::Two, &mut window),
                 _ => {}
             }
             end_of_fight = true;
@@ -125,7 +125,7 @@ impl<'a> super::Arena<'a> {
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_some() {
             match self.get_player_one().get_next_move().unwrap() {
-                Next::Move(x) => call_resolve(self, x, enums::Player::One),
+                Next::Move(x) => call_resolve(self, x, enums::Player::One, &mut window),
                 _ => {}
             }
             end_of_fight = true;
@@ -172,21 +172,21 @@ impl<'a> super::Arena<'a> {
             // The attack with the higher Priority starts
             //
             if one_prio > two_prio {
-                call_resolve(self, one_attack, enums::Player::One);
-                call_resolve(self, two_attack, enums::Player::Two);
+                call_resolve(self, one_attack, enums::Player::One, &mut window);
+                call_resolve(self, two_attack, enums::Player::Two, &mut window);
             } else if one_prio < two_prio {
-                call_resolve(self, two_attack, enums::Player::Two);
-                call_resolve(self, one_attack, enums::Player::One);
+                call_resolve(self, two_attack, enums::Player::Two, &mut window);
+                call_resolve(self, one_attack, enums::Player::One, &mut window);
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
                 //
                 if one_speed >= two_speed {
-                    call_resolve(self, one_attack, enums::Player::One);
-                    call_resolve(self, two_attack, enums::Player::Two);
+                    call_resolve(self, one_attack, enums::Player::One, &mut window);
+                    call_resolve(self, two_attack, enums::Player::Two, &mut window);
                 } else {
-                    call_resolve(self, two_attack, enums::Player::Two);
-                    call_resolve(self, one_attack, enums::Player::One);
+                    call_resolve(self, two_attack, enums::Player::Two, &mut window);
+                    call_resolve(self, one_attack, enums::Player::One, &mut window);
                 }
             }
         }
@@ -198,16 +198,52 @@ impl<'a> super::Arena<'a> {
         // TODO: All kind of effect like sleep, paralysis, poison... arent handled yet.
     }
 }
+/// Resolving if the resolve method must be called and after that if the pokemon is dead
+fn call_resolve(arena: &mut super::Arena,
+                attack: moves::Technique,
+                player: enums::Player,
+                mut window: &mut graphic::gui::App) {
+    let message_switch;
+    // Get the current pokemon
+    let current_one = arena.get_player_one().get_current();
+    let current_two = arena.get_player_two().get_current();
+    // Get the names of the current pokemon
+    let message_one = arena.get_player_one().get_pokemon_list()[current_one].get_name();
+    let message_two = arena.get_player_two().get_pokemon_list()[current_two].get_name();
+    // Checks if the pokemon are dead
+    let dead_one = !arena.get_player_one().get_pokemon_list()[current_one].is_alive();
+    let dead_two = !arena.get_player_two().get_pokemon_list()[current_two].is_alive();
+    // Sets the message_switch for following handles
+    match player {
+        enums::Player::One => {
+            message_switch = message_one.clone();
+        }
+        enums::Player::Two => {
+            message_switch = message_two.clone();
+        }
+    }
 
-fn call_resolve(arena: &mut super::Arena, attack: moves::Technique, player: enums::Player) {
+    // Handles confusion and infatuation. If nothing is stops attack, the attack will be resolved
     if confusion(arena, player) {
         // TODO Damage for confusion
         // 40-power typeless physical attack
-        println!("Pokemon is confused!");
+        println!("{} is confused!", message_switch);
     } else if infatuation(arena, player) {
-        println!("Pokemon has the infatuation effect!");
+        println!("{} has the infatuation effect!", message_switch);
     } else {
-        attack.resolve(arena, player);
+        attack.resolve(arena, player, &mut window);
+    }
+
+    // Swaps the pokemon if its dead
+    if dead_one {
+        println!("{} is dead!", message_one);
+        let new = window.get_changed_pokemon(player);
+        arena.get_player_one().set_current(new);
+    }
+    if dead_two {
+        println!("{} is dead!", message_two);
+        let new = window.get_changed_pokemon(player);
+        arena.get_player_two().set_current(new);
     }
 
 }

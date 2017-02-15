@@ -8,22 +8,23 @@ use arena::Arena;
 use self::rand::{Rng, thread_rng};
 use self::regex::Regex;
 use player::Player;
+use graphic;
 
-/// Resolves moves that simply deals damage to the opponent.
+/// Resolves moves that simply deals damage to the opponent, or the damage part of more complex
+/// moves
 pub fn deal_damage(attack: &Technique,
                    user: &mut PokemonToken,
                    target: &mut PokemonToken,
-                   player: &mut Player)
+                   player: &mut Player,
+                   mut window: &mut graphic::gui::App)
                    -> u16 {
-    // TODO: Methode die matcht zwischen Attacken die direkt verrechnet werden können und denen,
-    // die variable Power haben. Hier muss eine Möglichkeit gefunden werden die Power möglichst
-    // effizient für alle Attacken zu berechnen.
     let mut stab = 1.0;
     let mut rng = thread_rng();
     let random = rng.gen_range(0.85, 1.0);
     if attack.get_type() == user.get_types().0 || attack.get_type() == user.get_types().1 {
         stab = 1.5;
     }
+    // First check for special or physical attack
     let attack_stat: enums::Stats;
     let defense_stat: enums::Stats;
     if attack.get_damage_class() == enums::DamageClass::Physical {
@@ -33,6 +34,7 @@ pub fn deal_damage(attack: &Technique,
         attack_stat = enums::Stats::SpecialAttack;
         defense_stat = enums::Stats::SpecialDefense;
     }
+    // get power for the move, calculate if it has a variable value
     let power: u16;
     if attack.get_power().is_none() {
         power = get_power(attack, user, target);
@@ -42,7 +44,7 @@ pub fn deal_damage(attack: &Technique,
     if power == 0 {
         return 0;
     }
-    let modifier = stab * attack.get_effectiveness(target.clone()) * random;
+    let modifier = stab * attack.get_effectiveness(target.clone(), &mut window) * random;
     let mut damage = ((((2.0 * user.get_level() as f32 + 10.0) / 250.0) *
                        user.get_current().get_stat(&attack_stat) as f32 /
                        target.get_current().get_stat(&defense_stat) as f32 *
@@ -66,9 +68,6 @@ pub fn deal_damage(attack: &Technique,
     }
     let current = target.get_current().get_stat(&enums::Stats::Hp);
     target.get_current().set_stats(enums::Stats::Hp, current - damage);
-    println!("Damage: {}", damage);
-    println!("HP in resolve: {}",
-             target.get_current().get_stat(&enums::Stats::Hp));
     damage
 }
 
@@ -287,9 +286,7 @@ pub fn ailment(name: &str,
     }
 }
 
-// TODO: Methode implementieren, die errechnet wie viel ein Stage für das entsprechende Pokemon ist
-// und den Stat entsprechend verringert/erhöht, wenn Stage 6/-6 noch nicht erreicht ist. Gibt einen
-// bool zurück der anzeigt, ob der Stat verändert wurde oder nicht.
+/// Calculates the new value of a stat given a specific change of stages.
 pub fn change_stats(stages: i8,
                     stat: enums::Stats,
                     target: &mut PokemonToken,
@@ -298,6 +295,7 @@ pub fn change_stats(stages: i8,
     if defender.get_flags().contains_key(&enums::PlayerFlag::Mist) {
         return false;
     }
+    // calculate current stage and cap stages at -6 and 6
     let stage = get_stages(stat, target);
     println!("{:?}", stage);
     if !(stage <= -6 && stage >= 6) {
@@ -307,8 +305,10 @@ pub fn change_stats(stages: i8,
         } else if new_stage < -6 {
             new_stage = -6
         }
+        // if target is paralysed the current speed value is set to half of it's value.
         let mut modifier = 1.0;
-        if target.get_non_volatile().0 == enums::NonVolatile::Paralysis {
+        if target.get_non_volatile().0 == enums::NonVolatile::Paralysis &&
+           stat == enums::Stats::Speed {
             modifier = 0.5;
         }
         let base = target.get_base().get_stat(&stat) as f32;
@@ -384,7 +384,7 @@ pub fn change_stats(stages: i8,
 
 fn get_stages(stat: enums::Stats, target: &mut PokemonToken) -> i8 {
     let mut current = target.get_current().get_stat(&stat);
-    if target.get_non_volatile().0 == enums::NonVolatile::Paralysis {
+    if target.get_non_volatile().0 == enums::NonVolatile::Paralysis && stat == enums::Stats::Speed {
         current = current * 2;
     }
     match stat {
@@ -560,6 +560,8 @@ pub fn weather(arena: &mut Arena, weather: enums::Weather) -> bool {
     true
 }
 
+/// Simply adds flags for one side of the field. They must be resolved in the fight method of the
+/// arena.
 pub fn field_effect(attack: &Technique, player: &mut Player) {
     match attack.get_name() {
         "sticky-web" => player.add_flag(enums::PlayerFlag::StickyWeb),
@@ -581,7 +583,7 @@ pub fn field_effect(attack: &Technique, player: &mut Player) {
 
 }
 
-
+/// Returns the power for a move with variable value
 pub fn get_power(attack: &Technique, user: &mut PokemonToken, target: &mut PokemonToken) -> u16 {
     let mut rng = thread_rng();
     match attack.get_name() {

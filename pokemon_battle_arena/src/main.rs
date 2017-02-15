@@ -33,6 +33,7 @@ fn testing() {
     //         println!("{:?}", entry.get_name());
     //     }
     // }
+    let mut window = graphic::gui::App::new();
     // test_players();
     // test_arena();
     let mut window = graphic::gui::App::new();
@@ -62,7 +63,7 @@ fn test_players() {
     println!("Custom: {}", human.get_current());
 }
 
-fn test_arena() {
+fn test_arena(mut window: &mut graphic::gui::App) {
     // Arena erstellen
     let mut p1 = Player::new_by_id(&[5], PlayerType::Human);
     let mut p2 = Player::new_by_id(&[8], PlayerType::Human);
@@ -89,13 +90,13 @@ fn test_arena() {
              arena.get_player_two().get_pokemon_list()[0]
                  .get_current()
                  .get_stat(&db::enums::Stats::Hp));
-    attack.resolve(&mut arena, enums::Player::Two);
-    attack_hail.resolve(&mut arena, enums::Player::Two);
-    attack_haze.resolve(&mut arena, enums::Player::Two);
-    attack_sandstorm.resolve(&mut arena, enums::Player::Two);
-    attack_mudsport.resolve(&mut arena, enums::Player::Two);
-    attack_fairylock.resolve(&mut arena, enums::Player::Two);
-    attack.resolve(&mut arena, enums::Player::Two);
+    attack.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_hail.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_haze.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_sandstorm.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_mudsport.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_fairylock.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack.resolve(&mut arena, enums::Player::Two, &mut window);
 
     println!("HP1 nachher: {}",
              arena.get_player_one().get_pokemon_list()[0]
