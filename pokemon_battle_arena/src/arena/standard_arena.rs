@@ -263,9 +263,9 @@ fn call_resolve(arena: &mut super::Arena,
             }
             enums::Player::Two => {
                 if arena.get_player_two().get_next_move().unwrap() == Next::Flinch {
-                    window.set_battle_text(message_one.clone() + " flinched.");
+                    window.set_battle_text(message_two.clone() + " flinched.");
                 } else {
-                    window.set_battle_text(message_one.clone() + " uses " + attack.get_name());
+                    window.set_battle_text(message_two.clone() + " uses " + attack.get_name());
                     attack.resolve(arena, player, &mut window);
                 }
             }
