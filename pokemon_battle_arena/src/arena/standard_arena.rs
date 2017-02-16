@@ -254,14 +254,23 @@ fn call_resolve(arena: &mut super::Arena,
     } else {
         match player {
             enums::Player::One => {
-                window.set_battle_text(message_one.clone() + " uses " + attack.get_name())
+                if arena.get_player_one().get_next_move().unwrap() == Next::Flinch {
+                    window.set_battle_text(message_one.clone() + "flinched.");
+                } else {
+                    window.set_battle_text(message_one.clone() + " uses " + attack.get_name());
+                    attack.resolve(arena, player, &mut window);
+                }
             }
             enums::Player::Two => {
-                window.set_battle_text(message_two.clone() + " uses " + attack.get_name())
+                if arena.get_player_two().get_next_move().unwrap() == Next::Flinch {
+                    window.set_battle_text(message_one.clone() + " flinched.");
+                } else {
+                    window.set_battle_text(message_one.clone() + " uses " + attack.get_name());
+                    attack.resolve(arena, player, &mut window);
+                }
             }
         }
-
-        attack.resolve(arena, player, &mut window);
+        
     }
 
     // Swaps the pokemon if its dead
