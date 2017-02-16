@@ -93,15 +93,17 @@ impl App {
         }
     }
 
-    pub fn set_screen(mut self, screen: Screen) {
+    pub fn set_screen(&mut self, screen: Screen) {
         self.screen = screen
     }
 
     pub fn get_screen(&self) -> Screen {
         self.clone().screen
     }
-    #[allow(dead_code)]
-    pub fn get_changed_pokemon(&self, player: db::enums::Player) -> usize {
+
+    pub fn get_changed_pokemon(&mut self, player: db::enums::Player) -> usize {
+        self.screen = Screen::Switch;
+
         match player {
             Player::One => self.changed_pkmn_p1,
             Player::Two => self.changed_pkmn_p2,
@@ -824,14 +826,22 @@ impl App {
                         _ => conrod::color::CHARCOAL,
                     };
                     let player1 = arena.get_player_one().clone();
-                    println!("{:?}", player1);
-                    let name = player1.clone()
+                    let pkmn1 = player1.clone()
                             .get_pokemon_list()
-                                   [player1.clone().get_current()]
-                        .clone()
+                                    [player1.clone().get_current()]
+                        .clone();
+                    let name1 = pkmn1.clone()
                         .get_name();
+                    let hp1 = pkmn1.clone()
+                        .get_current()
+                        .get_stat(&db::enums::Stats::Hp)
+                        .to_string();
+                    let status1 = pkmn1.clone()
+                        .get_non_volatile()
+                        .0
+                        .to_string();
 
-                    widget::Text::new(&name)
+                    widget::Text::new(&name1)
                         .color(color1)
                         .middle_of(ids.bg_sprite)
                         .align_text_left()
@@ -839,6 +849,15 @@ impl App {
                         .padded_wh_of(ids.bg_sprite, 20.0)
                         .line_spacing(10.0)
                         .set(ids.text_test1, ui);
+
+                    widget::Text::new(&[hp1, "HP\n\n".to_string(), status1.to_string()].concat())
+                        .color(color1)
+                        .down_from(ids.text_test1, -200.0)
+                        .align_text_left()
+                        .font_size(25)
+                        .padded_wh_of(ids.bg_sprite, 20.0)
+                        .line_spacing(10.0)
+                        .set(ids.text_hp1, ui);
 
 
                     // BG Pokemon2
@@ -854,14 +873,22 @@ impl App {
                         _ => conrod::color::CHARCOAL,
                     };
                     let player2 = arena.get_player_two().clone();
-                    println!("{:?}", player2);
-                    let name = player2.clone()
+                    let pkmn2 = player2.clone()
                             .get_pokemon_list()
-                                   [player2.clone().get_current()]
-                        .clone()
+                                    [player2.clone().get_current()]
+                        .clone();
+                    let name2 = pkmn2.clone()
                         .get_name();
+                    let hp2 = pkmn2.clone()
+                        .get_current()
+                        .get_stat(&db::enums::Stats::Hp)
+                        .to_string();
+                    let status2 = pkmn2.clone()
+                        .get_non_volatile()
+                        .0
+                        .to_string();
 
-                    widget::Text::new(&name)
+                    widget::Text::new(&name2)
                         .color(color2)
                         .middle_of(ids.bg_sprite2)
                         .align_text_left()
@@ -869,6 +896,15 @@ impl App {
                         .padded_wh_of(ids.bg_sprite2, 20.0)
                         .line_spacing(10.0)
                         .set(ids.text_test2, ui);
+
+                    widget::Text::new(&[hp2, "HP\n\n".to_string(), status2.to_string()].concat())
+                        .color(color2)
+                        .down_from(ids.text_test2, -200.0)
+                        .align_text_left()
+                        .font_size(25)
+                        .padded_wh_of(ids.bg_sprite, 20.0)
+                        .line_spacing(10.0)
+                        .set(ids.text_hp2, ui);
 
 
                     // BG What to do next
@@ -1399,6 +1435,8 @@ widget_ids! {
         text_test1,
         text_test2,
         text_battle,
+        text_hp1,
+        text_hp2,
 
         tab_whatdo,
         tab_pokemon,
