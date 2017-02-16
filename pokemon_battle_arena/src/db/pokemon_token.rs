@@ -178,7 +178,7 @@ impl PokemonToken {
 
     /// Sets the moves to the pokemon
     pub fn set_moves(&mut self, moves: Vec<moves::Technique>) {
-        if moves.len() > 1 {
+        if moves.len() > 0 {
             self.move_one = Some((moves[0].clone(), moves[0].get_power_points().unwrap()));
         }
         if moves.len() > 1 {
@@ -222,6 +222,10 @@ impl PokemonToken {
     /// Checks if the pokemon is alive
     pub fn is_alive(&mut self) -> bool {
         self.get_current().get_stat(&enums::Stats::Hp) > 0
+    }
+    /// Increments the Non Volatile Counter
+    pub fn increment_non_volatile(&mut self) {
+        self.non_volatile_status.1 += 1;
     }
     /// Decrements the AP
     pub fn decrement_ap(&mut self) {
