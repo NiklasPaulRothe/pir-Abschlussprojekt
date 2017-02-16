@@ -272,7 +272,7 @@ fn call_resolve(arena: &mut super::Arena,
     if (non_volatile == enums::NonVolatile::Poison) || (non_volatile == enums::NonVolatile::Burn) ||
        (non_volatile == enums::NonVolatile::BadPoison) {
         window.set_battle_text(get_target(player, arena).get_name().clone() + " got damage by" +
-                               non_volatile.to_string());
+                               non_volatile.to_string().as_str());
         poison_burn_damage(arena, player);
     }
 
@@ -298,7 +298,7 @@ fn call_resolve(arena: &mut super::Arena,
 }
 
 /// Handles the end of turn flags
-fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &graphic::gui::App) {
+fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, mut window: &mut graphic::gui::App) {
     let map: HashMap<enums::EndOfTurn, u8> =
         get_target(player, arena).get_end_of_turn_flags().clone();
 
