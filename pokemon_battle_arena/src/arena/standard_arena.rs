@@ -179,15 +179,33 @@ impl<'a> super::Arena<'a> {
                 }
             }
         }
-        // Increases Counter for NonVolatile status
-        let mut current = self.get_player_one().get_current();
-        self.get_player_one().get_pokemon_list()[current].increment_non_volatile();
-        current = self.get_player_two().get_current();
-        self.get_player_two().get_pokemon_list()[current].increment_non_volatile();
-        // End of Turn moves like validate the weather and effects, handle poison etc.
-        end_of_turn_flags(self, enums::Player::One, window);
-        end_of_turn_flags(self, enums::Player::Two, window);
-        self.validate_effects_and_weather();
+
+        // Handles Poison and Burn aswell as BadPoison(Bad Poison is dealing the same damage as
+        // Poison right now)
+        // Player One
+        let mut non_volatile = get_target(enums::Player::One, self).get_non_volatile().0;
+        if (non_volatile == enums::NonVolatile::Poison) ||
+           (non_volatile == enums::NonVolatile::Burn) ||
+           (non_volatile == enums::NonVolatile::BadPoison) {
+            window.set_battle_text(get_target(enums::Player::One, self).get_name().clone() +
+                                   " got damage by " +
+                                   non_volatile.to_string().as_str());
+            poison_burn_damage(self, enums::Player::One);
+        }
+        // Player Two
+        non_volatile = get_target(enums::Player::Two, self).get_non_volatile().0;
+        if (non_volatile == enums::NonVolatile::Poison) ||
+           (non_volatile == enums::NonVolatile::Burn) ||
+           (non_volatile == enums::NonVolatile::BadPoison) {
+            window.set_battle_text(get_target(enums::Player::Two, self).get_name().clone() +
+                                   " got damage by " +
+                                   non_volatile.to_string().as_str());
+            poison_burn_damage(self, enums::Player::Two);
+        }
+
+        // Checks if one of the two player died
+        check_dead(enums::Player::One, self, window);
+        check_dead(enums::Player::Two, self, window);
     }
 }
 /// Resolving if the resolve method must be called and after that if the pokemon is dead
@@ -266,34 +284,9 @@ fn call_resolve(arena: &mut super::Arena,
             }
         }
     }
-    // Handles Poison and Burn aswell as BadPoison(Bad Poison is dealing the same damage as Poison
-    // right now)
-    let non_volatile = get_user(player, arena).get_non_volatile().0;
-    if (non_volatile == enums::NonVolatile::Poison) || (non_volatile == enums::NonVolatile::Burn) ||
-       (non_volatile == enums::NonVolatile::BadPoison) {
-        window.set_battle_text(get_target(player, arena).get_name().clone() + " got damage by" +
-                               non_volatile.to_string().as_str());
-        poison_burn_damage(arena, player);
-    }
-
-    // Checks if the pokemon are dead
-    let current_one = arena.get_player_one().get_current();
-    let dead_one = !arena.get_player_one().get_pokemon_list()[current_one].is_alive();
-    let message_one = arena.get_player_one().get_pokemon_list()[current_one].get_name().clone();
-    let current_two = arena.get_player_two().get_current();
-    let dead_two = !arena.get_player_two().get_pokemon_list()[current_two].is_alive();
-    let message_two = arena.get_player_two().get_pokemon_list()[current_two].get_name().clone();
-    // Swaps the pokemon if its dead
-    if dead_one {
-        window.set_battle_text(message_one.clone() + " is defeated!");
-        let new = window.get_changed_pokemon(enums::Player::One);
-        arena.get_player_one().set_current(new);
-    }
-    if dead_two {
-        window.set_battle_text(message_two.clone() + " is defeated!");
-        let new = window.get_changed_pokemon(enums::Player::Two);
-        arena.get_player_two().set_current(new);
-    }
+    // Checks if one of the two player died
+    check_dead(enums::Player::One, arena, window);
+    check_dead(enums::Player::Two, arena, window);
 
 }
 
@@ -465,23 +458,30 @@ fn infatuation(arena: &mut super::Arena, player: enums::Player) -> bool {
 }
 /// Deals the burn and poison damage.
 fn poison_burn_damage(arena: &mut super::Arena, player: enums::Player) {
-    let mut hp = get_target(player, arena)
+    let base_hp = get_target(player, arena)
         .get_base()
         .get_stat(&enums::Stats::Hp);
     // Get the amount for heal
-    hp = hp - (hp / 8);
-    if get_target(player, arena)
-        .get_base()
-        .get_stat(&enums::Stats::Hp) >= hp {
-        get_target(player, arena)
-            .get_current()
-            .set_stats(enums::Stats::Hp, hp);
+    let damage = base_hp / 8;
+    let current_hp = get_target(player, arena).get_current().get_stat(&enums::Stats::Hp);
+    if !(damage > current_hp) {
+        get_target(player, arena).get_current().set_stats(enums::Stats::Hp, current_hp - damage);
     } else {
-        hp = get_target(player, arena)
-            .get_base()
-            .get_stat(&enums::Stats::Hp);
-        get_target(player, arena)
-            .get_current()
-            .set_stats(enums::Stats::Hp, hp);
+        get_target(player, arena).get_current().set_stats(enums::Stats::Hp, 0);
+    }
+}
+
+/// Checks if the pokemon are dead
+fn check_dead(player: enums::Player,
+              arena: &mut super::Arena,
+              mut window: &mut graphic::gui::App) {
+    // Checks if the pokemon are dead
+    let dead = !get_target(player, arena).is_alive();
+    let message = get_target(player, arena).get_name().clone();
+    // Swaps the pokemon if its dead
+    if dead {
+        window.set_battle_text(message.clone() + " is defeated!");
+        let new = window.get_changed_pokemon(player);
+        get_attacker(player, arena).set_current(new);
     }
 }
