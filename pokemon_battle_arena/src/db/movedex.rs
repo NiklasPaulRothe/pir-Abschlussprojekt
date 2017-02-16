@@ -77,14 +77,6 @@ impl Movedex {
                      move_tmp.clone().unwrap().get_name() == "powder" ||
                      move_tmp.clone().unwrap().get_name() == "reflect-type" ||
                      move_tmp.clone().unwrap().get_name() == "soak" ||
-                     move_tmp.clone().unwrap().get_name() == "" ||
-                     move_tmp.clone().unwrap().get_name() == "" ||
-                     move_tmp.clone().unwrap().get_name() == "" ||
-                     move_tmp.clone().unwrap().get_name() == "" ||
-                     move_tmp.clone().unwrap().get_name() == "" ||
-                     move_tmp.clone().unwrap().get_name() == "" ||
-                     move_tmp.clone().unwrap().get_name() == "" ||
-                     move_tmp.clone().unwrap().get_name() == "" ||
                      move_tmp.clone().unwrap().get_name() == "")) {
                     new_dex.push(self.move_by_id(move_id).unwrap());
 
