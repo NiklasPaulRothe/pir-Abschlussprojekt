@@ -116,6 +116,19 @@ pub enum NonVolatile {
     Poison,
     BadPoison,
 }
+impl NonVolatile {
+    pub fn to_string(&self) -> &str {
+        match *self {
+            NonVolatile::Paralysis => "Paralysis",
+            NonVolatile::Sleep => "Sleep",
+            NonVolatile::Freeze => "Freeze",
+            NonVolatile::Burn => "Burn",
+            NonVolatile::Poison => "Poison",
+            NonVolatile::BadPoison => "Bad Poison",
+            NonVolatile::Undefined => "Undefined",
+        }
+    }
+}
 
 /// Print method for non volatile status changes.
 pub fn print_non_volatile(status: NonVolatile) -> String {

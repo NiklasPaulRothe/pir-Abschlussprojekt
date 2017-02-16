@@ -223,6 +223,10 @@ impl PokemonToken {
     pub fn is_alive(&mut self) -> bool {
         self.get_current().get_stat(&enums::Stats::Hp) > 0
     }
+    /// Increments the Non Volatile Counter
+    pub fn increment_non_volatile(&mut self) {
+        self.non_volatile_status.1 += 1;
+    }
     /// Decrements the AP
     pub fn decrement_ap(&mut self) {
         unimplemented!();

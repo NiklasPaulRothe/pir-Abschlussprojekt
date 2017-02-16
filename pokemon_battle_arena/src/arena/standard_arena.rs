@@ -3,6 +3,7 @@ use db::moves::{get_attacker, get_target, get_user};
 use graphic;
 use player::Next;
 use rand;
+use rand::{Rng, thread_rng};
 use std::collections::HashMap;
 
 /// The standard arena is based on the default 1v1 fight.
@@ -142,13 +143,23 @@ impl<'a> super::Arena<'a> {
                 _ => unreachable!(),
             };
             let mut current = self.get_player_one().get_current();
-            let one_speed = self.get_player_one().get_pokemon_list()[current]
+            let mut one_speed = self.get_player_one().get_pokemon_list()[current]
                 .get_current()
                 .get_stat(&enums::Stats::Speed);
+            // If the pokemon one is paralysed reduce speed by 50%
+            if self.get_player_one().get_pokemon_list()[current].get_non_volatile().0 ==
+               enums::NonVolatile::Paralysis {
+                one_speed /= 2;
+            }
             current = self.get_player_two().get_current();
-            let two_speed = self.get_player_two().get_pokemon_list()[current]
+            let mut two_speed = self.get_player_two().get_pokemon_list()[current]
                 .get_current()
                 .get_stat(&enums::Stats::Speed);
+            // If the pokemon two is paralysed reduce speed by 50%
+            if self.get_player_two().get_pokemon_list()[current].get_non_volatile().0 ==
+               enums::NonVolatile::Paralysis {
+                two_speed /= 2;
+            }
             // The attack with the higher Priority starts
             if one_prio > two_prio {
                 call_resolve(self, one_attack, enums::Player::One, &mut window);
@@ -168,11 +179,15 @@ impl<'a> super::Arena<'a> {
                 }
             }
         }
+        // Increases Counter for NonVolatile status
+        let mut current = self.get_player_one().get_current();
+        self.get_player_one().get_pokemon_list()[current].increment_non_volatile();
+        current = self.get_player_two().get_current();
+        self.get_player_two().get_pokemon_list()[current].increment_non_volatile();
         // End of Turn moves like validate the weather and effects, handle poison etc.
         end_of_turn_flags(self, enums::Player::One, window);
         end_of_turn_flags(self, enums::Player::Two, window);
         self.validate_effects_and_weather();
-        // TODO: All kind of effect like sleep, paralysis, poison... arent handled yet.
     }
 }
 /// Resolving if the resolve method must be called and after that if the pokemon is dead
@@ -180,31 +195,85 @@ fn call_resolve(arena: &mut super::Arena,
                 attack: moves::Technique,
                 player: enums::Player,
                 mut window: &mut graphic::gui::App) {
-    // Get the names of the current pokemon
-    let message = get_target(player, arena).get_name().clone();
-    // Sets the message_switch for following handles
-
-    // Handles confusion and infatuation. If nothing is stops attack, the attack will be resolved
-    if confusion(arena, player) {
-        let mut pkmn = get_target(player, arena).clone();
-        let damage = ((((2.0 * pkmn.get_level() as f32 + 10.0) / 250.0) *
-                       pkmn.get_current().get_stat(&enums::Stats::Attack) as f32 /
-                       pkmn.get_current().get_stat(&enums::Stats::Defense) as f32 *
-                       40.0 + 2.0)) as u16;
-        get_target(player, arena).get_current().set_stats(enums::Stats::Hp, damage);
-        window.set_battle_text(message + " is confused and hitted himself!");
-    } else if infatuation(arena, player) {
-        window.set_battle_text(message + " has the infatuation effect!");
-    } else {
-        if get_attacker(player, arena).get_next_move().unwrap() == Next::Flinch {
-            window.set_battle_text(message.clone() + "flinched.");
-            let last = get_attacker(player, arena).get_next_move().unwrap();
-            get_attacker(player, arena).set_last_action((last, 0));
-            get_attacker(player, arena).set_next_move(None);
-        } else {
-            window.set_battle_text(message.clone() + " uses " + attack.get_name());
-            attack.resolve(arena, player, &mut window);
+    let mut attack_is_allowed = true;
+    // Checks if the pokemon is allowed to attack. This is influeced by Sleep, Freeze and Paralysis
+    // Checks if the pokemon is paralysed
+    if get_target(player, arena).get_non_volatile().0 == enums::NonVolatile::Paralysis {
+        let mut rng = thread_rng();
+        // With a chance of 25% the pokemon will not attack
+        if rng.gen_range(0, 4) != 0 {
+            attack_is_allowed = false;
+            window.set_battle_text(get_target(player, arena).get_name().clone() + " is paralysed!");
         }
+        // Checks it the pokemon is sleeping
+    } else if get_target(player, arena).get_non_volatile().0 == enums::NonVolatile::Sleep {
+        // If the pokemon is not sleeping for atleast one round it will not wake up
+        if get_target(player, arena).get_non_volatile().1 == 0 {
+            window.set_battle_text(get_target(player, arena).get_name().clone() + " is sleeping!");
+            attack_is_allowed = false;
+            // Pokemon will wake up after 3 rounds
+        } else if get_target(player, arena).get_non_volatile().1 >= 3 {
+            window.set_battle_text(get_target(player, arena).get_name().clone() + " wakes up.");
+            get_target(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
+        } else {
+            // Check if pokemon will wake up
+            if rand::random::<bool>() {
+                window.set_battle_text(get_target(player, arena).get_name().clone() + " wakes up.");
+                get_target(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
+            } else {
+                window.set_battle_text(get_target(player, arena).get_name().clone() +
+                                       " is sleeping!");
+                attack_is_allowed = false;
+            }
+        }
+    } else if get_target(player, arena).get_non_volatile().0 == enums::NonVolatile::Freeze {
+        let mut rng = thread_rng();
+        // With a chance of 20% the pokemon will not attack
+        if rng.gen_range(0, 5) != 0 {
+            attack_is_allowed = false;
+            window.set_battle_text(get_target(player, arena).get_name().clone() + " is frozen!");
+        } else {
+            window.set_battle_text(get_target(player, arena).get_name().clone() +
+                                   " is not frozen anymore!");
+            get_target(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
+        }
+    }
+
+    if attack_is_allowed {
+        // Get the names of the current pokemon
+        let message = get_target(player, arena).get_name().clone();
+        // Handles confusion and infatuation. If nothing is stops attack, the attack will be
+        // resolved
+        if confusion(arena, player) {
+            let mut pkmn = get_target(player, arena).clone();
+            let damage = ((((2.0 * pkmn.get_level() as f32 + 10.0) / 250.0) *
+                           pkmn.get_current().get_stat(&enums::Stats::Attack) as f32 /
+                           pkmn.get_current().get_stat(&enums::Stats::Defense) as f32 *
+                           40.0 + 2.0)) as u16;
+            get_target(player, arena).get_current().set_stats(enums::Stats::Hp, damage);
+            window.set_battle_text(message + " is confused and hitted himself!");
+        } else if infatuation(arena, player) {
+            window.set_battle_text(message + " has the infatuation effect!");
+        } else {
+            if get_attacker(player, arena).get_next_move().unwrap() == Next::Flinch {
+                window.set_battle_text(message.clone() + "flinched.");
+                let last = get_attacker(player, arena).get_next_move().unwrap();
+                get_attacker(player, arena).set_last_action((last, 0));
+                get_attacker(player, arena).set_next_move(None);
+            } else {
+                window.set_battle_text(message.clone() + " uses " + attack.get_name());
+                attack.resolve(arena, player, &mut window);
+            }
+        }
+    }
+    // Handles Poison and Burn aswell as BadPoison(Bad Poison is dealing the same damage as Poison
+    // right now)
+    let non_volatile = get_target(player, arena).get_non_volatile().0;
+    if (non_volatile == enums::NonVolatile::Poison) || (non_volatile == enums::NonVolatile::Burn) ||
+       (non_volatile == enums::NonVolatile::BadPoison) {
+        window.set_battle_text(get_target(player, arena).get_name().clone() + " got damage by" +
+                               non_volatile.to_string());
+        poison_burn_damage(arena, player);
     }
 
     // Checks if the pokemon are dead
@@ -391,4 +460,26 @@ fn infatuation(arena: &mut super::Arena, player: enums::Player) -> bool {
         return random > random / 3;
     }
     false
+}
+/// Deals the burn and poison damage.
+fn poison_burn_damage(arena: &mut super::Arena, player: enums::Player) {
+    let mut hp = get_target(player, arena)
+        .get_base()
+        .get_stat(&enums::Stats::Hp);
+    // Get the amount for heal
+    hp = hp - (hp / 8);
+    if get_target(player, arena)
+        .get_base()
+        .get_stat(&enums::Stats::Hp) >= hp {
+        get_target(player, arena)
+            .get_current()
+            .set_stats(enums::Stats::Hp, hp);
+    } else {
+        hp = get_target(player, arena)
+            .get_base()
+            .get_stat(&enums::Stats::Hp);
+        get_target(player, arena)
+            .get_current()
+            .set_stats(enums::Stats::Hp, hp);
+    }
 }
