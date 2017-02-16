@@ -1,7 +1,4 @@
-// use player::{Player, AttackSlot};
-// use db::pokemon_token::*;
-// use db::{enums, moves};
+// use player;
 // use arena;
-
-// /// Representing a SimpleAi
-// pub struct SimpleAi {}
+// use rand;
+// use rand::Rng;

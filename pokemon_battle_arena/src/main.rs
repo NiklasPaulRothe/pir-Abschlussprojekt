@@ -6,6 +6,7 @@ extern crate conrod;
 extern crate rustc_serialize;
 extern crate time;
 extern crate piston_window;
+extern crate rand;
 
 mod arena;
 mod db;

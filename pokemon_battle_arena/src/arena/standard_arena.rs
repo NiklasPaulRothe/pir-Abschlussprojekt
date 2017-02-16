@@ -1,6 +1,5 @@
-extern crate rand;
-
 use std::collections::HashMap;
+use rand;
 use player::Next;
 use db::{enums, moves};
 use graphic;
@@ -19,12 +18,12 @@ impl<'a> super::Arena<'a> {
         // This can be happen if pursuit was used or both pokemons are swapped.
         let mut end_of_fight = false;
         // Setting the switched flag in the Player structs to false and reset if a swap will be done
-        //
         self.get_player_one().set_switched(false);
         self.get_player_two().set_switched(false);
 
         // Handle the pursuit(ID: 228) attack
-        //
+        // If one pokemon wants to swap and the other pokemon is using pursuit. The attack will be
+        // handle before swapping the pokemon
         match self.get_player_one()
             .get_next_move()
             .expect("Unexpected error! This field of player one shouldn`t be None at this point.") {
@@ -38,13 +37,6 @@ impl<'a> super::Arena<'a> {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
                             call_resolve(self, technique, enums::Player::Two, &mut window);
-                            // let slot =
-                            //     self.get_player_one().get_attack_slot(technique.clone())
-                            //         .unwrap();
-                            // self.get_player_one().set_last_move(Some((technique, slot)));
-                            // let old_move = self.get_player_one().get_next_move().unwrap()
-                            //         .clone();
-                            // self.get_player_one().set_last_action(old_move);
                             self.get_player_one().set_next_move(None);
 
                         }
@@ -62,13 +54,6 @@ impl<'a> super::Arena<'a> {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
                             call_resolve(self, technique, enums::Player::One, &mut window);
-                            // let slot =
-                            //     self.get_player_two().get_attack_slot(technique.clone())
-                            //         .unwrap();
-                            // self.get_player_two().set_last_move(Some((technique, slot)));
-                            // let old_move = self.get_player_two().get_next_move().unwrap()
-                            //         .clone();
-                            // self.get_player_two().set_last_action(old_move);
                             self.get_player_two().set_next_move(None);
                         }
                     }
@@ -78,12 +63,11 @@ impl<'a> super::Arena<'a> {
             _ => {}
         }
         // Switch Pokemon of Player One if he wants to
-        //
         if let Some(x) = self.get_player_one().get_next_move() {
             match x {
                 Next::Switch(pkmn) => {
                     // Switch of the current pokemon + setting flag
-                    self.get_player_one().set_current(pkmn.get_int());
+                    self.get_player_one().set_current(pkmn.get_int() - 1);
                     self.get_player_one().set_switched(true);
                     // Updating last action and setting next move to None. Last Move isnt updated
                     // because the last action wasnt a move
@@ -95,12 +79,11 @@ impl<'a> super::Arena<'a> {
             }
         }
         // Switch Pokemon of Player Two if he wants to
-        //
         if let Some(x) = self.get_player_two().get_next_move() {
             match x {
                 Next::Switch(pkmn) => {
                     // Switch of the current pokemon + setting flag
-                    self.get_player_two().set_current(pkmn.get_int());
+                    self.get_player_two().set_current(pkmn.get_int() - 1);
                     self.get_player_two().set_switched(true);
                     // Updating last action and setting next move to None. Last Move isnt updated
                     // because the last action wasnt a move
@@ -112,7 +95,6 @@ impl<'a> super::Arena<'a> {
             }
         }
         // If player one doesnt need to make a move anymore, only resolve attack of player two
-        //
         if self.get_player_one().get_next_move().is_none() &&
            self.get_player_two().get_next_move().is_some() {
             match self.get_player_two().get_next_move().unwrap() {
@@ -121,7 +103,6 @@ impl<'a> super::Arena<'a> {
             }
             end_of_fight = true;
             // If player two doesnt need to make a move anymore, only resolve attack of player one
-            //
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_some() {
             match self.get_player_one().get_next_move().unwrap() {
@@ -130,7 +111,6 @@ impl<'a> super::Arena<'a> {
             }
             end_of_fight = true;
             // If both player dont have a move go out of fight
-            //
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_none() {
             end_of_fight = true;
@@ -139,7 +119,7 @@ impl<'a> super::Arena<'a> {
 
         // If both player want to perform an attack Priority and Speed of Pokemon will be used to
         // decide which pokemon strikes first
-        //
+
         // Variables for faster comparison. x_prio is the priority of the pokemon of player x and
         // x_speed is the attackspeed of the pokemon of player x
         if !end_of_fight {
@@ -170,7 +150,6 @@ impl<'a> super::Arena<'a> {
                 .get_current()
                 .get_stat(&enums::Stats::Speed);
             // The attack with the higher Priority starts
-            //
             if one_prio > two_prio {
                 call_resolve(self, one_attack, enums::Player::One, &mut window);
                 call_resolve(self, two_attack, enums::Player::Two, &mut window);
@@ -180,7 +159,6 @@ impl<'a> super::Arena<'a> {
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
-                //
                 if one_speed >= two_speed {
                     call_resolve(self, one_attack, enums::Player::One, &mut window);
                     call_resolve(self, two_attack, enums::Player::Two, &mut window);
@@ -191,7 +169,6 @@ impl<'a> super::Arena<'a> {
             }
         }
         // End of Turn moves like validate the weather and effects, handle poison etc.
-        //
         end_of_turn_flags(self, enums::Player::One, window);
         end_of_turn_flags(self, enums::Player::Two, window);
         self.validate_effects_and_weather();
