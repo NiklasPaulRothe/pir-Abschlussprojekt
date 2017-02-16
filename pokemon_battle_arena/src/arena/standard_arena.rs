@@ -286,12 +286,12 @@ fn call_resolve(arena: &mut super::Arena,
     // Swaps the pokemon if its dead
     if dead_one {
         window.set_battle_text(message_one.clone() + " is defeated!");
-        let new = window.get_changed_pokemon(player);
+        let new = window.get_changed_pokemon(enums::Player::One);
         arena.get_player_one().set_current(new);
     }
     if dead_two {
         window.set_battle_text(message_two.clone() + " is defeated!");
-        let new = window.get_changed_pokemon(player);
+        let new = window.get_changed_pokemon(enums::Player::Two);
         arena.get_player_two().set_current(new);
     }
 
