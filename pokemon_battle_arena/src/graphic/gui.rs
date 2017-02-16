@@ -825,15 +825,20 @@ impl App {
                     };
                     let player1 = arena.get_player_one().clone();
                     println!("{:?}", player1);
-                    let name = player1.clone().get_pokemon_list()[player1.clone().get_current()].clone().get_name();
+                    let name = player1.clone()
+                            .get_pokemon_list()
+                                   [player1.clone().get_current()]
+                        .clone()
+                        .get_name();
+
                     widget::Text::new(&name)
                         .color(color1)
-                         .middle_of(ids.bg_sprite)
+                        .middle_of(ids.bg_sprite)
                         .align_text_left()
                         .font_size(25)
                         .padded_wh_of(ids.bg_sprite, 20.0)
                         .line_spacing(10.0)
-                       .set(ids.text_test1, ui);
+                        .set(ids.text_test1, ui);
 
 
                     // BG Pokemon2
@@ -850,7 +855,12 @@ impl App {
                     };
                     let player2 = arena.get_player_two().clone();
                     println!("{:?}", player2);
-                    let name = player2.clone().get_pokemon_list()[player2.clone().get_current()].clone().get_name();
+                    let name = player2.clone()
+                            .get_pokemon_list()
+                                   [player2.clone().get_current()]
+                        .clone()
+                        .get_name();
+
                     widget::Text::new(&name)
                         .color(color2)
                         .middle_of(ids.bg_sprite2)
@@ -859,7 +869,7 @@ impl App {
                         .padded_wh_of(ids.bg_sprite2, 20.0)
                         .line_spacing(10.0)
                         .set(ids.text_test2, ui);
-                    
+
 
                     // BG What to do next
                     widget::Canvas::new()
@@ -1045,8 +1055,8 @@ impl App {
                                     app.battle_text = "".to_string();
                                     let player = arena.get_player_two();
                                     let att = player.clone()
-                                        .get_pokemon_list()
-                                        [player.clone().get_current()]
+                                            .get_pokemon_list()
+                                                  [player.clone().get_current()]
                                         .clone()
                                         .get_move_one();
 
@@ -1292,9 +1302,13 @@ impl App {
                                     match app.player {
                                         Player::One => {
                                             if selection != player.get_current() {
-                                                app.battle_text = "What will Player 2 do?".to_string();
+                                                app.battle_text = "What will Player 2 do?"
+                                                    .to_string();
                                                 app.changed_pkmn_p1 = selection;
-                                                let slot = player::PokemonSlot::get_slot_name(selection + 1).unwrap();
+                                                let slot =
+                                                    player::PokemonSlot::get_slot_name(selection +
+                                                                                       1)
+                                                        .unwrap();
                                                 player.set_next_move(Some(
                                                     player::Next::Switch(slot)));
                                                 app.screen = Screen::Battle;
@@ -1302,13 +1316,15 @@ impl App {
                                             } else {
                                                 println!("Error: Can't swap with itself");
                                             }
-                                            
                                         }
                                         Player::Two => {
                                             if selection != player.get_current() {
                                                 app.battle_text = "".to_string();
                                                 app.changed_pkmn_p2 = selection;
-                                                let slot = player::PokemonSlot::get_slot_name(selection + 1).unwrap();
+                                                let slot =
+                                                    player::PokemonSlot::get_slot_name(selection +
+                                                                                       1)
+                                                        .unwrap();
                                                 player.set_next_move(Some(
                                                     player::Next::Switch(slot)));
                                                 app.screen = Screen::Battle;
