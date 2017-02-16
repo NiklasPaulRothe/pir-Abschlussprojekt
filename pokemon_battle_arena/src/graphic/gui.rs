@@ -1423,12 +1423,6 @@ impl App {
                                                 app.battle_text = "What will Player 2 do?"
                                                     .to_string();
                                                 app.changed_pkmn_p1 = selection;
-                                                let slot =
-                                                    player::PokemonSlot::get_slot_name(selection +
-                                                                                       1)
-                                                        .unwrap();
-                                                player.set_next_move(Some(
-                                                    player::Next::Switch(slot)));
                                                 app.screen = Screen::Battle;
                                                 app.player = Player::Two;
                                             } else {
@@ -1439,12 +1433,6 @@ impl App {
                                             if selection != player.get_current() {
                                                 app.battle_text = "".to_string();
                                                 app.changed_pkmn_p2 = selection;
-                                                let slot =
-                                                    player::PokemonSlot::get_slot_name(selection +
-                                                                                       1)
-                                                        .unwrap();
-                                                player.set_next_move(Some(
-                                                    player::Next::Switch(slot)));
                                                 app.screen = Screen::Battle;
                                                 app.player = Player::One;
                                             } else {
