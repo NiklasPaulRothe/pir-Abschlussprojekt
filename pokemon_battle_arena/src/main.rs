@@ -33,11 +33,10 @@ fn testing() {
     //         println!("{:?}", entry.get_name());
     //     }
     // }
-    let mut window = graphic::gui::App::new();
     // test_players();
     // test_arena();
-    let mut window = graphic::gui::App::new();
-    window.draw_window();
+    // let mut window = graphic::gui::App::new();
+    // window.draw_window();
 }
 
 
