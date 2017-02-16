@@ -1,11 +1,8 @@
-extern crate rand;
-
-use std::collections::HashMap;
-use player::Next;
 use db::{enums, moves};
 use graphic;
-
-
+use player::Next;
+use rand;
+use std::collections::HashMap;
 
 /// The standard arena is based on the default 1v1 fight.
 
@@ -15,16 +12,17 @@ impl<'a> super::Arena<'a> {
     /// Important: All next_move variables must contain a Some() entry. If the function is called
     /// and atleast one variable is holding a None, this function will panic!
     pub fn fight(&mut self, mut window: &mut graphic::gui::App) {
+
         // This flag is used to show that the round is "over" earlier as aspected.
         // This can be happen if pursuit was used or both pokemons are swapped.
         let mut end_of_fight = false;
         // Setting the switched flag in the Player structs to false and reset if a swap will be done
-        //
         self.get_player_one().set_switched(false);
         self.get_player_two().set_switched(false);
 
         // Handle the pursuit(ID: 228) attack
-        //
+        // If one pokemon wants to swap and the other pokemon is using pursuit. The attack will be
+        // handle before swapping the pokemon
         match self.get_player_one()
             .get_next_move()
             .expect("Unexpected error! This field of player one shouldn`t be None at this point.") {
@@ -38,13 +36,6 @@ impl<'a> super::Arena<'a> {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
                             call_resolve(self, technique, enums::Player::Two, &mut window);
-                            // let slot =
-                            //     self.get_player_one().get_attack_slot(technique.clone())
-                            //         .unwrap();
-                            // self.get_player_one().set_last_move(Some((technique, slot)));
-                            // let old_move = self.get_player_one().get_next_move().unwrap()
-                            //         .clone();
-                            // self.get_player_one().set_last_action(old_move);
                             self.get_player_one().set_next_move(None);
 
                         }
@@ -62,13 +53,6 @@ impl<'a> super::Arena<'a> {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
                             call_resolve(self, technique, enums::Player::One, &mut window);
-                            // let slot =
-                            //     self.get_player_two().get_attack_slot(technique.clone())
-                            //         .unwrap();
-                            // self.get_player_two().set_last_move(Some((technique, slot)));
-                            // let old_move = self.get_player_two().get_next_move().unwrap()
-                            //         .clone();
-                            // self.get_player_two().set_last_action(old_move);
                             self.get_player_two().set_next_move(None);
                         }
                     }
@@ -78,12 +62,11 @@ impl<'a> super::Arena<'a> {
             _ => {}
         }
         // Switch Pokemon of Player One if he wants to
-        //
         if let Some(x) = self.get_player_one().get_next_move() {
             match x {
                 Next::Switch(pkmn) => {
                     // Switch of the current pokemon + setting flag
-                    self.get_player_one().set_current(pkmn.get_int());
+                    self.get_player_one().set_current(pkmn.get_int() - 1);
                     self.get_player_one().set_switched(true);
                     // Updating last action and setting next move to None. Last Move isnt updated
                     // because the last action wasnt a move
@@ -95,12 +78,11 @@ impl<'a> super::Arena<'a> {
             }
         }
         // Switch Pokemon of Player Two if he wants to
-        //
         if let Some(x) = self.get_player_two().get_next_move() {
             match x {
                 Next::Switch(pkmn) => {
                     // Switch of the current pokemon + setting flag
-                    self.get_player_two().set_current(pkmn.get_int());
+                    self.get_player_two().set_current(pkmn.get_int() - 1);
                     self.get_player_two().set_switched(true);
                     // Updating last action and setting next move to None. Last Move isnt updated
                     // because the last action wasnt a move
@@ -112,7 +94,6 @@ impl<'a> super::Arena<'a> {
             }
         }
         // If player one doesnt need to make a move anymore, only resolve attack of player two
-        //
         if self.get_player_one().get_next_move().is_none() &&
            self.get_player_two().get_next_move().is_some() {
             match self.get_player_two().get_next_move().unwrap() {
@@ -121,7 +102,6 @@ impl<'a> super::Arena<'a> {
             }
             end_of_fight = true;
             // If player two doesnt need to make a move anymore, only resolve attack of player one
-            //
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_some() {
             match self.get_player_one().get_next_move().unwrap() {
@@ -130,7 +110,6 @@ impl<'a> super::Arena<'a> {
             }
             end_of_fight = true;
             // If both player dont have a move go out of fight
-            //
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_none() {
             end_of_fight = true;
@@ -139,7 +118,7 @@ impl<'a> super::Arena<'a> {
 
         // If both player want to perform an attack Priority and Speed of Pokemon will be used to
         // decide which pokemon strikes first
-        //
+
         // Variables for faster comparison. x_prio is the priority of the pokemon of player x and
         // x_speed is the attackspeed of the pokemon of player x
         if !end_of_fight {
@@ -170,7 +149,6 @@ impl<'a> super::Arena<'a> {
                 .get_current()
                 .get_stat(&enums::Stats::Speed);
             // The attack with the higher Priority starts
-            //
             if one_prio > two_prio {
                 call_resolve(self, one_attack, enums::Player::One, &mut window);
                 call_resolve(self, two_attack, enums::Player::Two, &mut window);
@@ -180,7 +158,6 @@ impl<'a> super::Arena<'a> {
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
-                //
                 if one_speed >= two_speed {
                     call_resolve(self, one_attack, enums::Player::One, &mut window);
                     call_resolve(self, two_attack, enums::Player::Two, &mut window);
@@ -191,7 +168,6 @@ impl<'a> super::Arena<'a> {
             }
         }
         // End of Turn moves like validate the weather and effects, handle poison etc.
-        //
         end_of_turn_flags(self, enums::Player::One, window);
         end_of_turn_flags(self, enums::Player::Two, window);
         self.validate_effects_and_weather();
@@ -210,9 +186,6 @@ fn call_resolve(arena: &mut super::Arena,
     // Get the names of the current pokemon
     let message_one = arena.get_player_one().get_pokemon_list()[current_one].get_name();
     let message_two = arena.get_player_two().get_pokemon_list()[current_two].get_name();
-    // Checks if the pokemon are dead
-    let dead_one = !arena.get_player_one().get_pokemon_list()[current_one].is_alive();
-    let dead_two = !arena.get_player_two().get_pokemon_list()[current_two].is_alive();
     // Sets the message_switch for following handles
     match player {
         enums::Player::One => {
@@ -222,32 +195,80 @@ fn call_resolve(arena: &mut super::Arena,
             message_switch = message_two.clone();
         }
     }
-
     // Handles confusion and infatuation. If nothing is stops attack, the attack will be resolved
     if confusion(arena, player) {
-        // TODO Damage for confusion
-        // 40-power typeless physical attack
-        println!("{} is confused!", message_switch);
+        match player {
+            enums::Player::One => {
+                let mut pkmn = arena.get_player_one().get_pokemon_list()[current_one].clone();
+                let damage = ((((2.0 * pkmn.get_level() as f32 + 10.0) / 250.0) *
+                               pkmn.get_current().get_stat(&enums::Stats::Attack) as f32 /
+                               pkmn.get_current().get_stat(&enums::Stats::Defense) as
+                               f32 * 40.0 + 2.0)) as u16;
+                arena.get_player_one().get_pokemon_list()[current_one]
+                    .get_current()
+                    .set_stats(enums::Stats::Hp, damage);
+            }
+            enums::Player::Two => {
+                let mut pkmn = arena.get_player_two().get_pokemon_list()[current_two].clone();
+                let damage = ((((2.0 * pkmn.get_level() as f32 + 10.0) / 250.0) *
+                               pkmn.get_current().get_stat(&enums::Stats::Attack) as f32 /
+                               pkmn.get_current().get_stat(&enums::Stats::Defense) as
+                               f32 * 40.0 + 2.0)) as u16;
+                arena.get_player_two().get_pokemon_list()[current_two]
+                    .get_current()
+                    .set_stats(enums::Stats::Hp, damage);
+            }
+        }
+        window.set_battle_text(message_switch + " is confused and hitted himself!");
     } else if infatuation(arena, player) {
-        println!("{} has the infatuation effect!", message_switch);
+        window.set_battle_text(message_switch + " has the infatuation effect!");
     } else {
-        attack.resolve(arena, player, &mut window);
+        match player {
+            enums::Player::One => {
+                if arena.get_player_one().get_next_move().unwrap() == Next::Flinch {
+                    window.set_battle_text(message_one.clone() + "flinched.");
+                    let last = arena.get_player_one().get_next_move().unwrap();
+                    arena.get_player_one().set_last_action((last, 0));
+                    arena.get_player_one().set_next_move(None);
+                } else {
+                    window.set_battle_text(message_one.clone() + " uses " + attack.get_name());
+                    attack.resolve(arena, player, &mut window);
+                }
+            }
+
+            enums::Player::Two => {
+                if arena.get_player_two().get_next_move().unwrap() == Next::Flinch {
+                    window.set_battle_text(message_two.clone() + " flinched.");
+                    let last = arena.get_player_two().get_next_move().unwrap();
+                    arena.get_player_two().set_last_action((last, 0));
+                    arena.get_player_two().set_next_move(None);
+                } else {
+                    window.set_battle_text(message_two.clone() + " uses " + attack.get_name());
+                    attack.resolve(arena, player, &mut window);
+                }
+            }
+        }
+
     }
 
+    // Checks if the pokemon are dead
+    let dead_one = !arena.get_player_one().get_pokemon_list()[current_one].is_alive();
+    let dead_two = !arena.get_player_two().get_pokemon_list()[current_two].is_alive();
     // Swaps the pokemon if its dead
     if dead_one {
-        println!("{} is dead!", message_one);
+        window.set_battle_text(message_one.clone() + "is defeated!");
         let new = window.get_changed_pokemon(player);
         arena.get_player_one().set_current(new);
     }
     if dead_two {
-        println!("{} is dead!", message_two);
+        window.set_battle_text(message_one.clone() + "is defeated!");
         let new = window.get_changed_pokemon(player);
         arena.get_player_two().set_current(new);
     }
 
 }
 
+/// Handles the end of turn flags
 fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &graphic::gui::App) {
     let current_one = arena.get_player_one().get_current();
     let current_two = arena.get_player_two().get_current();
@@ -261,6 +282,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
     };
     for i in map.iter() {
         match *i.0 {
+            // Absorbs HP of the pokemon
             enums::EndOfTurn::LeechSeed => {
                 match player {
                     enums::Player::One => {
@@ -342,6 +364,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     }
                 }
             }
+            // After four rounds the pokemon will die
             enums::EndOfTurn::PerishSong => {
                 match player {
                     enums::Player::One => {
@@ -374,6 +397,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     }
                 }
             }
+            // Pokemon will fall asleep in the next round
             enums::EndOfTurn::Yawn => {
                 match player {
                     enums::Player::One => {
@@ -414,6 +438,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     }
                 }
             }
+            // Changing the flying type at position one
             enums::EndOfTurn::RoostTypeOne => {
                 match player {
                     enums::Player::One => {
@@ -441,6 +466,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
 
                 }
             }
+            // Changing the flying type at position two
             enums::EndOfTurn::RoostTypeTwo => {
                 match player {
                     enums::Player::One => {
@@ -468,6 +494,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
 
                 }
             }
+            // Pokemon gets damage at the end of each round
             enums::EndOfTurn::Trap => {
                 match player {
                     enums::Player::One => {
@@ -506,6 +533,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     }
                 }
             }
+            // Pokemon get hp at the end of every round
             enums::EndOfTurn::Ingrain => {
                 match player {
                     enums::Player::One => {

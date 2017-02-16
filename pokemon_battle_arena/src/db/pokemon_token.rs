@@ -1,13 +1,12 @@
 extern crate csv;
 
-use super::pokemon_model;
-use super::natures;
-use super::enums;
-use super::stats;
 use super::determinant_values;
+use super::enums;
 use super::movedex;
 use super::moves;
-
+use super::natures;
+use super::pokemon_model;
+use super::stats;
 use std::collections::HashMap;
 
 /// Represents a single Token of a Pokemon with individual values for this token.
