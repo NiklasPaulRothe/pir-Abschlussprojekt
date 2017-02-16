@@ -61,8 +61,8 @@ impl Movedex {
                      move_tmp.clone().unwrap().get_name() == "fling" ||
                      move_tmp.clone().unwrap().get_name() == "trump-card" ||
                      move_tmp.clone().unwrap().get_name() == "me-first" ||
-                     move_tmp.unwrap().get_category() == enums::MoveCategory::Unique) ||
-                   (move_tmp.unwrap().get_category() == enums::MoveCategory::Unique &&
+                     move_tmp.clone().unwrap().get_category() == enums::MoveCategory::Unique) ||
+                    (move_tmp.clone().unwrap().get_category() == enums::MoveCategory::Unique &&
                     (move_tmp.clone().unwrap().get_name() == "teleport" ||
                      move_tmp.clone().unwrap().get_name() == "mimic" ||
                      move_tmp.clone().unwrap().get_name() == "metronome" ||
