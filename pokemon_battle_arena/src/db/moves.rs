@@ -70,24 +70,21 @@ impl Technique {
 
                 enums::MoveCategory::Damage => {
                     // Set only the last action if move needs to be charged or recharged
-                    if attacker_clone.get_last_action().0 != Next::None {
-                        if self.get_flags().contains(&enums::MoveFlags::Charge) &&
-                           !(attacker_clone.get_last_action().clone() ==
-                             (Next::Move(self.clone()), 0)) {
-                            let attacker = get_attacker(flag, arena);
-                            window.set_battle_text(user_clone.get_name().to_string() +
-                                                   " prepared itself");
-                            attacker.set_last_action(((Next::Move(self.clone()), 0)));
-                            attacker.set_next_move(Some(Next::Move(self.clone())));
-                            return;
-                        } else if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
-                                  attacker_clone.get_last_action().clone() ==
-                                  (Next::Move(self.clone()), 0) {
-                            let attacker = get_attacker(flag, arena);
-                            window.set_battle_text(user_clone.get_name() + " has to recharge");
-                            attacker.set_last_action((Next::Move(self.clone()), 1));
-                            return;
-                        }
+                    if self.get_flags().contains(&enums::MoveFlags::Charge) &&
+                       attacker_clone.get_last_action().clone() != (Next::Move(self.clone()), 0) {
+                        let attacker = get_attacker(flag, arena);
+                        window.set_battle_text(user_clone.get_name().to_string() +
+                                               " prepared itself");
+                        attacker.set_last_action(((Next::Move(self.clone()), 0)));
+                        attacker.set_next_move(Some(Next::Move(self.clone())));
+                        return;
+                    } else if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
+                              attacker_clone.get_last_action().clone() ==
+                              (Next::Move(self.clone()), 0) {
+                        let attacker = get_attacker(flag, arena);
+                        window.set_battle_text(user_clone.get_name() + " has to recharge");
+                        attacker.set_last_action((Next::Move(self.clone()), 1));
+                        return;
                     }
                     let mut rng = thread_rng();
                     // scope to destroy target afterwards, otherwise flinch could not be resolved
@@ -120,7 +117,11 @@ impl Technique {
                         get_defender(flag, arena).set_next_move(Some(Next::Flinch));
                         window.set_battle_text(target_clone.get_name() + " flinched.");
                     }
-
+                    if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
+                       attacker_clone.get_last_action().clone() != (Next::Move(self.clone()), 0) {
+                        let attacker = get_attacker(flag, arena);
+                        attacker.set_next_move(Some(Next::Move(self.clone())));
+                    }
                 }
 
                 enums::MoveCategory::Ailment => {
