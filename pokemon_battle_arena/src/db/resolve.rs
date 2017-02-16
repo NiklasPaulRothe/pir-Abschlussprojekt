@@ -118,9 +118,8 @@ pub fn ailment(name: &str,
                                                      name);
                             }
                         } else {
-                            window.set_battle_text(target.get_name() + " is already " +
-                                                 &enums::print_non_volatile(target.get_non_volatile()
-                                    .0));
+                            window.set_battle_text(target.get_name() +" is already " +
+                                &enums::print_non_volatile(target.get_non_volatile().0));
                         }
                     } else {
                         window.set_battle_text(target.get_name() + " was protected.");
@@ -133,9 +132,8 @@ pub fn ailment(name: &str,
                             window.set_battle_text(target.get_name() + " slept in.");
                             target.set_non_volatile(enums::NonVolatile::Sleep)
                         } else {
-                            window.set_battle_text(target.get_name() + " is already " +
-                                                 &enums::print_non_volatile(target.get_non_volatile()
-                                    .0));
+                            window.set_battle_text(target.get_name() +" is already " +
+                                &enums::print_non_volatile(target.get_non_volatile().0));
                         }
                     } else {
                         window.set_battle_text(target.get_name() + " was protected.");
