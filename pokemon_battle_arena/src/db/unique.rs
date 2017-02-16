@@ -6,40 +6,21 @@ use super::moves::Technique;
 use super::resolve;
 use super::pokemon_token::PokemonToken;
 use super::movedex::Movedex;
-use super::moves;
+//use super::moves;
 use self::rand::{Rng, thread_rng};
+use graphic;
 
 extern crate rand;
 
-pub fn test() {
-    println!("Unique");
-    for entry in Movedex::new().get_entries() {
-        if entry.get_category() == enums::MoveCategory::Unique {
-            println!("{:?}: {:?} - {:?}",
-                     entry.get_id(),
-                     entry.get_name(),
-                     entry.get_type());
-        }
-    }
-}
-
-pub fn test2() {
-    println!("Unique");
-    for entry in Movedex::new().get_entries() {
-        if entry.get_category() == enums::MoveCategory::Unique {
-            println!("{:?}", entry.get_name());
-        }
-    }
-}
-
 pub fn unique(attack: &Technique,
               name: &str,
-              move_type: enums::Types,
               mut user: PokemonToken,
               mut target: PokemonToken,
               attacker: &mut Player,
               defender: &mut Player,
-              arena: &mut Arena) {
+              arena: &mut Arena,
+              flag: enums::Player,
+              mut window: &mut graphic::gui::App) {
     let movedex = Movedex::new();
     let mut rng = thread_rng();
 
@@ -50,70 +31,70 @@ pub fn unique(attack: &Technique,
             println!("disable");
         }
         "teleport" => {
-            println!("teleport");
+            resolve::switch_pokemon(attacker);
         }
         "mimic" => {
             let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
                 .unwrap();
-            attack.resolve(arena, enums::Player::One);
+            attack.resolve(arena, flag, window);
         }
         "focus-energy" => {}
         "metronome" => {
             let random = rng.gen_range(1, 616);
             let attack = movedex.move_by_id(random).unwrap();
-            attack.resolve(arena, enums::Player::One);
+            attack.resolve(arena, flag, window);
         }
         "mirror-move" => {
             let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
                 .unwrap();
-            attack.resolve(arena, enums::Player::One);
+            attack.resolve(arena, flag, window);
         }
         "nature-power" => {
             match arena.get_current_effect().0 {
                 enums::Types::Normal => {
                     //"tri-attack"
                     let attack = movedex.move_by_id(161).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 enums::Types::Flying => {
                     //"air-slash" {
                     let attack = movedex.move_by_id(403).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 enums::Types::Ground => {
                     //"earth-power" {
                     let attack = movedex.move_by_id(414).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 enums::Types::Rock => {
                     //"power_gem" {
                     let attack = movedex.move_by_id(408).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 enums::Types::Fire => {
                     //"lava-plume" {
                     let attack = movedex.move_by_id(436).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 enums::Types::Water => {
                     //"hydro-pump" {
                     let attack = movedex.move_by_id(56).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 enums::Types::Grass => {
                     //"energy-ball" {
                     let attack = movedex.move_by_id(412).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 enums::Types::Electric => {
                     //"thunderbolt" {
                     let attack = movedex.move_by_id(85).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 enums::Types::Ice => {
                     //"ice-beam" {
                     let attack = movedex.move_by_id(58).unwrap();
-                    attack.resolve(arena, enums::Player::One);
+                    attack.resolve(arena, flag, window);
                 }
                 _ => {}
             }
@@ -133,14 +114,15 @@ pub fn unique(attack: &Technique,
             for entry in Movedex::new().get_entries() {
                 if entry.get_name() == "rest" {
                     ////Fehler muss noch behofen werden
-                    let mut user_clone = moves::get_user(1, arena).clone();
-                    resolve::ailment("rest",
-                                     entry.get_type(),
-                                     entry.get_ailment(),
-                                     100,
-                                     user,
-                                     &mut target,
-                                     defender);
+                    //let mut user_clone = moves::get_user(flag, arena).clone();
+                    // resolve::ailment("rest",
+                    //                  entry.get_type(),
+                    //                  entry.get_ailment(),
+                    //                  100,
+                    //                  user,
+                    //                  &mut target,
+                    //                  defender,
+                    //                  window);
                 }
             }
 
@@ -169,7 +151,7 @@ pub fn unique(attack: &Technique,
                 }
                 let random = rng.gen_range(0, id_vec.len());
                 let attack = movedex.move_by_id(id_vec[random]).unwrap();
-                attack.resolve(arena, enums::Player::One);
+                attack.resolve(arena, flag, window);
             }
         }
         "celebrate" => {

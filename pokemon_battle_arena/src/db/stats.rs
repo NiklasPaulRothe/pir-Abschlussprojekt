@@ -1,7 +1,8 @@
-use super::pokemon_model::PokemonModel;
 use super::determinant_values::Dv;
 use super::enums;
 use super::natures;
+use super::pokemon_model::PokemonModel;
+
 
 /// Contains the main stats for every Pokemon.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

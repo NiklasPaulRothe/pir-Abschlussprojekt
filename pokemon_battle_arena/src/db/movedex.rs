@@ -1,9 +1,10 @@
 extern crate csv;
 
-use super::moves::Technique;
 use super::enums;
-use std::collections::HashMap;
+use super::moves::Technique;
 use enum_primitive::FromPrimitive;
+use std::collections::HashMap;
+
 
 
 /// Manages the list of moves that are available. Contains a bool that is true whenever all
@@ -48,8 +49,45 @@ impl Movedex {
                                                                 u16,
                                                                 Option<usize>) = record.unwrap();
             if move_id < 617 && move_level <= level && poke_id == id && version == 16 {
-                if self.move_by_id(move_id).is_some() {
+                let move_tmp = self.move_by_id(move_id);
+                // ifs are needed to exclude unimplemented moves from the list
+                if move_tmp.clone().is_some() &&
+                   !(move_tmp.clone().unwrap().get_name() == "counter" ||
+                     move_tmp.clone().unwrap().get_name() == "bide" ||
+                     move_tmp.clone().unwrap().get_name() == "mirror-coat" ||
+                     move_tmp.clone().unwrap().get_name() == "spit-up" ||
+                     move_tmp.clone().unwrap().get_name() == "natural-gift" ||
+                     move_tmp.clone().unwrap().get_name() == "metal-burst" ||
+                     move_tmp.clone().unwrap().get_name() == "fling" ||
+                     move_tmp.clone().unwrap().get_name() == "trump-card" ||
+                     move_tmp.clone().unwrap().get_name() == "me-first" ||
+                     move_tmp.unwrap().get_category() == enums::MoveCategory::Unique) ||
+                   (move_tmp.unwrap().get_category() == enums::MoveCategory::Unique &&
+                    (move_tmp.clone().unwrap().get_name() == "teleport" ||
+                     move_tmp.clone().unwrap().get_name() == "mimic" ||
+                     move_tmp.clone().unwrap().get_name() == "metronome" ||
+                     move_tmp.clone().unwrap().get_name() == "mirror-move" ||
+                     move_tmp.clone().unwrap().get_name() == "nature-power" ||
+                     move_tmp.clone().unwrap().get_name() == "splash" ||
+                     //move_tmp.clone().unwrap().get_name() == "rest" ||
+                     move_tmp.clone().unwrap().get_name() == "conversion" ||
+                     move_tmp.clone().unwrap().get_name() == "spite" ||
+                     move_tmp.clone().unwrap().get_name() == "sleep-talk" ||
+                     move_tmp.clone().unwrap().get_name() == "celebrate" ||
+                     move_tmp.clone().unwrap().get_name() == "powder" ||
+                     move_tmp.clone().unwrap().get_name() == "reflect-type" ||
+                     move_tmp.clone().unwrap().get_name() == "soak" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "")) {
                     new_dex.push(self.move_by_id(move_id).unwrap());
+
                 }
             }
         }

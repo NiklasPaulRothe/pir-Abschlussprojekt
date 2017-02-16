@@ -1,22 +1,22 @@
 #![allow(dead_code)]
 #[macro_use]
-extern crate enum_primitive;
-#[macro_use]
 extern crate conrod;
+#[macro_use]
+extern crate enum_primitive;
+extern crate piston_window;
+extern crate rand;
 extern crate rustc_serialize;
 extern crate time;
-extern crate piston_window;
 
 mod arena;
 mod db;
 mod graphic;
 mod player;
 
-use player::Player;
-use player::PlayerType;
 use arena::Arena;
 use db::enums;
-//use db::unique;
+use player::Player;
+use player::PlayerType;
 
 fn main() {
     println!("");
@@ -29,14 +29,14 @@ fn main() {
 fn testing() {
 
     println!("Testing:");
-    for entry in db::movedex::Movedex::new().get_entries() {
-        if entry.get_category() == enums::MoveCategory::WholeFieldEffect {
-            println!("{:?}", entry.get_name());
-        }
-    }
-    // test_players();
-    // test_arena();
+    // for entry in db::movedex::Movedex::new().get_entries() {
+    //     if entry.get_category() == enums::MoveCategory::WholeFieldEffect {
+    //         println!("{:?}", entry.get_name());
+    //     }
+    // }
     let mut window = graphic::gui::App::new();
+    // test_players();
+    test_arena(&mut window);
     window.draw_window();
 }
 
@@ -63,7 +63,7 @@ fn test_players() {
     println!("Custom: {}", human.get_current());
 }
 
-fn test_arena() {
+fn test_arena(mut window: &mut graphic::gui::App) {
     // Arena erstellen
     let mut p1 = Player::new_by_id(&[5], PlayerType::Human);
     let mut p2 = Player::new_by_id(&[8], PlayerType::Human);
@@ -90,13 +90,13 @@ fn test_arena() {
              arena.get_player_two().get_pokemon_list()[0]
                  .get_current()
                  .get_stat(&db::enums::Stats::Hp));
-    attack.resolve(&mut arena, enums::Player::Two);
-    attack_hail.resolve(&mut arena, enums::Player::Two);
-    attack_haze.resolve(&mut arena, enums::Player::Two);
-    attack_sandstorm.resolve(&mut arena, enums::Player::Two);
-    attack_mudsport.resolve(&mut arena, enums::Player::Two);
-    attack_fairylock.resolve(&mut arena, enums::Player::Two);
-    attack.resolve(&mut arena, enums::Player::Two);
+    attack.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_hail.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_haze.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_sandstorm.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_mudsport.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack_fairylock.resolve(&mut arena, enums::Player::Two, &mut window);
+    attack.resolve(&mut arena, enums::Player::Two, &mut window);
 
     println!("HP1 nachher: {}",
              arena.get_player_one().get_pokemon_list()[0]

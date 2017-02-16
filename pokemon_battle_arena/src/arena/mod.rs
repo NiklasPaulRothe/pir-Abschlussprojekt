@@ -1,12 +1,13 @@
 pub mod standard_arena;
 pub mod to_ui;
 
-use std::collections::HashMap;
 use db::enums;
 use player::Player;
+use std::collections::HashMap;
 
 /// The Arena struct holds the weather and the type of the arena aswell as the references at the
 /// two players
+#[derive(Debug)]
 pub struct Arena<'a> {
     default_effect: enums::Types,
     current_effect: (enums::Types, u8),
