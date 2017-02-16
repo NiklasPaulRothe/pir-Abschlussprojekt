@@ -9,11 +9,13 @@ use db;
 use db::enums::Player;
 use player;
 
+// Constant window/button sizes
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;
 const BUTTON_W: f64 = 150.0;
 const BUTTON_H: f64 = 30.0;
 
+/// Collection of all possible screens
 #[derive(Clone, Debug)]
 pub enum Screen {
     Title,
@@ -28,19 +30,34 @@ pub enum Screen {
 }
 
 #[derive(Clone)]
+/// Available gamemodes
 enum Mode {
     Singleplayer,
     Multiplayer,
 }
 
-
 /// App struct, which contains important data
-///     screen:         screen that gets drawn
-///     label_color:    color of labels (text)
-///     bg_color:       background color
-///     pokedex:        currently used pokedex
-///     pkmn_team:      current team
-///     sel_pkmn:       currently selected pokemon and its index in the team
+///     ===== UI =====
+///     screen          -   the current screen to be displayed
+///     sub_screen      -   current partial screen to be displayed
+///     label_color     -   text color
+///     bg_color        -   background
+///     button_color    -   button color
+///     border_color    -   border colog
+/// 
+///     ===== Variables =====
+///     pokedex         -   used Pokedex
+///     pkmn_team       -   variable to save current team in team selection
+///     sel_pkmn        -   currently selected pokemon and position in team
+///     movedex         -   used Movedex
+///     techs           -   all techniques of the currently selected pokemon
+///     pkmn_moves      -   selected moves for the selected pokemon
+///     player          -   saves the currently active player (One or Two)
+///     mode            -   saves the currently active mode (Single- or Multiplayer)
+///     done            -   determines if a round is done
+///     changed_pkmn_p1 -   index of player one's last changed pokemon
+///     changed_pkmn_p2 -   index of player two's last changed pokemon
+///     battle_text     -   text that is shown during battle
 #[derive(Clone)]
 pub struct App {
     // UI
@@ -65,8 +82,8 @@ pub struct App {
     changed_pkmn_p2: usize,
     battle_text: String,
 }
-
 impl App {
+    // Creates a new App with default settings
     pub fn new() -> Self {
         App {
             // UI
@@ -93,28 +110,38 @@ impl App {
         }
     }
 
+    // Gets the current screen
     pub fn set_screen(&mut self, screen: Screen) {
         self.screen = screen
     }
 
+    // Gets the current screen
     pub fn get_screen(&self) -> Screen {
         self.clone().screen
     }
 
+    // Returns the changed pokemon of a given player
     pub fn get_changed_pokemon(&mut self, player: db::enums::Player) -> usize {
         self.screen = Screen::Switch;
 
         match player {
-            Player::One => self.changed_pkmn_p1,
-            Player::Two => self.changed_pkmn_p2,
+            Player::One => {
+                self.player = Player::One;
+                return self.changed_pkmn_p1;
+            }
+            Player::Two => {
+                self.player = Player::Two;
+                return self.changed_pkmn_p2;
+            }
         }
     }
 
+    // Sets the battle text
     pub fn set_battle_text(&mut self, text: String) {
         self.battle_text = [self.battle_text.clone(), text, "\n".to_string()].concat();
-        println!("{:?}", self.battle_text);
     }
 
+    // Draws the UI
     pub fn draw_window<'a>(&mut self) {
         // Construct the window.
         let mut window: Window = piston::window::WindowSettings::new("PokemonBattleArena",
@@ -151,6 +178,7 @@ impl App {
         let image_map = conrod::image::Map::new();
 
         let app = self;
+        // Create arena with dummy players
         let mut player1 = player::Player::new();
         let mut player2 = player::Player::new();
         let mut arena = arena::Arena::new(&mut player1,
@@ -168,19 +196,22 @@ impl App {
             event.update(|_| {
                 let mut ui = &mut ui.set_widgets();
 
-                // Create new empty canvas
+                // Create new empty canvas as default background
                 widget::Canvas::new()
                     .border(0.0)
                     .color(app.bg_color)
                     .set(ids.canvas, ui);
 
-                // draws Title-Screen
-                // Contains:    Play-Button
-                //              Options-Button
-                //              Exit-Button
+
+
+
+
+                // /////////////////////////////////////////////////////////////
+                // //////////                TITLE SCREEN             //////////
+                // /////////////////////////////////////////////////////////////
                 if let Screen::Title = app.screen {
                     // Play button
-                    // Shows Play-Screen when clicked
+                    // Lets the user switch to the gamemode selection
                     if widget::Button::new()
                         .border(1.0)
                         .border_color(app.border_color)
@@ -196,6 +227,7 @@ impl App {
                     }
 
                     // Options button
+                    // Lets the user switch to the options menu (not implemented)
                     if widget::Button::new()
                         .border(1.0)
                         .border_color(app.border_color)
@@ -211,7 +243,7 @@ impl App {
                     }
 
                     // Exit button
-                    // closes the window
+                    // Closes the game
                     if widget::Button::new()
                         .border(1.0)
                         .border_color(app.border_color)
@@ -226,10 +258,13 @@ impl App {
                     }
                 }
 
-                // draws Play-Screen
-                // Contains:    Singleplayer-Button
-                //              Multiplayer-Button
-                //              Back-Button
+
+
+
+
+                // /////////////////////////////////////////////////////////////
+                // //////////                PLAY SCREEN              //////////
+                // /////////////////////////////////////////////////////////////
                 if let Screen::Play = app.screen {
                     // Singleplayer button
                     if widget::Button::new()
@@ -264,7 +299,7 @@ impl App {
                     }
 
                     // Back button
-                    // returns to previous screen
+                    // Returns to previous screen
                     if widget::Button::new()
                         .border(1.0)
                         .border_color(app.border_color)
@@ -280,7 +315,13 @@ impl App {
                     }
                 }
 
-                // draws Options-Screen
+
+
+
+
+                // /////////////////////////////////////////////////////////////
+                // //////////              OPTIONS SCREEN             //////////
+                // /////////////////////////////////////////////////////////////
                 if let Screen::Options = app.screen {
                     if widget::Button::new()
                         .border(1.0)
@@ -297,21 +338,20 @@ impl App {
                     }
                 }
 
-                // Draws Choose Team Screen
-                // IDEAS:   - pictures of pokemon
-                //          - filter gen/type (get pokedex with only specific type/gen)
-                //          - search ( fn that gives Vec with pokemon that have certain string
-                //            in name)
-                if let Screen::ChooseTeam = app.screen {
 
-                    // ===============================================================
-                    // = Scrollable List from which the Player can select their team =
-                    // ===============================================================
+
+
+
+                // /////////////////////////////////////////////////////////////
+                // //////////            CHOOSE TEAM SCREEN           //////////
+                // /////////////////////////////////////////////////////////////
+                if let Screen::ChooseTeam = app.screen {
+                    // ==============================
+                    // =====       POKEDEX      =====
+                    // ==============================
                     let pokedex_entries = app.pokedex.get_entries();
                     let num_items = pokedex_entries.len();
-                    let item_h = 64.0;
-
-                    let (mut events, scrollbar) = widget::ListSelect::single(num_items, item_h)
+                    let (mut events, scrollbar) = widget::ListSelect::single(num_items, 64.0)
                         .scrollbar_next_to()
                         .w_h(200.0, 650.0)
                         .mid_left_with_margin_on(ids.canvas, 25.0)
@@ -334,7 +374,7 @@ impl App {
                             Event::Item(item) => {
                                 let label = &pokedex_entries[item.i].get_name();
 
-                                // each button with the respective pokemon name as label
+                                // Button with Pokemons' name as label
                                 let button = widget::Button::new()
                                     .border(1.0)
                                     .border_color(app.bg_color)
@@ -344,30 +384,31 @@ impl App {
                                 item.set(button, ui);
                             }
 
-                            // Select Pokemon when button is pressed
+                            // When the button is pressed the repective Pokemon is selected
                             Event::Selection(selection) => {
-                                println!("selected index (PokeDex): {:?}", selection);
-
+                                // Save selected Pokemon and set its team index to none
                                 app.sel_pkmn =
                                     (Some(db::pokemon_token::PokemonToken::from_model(app.pokedex
                                          .pokemon_by_id(selection + 1)
                                          .unwrap())),
                                      None);
+                                // Create move list for the selected Pokemon
                                 app.techs = Some(app.sel_pkmn
                                     .clone()
                                     .0
                                     .unwrap()
                                     .get_moves(app.movedex.clone())
                                     .get_entries());
+                                // Reset the currently selected moves
                                 app.pkmn_moves = Vec::new();
                             }
                             _ => {}
                         }
                     }
 
-                    // =====================================
-                    // = List that shows the player's team =
-                    // =====================================
+                    // ==============================
+                    // =====     PLAYER TEAM    =====
+                    // ==============================
                     let (mut events, _) = widget::ListSelect::single(6, 650.0 / 6.0)
                         .w_h(200.0, 650.0)
                         .mid_right_with_margin_on(ids.canvas, 25.0)
@@ -794,7 +835,22 @@ impl App {
 
                 // Draws Fight Screen
                 if let Screen::Battle = app.screen {
+                    let player1 = arena.get_player_one().clone();
+                    let player2 = arena.get_player_two().clone();
+
                     // Text BG
+                    let player_show = match app.player {
+                        Player::One => "Player One",
+                        Player::Two => "Player Two",
+                    };
+                    widget::Text::new(player_show)
+                        .color(app.label_color)
+                        .middle_of(ids.canvas)
+                        .align_text_left()
+                        .font_size(25)
+                        .line_spacing(10.0)
+                        .set(ids.text_player, ui);
+
                     widget::Canvas::new()
                         .color(app.button_color)
                         .border_color(app.border_color)
@@ -825,7 +881,7 @@ impl App {
                         Player::One => conrod::color::WHITE,
                         _ => conrod::color::CHARCOAL,
                     };
-                    let player1 = arena.get_player_one().clone();
+
                     let pkmn1 = player1.clone()
                             .get_pokemon_list()
                                     [player1.clone().get_current()]
@@ -872,7 +928,7 @@ impl App {
                         Player::Two => conrod::color::WHITE,
                         _ => conrod::color::CHARCOAL,
                     };
-                    let player2 = arena.get_player_two().clone();
+
                     let pkmn2 = player2.clone()
                             .get_pokemon_list()
                                     [player2.clone().get_current()]
@@ -926,6 +982,19 @@ impl App {
                         .set(ids.button_att, ui)
                         .was_clicked() {
                         println!("Battle_Fight");
+                        match app.player {
+                            Player::One => {
+                                println!("{:?}", player1.clone().get_next_move());
+                                if let Some(_) = player1.clone().get_next_move() {
+                                    app.player = Player::Two;
+                                }
+                            }
+                            Player::Two => {
+                                if let Some(_) = player2.clone().get_next_move() {
+                                    app.player = Player::One;
+                                }
+                            }
+                        }
                         if let Screen::BattleAttack = app.sub_screen {
                             app.sub_screen = Screen::None;
                         } else {
@@ -947,6 +1016,7 @@ impl App {
                         app.screen = Screen::Switch;
                     }
 
+                    // ===== Choose attack =====
                     if let Screen::BattleAttack = app.sub_screen {
                         let label1 = match app.player.clone() {
                             Player::One => {
@@ -1293,6 +1363,18 @@ impl App {
                 }
 
                 if let Screen::Switch = app.screen {
+                    let player_show = match app.player {
+                        Player::One => "Player One",
+                        Player::Two => "Player Two",
+                    };
+                    widget::Text::new(player_show)
+                        .color(app.label_color)
+                        .middle_of(ids.canvas)
+                        .align_text_left()
+                        .font_size(25)
+                        .line_spacing(10.0)
+                        .set(ids.text_player, ui);
+
                     let (mut events, _) = widget::ListSelect::single(6, 650.0 / 6.0)
                         .w_h(200.0, 650.0)
                         .mid_left_with_margin_on(ids.canvas, 25.0)
@@ -1437,6 +1519,7 @@ widget_ids! {
         text_battle,
         text_hp1,
         text_hp2,
+        text_player,
 
         tab_whatdo,
         tab_pokemon,
