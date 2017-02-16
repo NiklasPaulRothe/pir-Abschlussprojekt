@@ -116,17 +116,19 @@ pub enum NonVolatile {
     Poison,
     BadPoison,
 }
-impl NonVolatile {
-    pub fn to_string(&self) -> &str {
-        match *self {
+impl ::std::fmt::Display for NonVolatile {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        let x = match *self {
             NonVolatile::Paralysis => "Paralysis",
             NonVolatile::Sleep => "Sleep",
             NonVolatile::Freeze => "Freeze",
             NonVolatile::Burn => "Burn",
             NonVolatile::Poison => "Poison",
             NonVolatile::BadPoison => "Bad Poison",
-            NonVolatile::Undefined => "Undefined",
-        }
+            NonVolatile::Undefined => "",
+        };
+
+        write!(f, "{}", x)
     }
 }
 
