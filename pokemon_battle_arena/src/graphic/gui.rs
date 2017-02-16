@@ -827,18 +827,16 @@ impl App {
                     };
                     let player1 = arena.get_player_one().clone();
                     let pkmn1 = player1.clone()
-                        .get_pokemon_list()[player1.clone().get_current()]
+                            .get_pokemon_list()
+                                    [player1.clone().get_current()]
                         .clone();
-                    let name1 = pkmn1
-                        .clone()
+                    let name1 = pkmn1.clone()
                         .get_name();
-                    let hp1 = pkmn1
-                        .clone()
+                    let hp1 = pkmn1.clone()
                         .get_current()
                         .get_stat(&db::enums::Stats::Hp)
                         .to_string();
-                    let status1 = pkmn1
-                        .clone()
+                    let status1 = pkmn1.clone()
                         .get_non_volatile()
                         .0
                         .to_string();
@@ -876,18 +874,16 @@ impl App {
                     };
                     let player2 = arena.get_player_two().clone();
                     let pkmn2 = player2.clone()
-                        .get_pokemon_list()[player2.clone().get_current()]
+                            .get_pokemon_list()
+                                    [player2.clone().get_current()]
                         .clone();
-                    let name2 = pkmn2
-                        .clone()
+                    let name2 = pkmn2.clone()
                         .get_name();
-                    let hp2 = pkmn2
-                        .clone()
+                    let hp2 = pkmn2.clone()
                         .get_current()
                         .get_stat(&db::enums::Stats::Hp)
                         .to_string();
-                    let status2 = pkmn2
-                        .clone()
+                    let status2 = pkmn2.clone()
                         .get_non_volatile()
                         .0
                         .to_string();
@@ -901,7 +897,7 @@ impl App {
                         .line_spacing(10.0)
                         .set(ids.text_test2, ui);
 
-                     widget::Text::new(&[hp2, "HP\n\n".to_string(), status2.to_string()].concat())
+                    widget::Text::new(&[hp2, "HP\n\n".to_string(), status2.to_string()].concat())
                         .color(color2)
                         .down_from(ids.text_test2, -200.0)
                         .align_text_left()

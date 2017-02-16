@@ -298,7 +298,9 @@ fn call_resolve(arena: &mut super::Arena,
 }
 
 /// Handles the end of turn flags
-fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, mut window: &mut graphic::gui::App) {
+fn end_of_turn_flags(arena: &mut super::Arena,
+                     player: enums::Player,
+                     mut window: &mut graphic::gui::App) {
     let map: HashMap<enums::EndOfTurn, u8> =
         get_target(player, arena).get_end_of_turn_flags().clone();
 
