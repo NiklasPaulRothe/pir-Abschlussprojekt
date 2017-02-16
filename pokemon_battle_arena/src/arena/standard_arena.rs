@@ -262,7 +262,11 @@ fn call_resolve(arena: &mut super::Arena,
                 get_attacker(player, arena).set_next_move(None);
             } else {
                 window.set_battle_text(message.clone() + " uses " + attack.get_name());
+                let tmp = get_attacker(player, arena).get_next_move();
                 attack.resolve(arena, player, &mut window);
+                if tmp == get_attacker(player, arena).get_next_move() {
+                    get_attacker(player, arena).set_next_move(None);
+                }
             }
         }
     }
