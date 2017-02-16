@@ -1,20 +1,21 @@
 extern crate csv;
 extern crate num;
-extern crate rustc_serialize;
 extern crate rand;
 extern crate regex;
+extern crate rustc_serialize;
 
-use super::pokemon_token;
 use super::enums;
+use super::pokemon_token;
 use super::resolve;
 use self::num::FromPrimitive;
 use self::rand::{Rng, thread_rng};
 use self::regex::Regex;
-use std::collections::HashMap;
-use std::cmp::Ordering;
 use arena::Arena;
-use player::{Player, Next};
 use graphic;
+use player::{Player, Next};
+use std::cmp::Ordering;
+use std::collections::HashMap;
+
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.
@@ -841,9 +842,9 @@ impl PartialEq for Technique {
 impl Eq for Technique {}
 
 /// Helper function which will get the mutable reference of the targets pokemon out of an arena
-fn get_target<'a>(target: enums::Player,
-                  arena: &'a mut Arena)
-                  -> &'a mut pokemon_token::PokemonToken {
+pub fn get_target<'a>(target: enums::Player,
+                      arena: &'a mut Arena)
+                      -> &'a mut pokemon_token::PokemonToken {
     match target {
         enums::Player::One => {
             let current = arena.get_player_one().get_current();
@@ -857,9 +858,9 @@ fn get_target<'a>(target: enums::Player,
 }
 
 /// Helper function which will get the mutable reference of the users pokemon out of an arena
-fn get_user<'a>(target: enums::Player,
-                arena: &'a mut Arena)
-                -> &'a mut pokemon_token::PokemonToken {
+pub fn get_user<'a>(target: enums::Player,
+                    arena: &'a mut Arena)
+                    -> &'a mut pokemon_token::PokemonToken {
     match target {
         enums::Player::Two => {
             let current = arena.get_player_one().get_current();
@@ -872,14 +873,14 @@ fn get_user<'a>(target: enums::Player,
     }
 }
 
-fn get_attacker<'a>(target: enums::Player, arena: &'a mut Arena) -> &'a mut Player {
+pub fn get_attacker<'a>(target: enums::Player, arena: &'a mut Arena) -> &'a mut Player {
     match target {
         enums::Player::One => arena.get_player_one(),
         enums::Player::Two => arena.get_player_two(),
     }
 }
 
-fn get_defender<'a>(target: enums::Player, arena: &'a mut Arena) -> &'a mut Player {
+pub fn get_defender<'a>(target: enums::Player, arena: &'a mut Arena) -> &'a mut Player {
     match target {
         enums::Player::One => arena.get_player_two(),
         enums::Player::Two => arena.get_player_one(),

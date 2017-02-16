@@ -1,13 +1,13 @@
-extern crate find_folder;
 extern crate conrod;
+extern crate find_folder;
 
-use conrod::backend::piston::{self, Window, WindowEvents, OpenGL};
+use arena;
 use conrod::backend::piston::event::UpdateEvent;
+use conrod::backend::piston::{self, Window, WindowEvents, OpenGL};
 use conrod::{widget, Borderable, Colorable, Labelable, Positionable, Sizeable, Widget};
 use db;
 use db::enums::Player;
 use player;
-use arena;
 
 const WIDTH: u32 = 1280;
 const HEIGHT: u32 = 720;

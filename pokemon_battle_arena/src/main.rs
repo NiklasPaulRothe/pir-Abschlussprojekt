@@ -1,21 +1,22 @@
 #![allow(dead_code)]
 #[macro_use]
-extern crate enum_primitive;
-#[macro_use]
 extern crate conrod;
+#[macro_use]
+extern crate enum_primitive;
+extern crate piston_window;
+extern crate rand;
 extern crate rustc_serialize;
 extern crate time;
-extern crate piston_window;
 
 mod arena;
 mod db;
 mod graphic;
 mod player;
 
-use player::Player;
-use player::PlayerType;
 use arena::Arena;
 use db::enums;
+use player::Player;
+use player::PlayerType;
 
 fn main() {
     println!("");

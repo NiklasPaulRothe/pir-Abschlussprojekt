@@ -1,13 +1,12 @@
 extern crate csv;
 
-use super::pokemon_model;
-use super::natures;
-use super::enums;
-use super::stats;
 use super::determinant_values;
+use super::enums;
 use super::movedex;
 use super::moves;
-
+use super::natures;
+use super::pokemon_model;
+use super::stats;
 use std::collections::HashMap;
 
 /// Represents a single Token of a Pokemon with individual values for this token.
@@ -223,6 +222,10 @@ impl PokemonToken {
     /// Checks if the pokemon is alive
     pub fn is_alive(&mut self) -> bool {
         self.get_current().get_stat(&enums::Stats::Hp) > 0
+    }
+    /// Increments the Non Volatile Counter
+    pub fn increment_non_volatile(&mut self) {
+        self.non_volatile_status.1 += 1;
     }
     /// Decrements the AP
     pub fn decrement_ap(&mut self) {

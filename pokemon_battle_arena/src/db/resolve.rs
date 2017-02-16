@@ -1,14 +1,15 @@
 extern crate rand;
 extern crate regex;
 
+use super::enums;
 use super::moves::Technique;
 use super::pokemon_token::PokemonToken;
-use super::enums;
-use arena::Arena;
 use self::rand::{Rng, thread_rng};
 use self::regex::Regex;
-use player::Player;
+use arena::Arena;
 use graphic;
+use player::Player;
+
 
 /// Resolves moves that simply deals damage to the opponent, or the damage part of more complex
 /// moves
@@ -118,9 +119,8 @@ pub fn ailment(name: &str,
                                                      name);
                             }
                         } else {
-                            window.set_battle_text(target.get_name() + " is already " +
-                                                 &enums::print_non_volatile(target.get_non_volatile()
-                                    .0));
+                            window.set_battle_text(target.get_name() +" is already " +
+                                &enums::print_non_volatile(target.get_non_volatile().0));
                         }
                     } else {
                         window.set_battle_text(target.get_name() + " was protected.");
@@ -133,9 +133,8 @@ pub fn ailment(name: &str,
                             window.set_battle_text(target.get_name() + " slept in.");
                             target.set_non_volatile(enums::NonVolatile::Sleep)
                         } else {
-                            window.set_battle_text(target.get_name() + " is already " +
-                                                 &enums::print_non_volatile(target.get_non_volatile()
-                                    .0));
+                            window.set_battle_text(target.get_name() +" is already " +
+                                &enums::print_non_volatile(target.get_non_volatile().0));
                         }
                     } else {
                         window.set_battle_text(target.get_name() + " was protected.");

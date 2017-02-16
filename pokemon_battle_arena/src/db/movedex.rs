@@ -1,9 +1,10 @@
 extern crate csv;
 
-use super::moves::Technique;
 use super::enums;
-use std::collections::HashMap;
+use super::moves::Technique;
 use enum_primitive::FromPrimitive;
+use std::collections::HashMap;
+
 
 
 /// Manages the list of moves that are available. Contains a bool that is true whenever all
