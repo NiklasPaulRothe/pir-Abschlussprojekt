@@ -1,7 +1,3 @@
-pub mod human;
-pub mod ki;
-
-
 use arena;
 use db::{self, enums, moves};
 use db::pokedex::*;
