@@ -1,20 +1,21 @@
 extern crate csv;
 extern crate num;
-extern crate rustc_serialize;
 extern crate rand;
 extern crate regex;
+extern crate rustc_serialize;
 
-use super::pokemon_token;
 use super::enums;
+use super::pokemon_token;
 use super::resolve;
 use self::num::FromPrimitive;
 use self::rand::{Rng, thread_rng};
 use self::regex::Regex;
-use std::collections::HashMap;
-use std::cmp::Ordering;
 use arena::Arena;
-use player::{Player, Next};
 use graphic;
+use player::{Player, Next};
+use std::cmp::Ordering;
+use std::collections::HashMap;
+
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
 /// needed to calculate it's impact given a user and a target Pokemon.

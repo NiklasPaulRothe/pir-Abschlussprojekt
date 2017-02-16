@@ -1,9 +1,8 @@
-use std::collections::HashMap;
-use rand;
-use player::Next;
 use db::{enums, moves};
 use graphic;
-
+use player::Next;
+use rand;
+use std::collections::HashMap;
 
 /// The standard arena is based on the default 1v1 fight.
 

@@ -3,10 +3,11 @@ pub mod ki;
 
 
 use arena;
-use db::pokemon_token::PokemonToken;
+use db::{self, enums, moves};
 use db::pokedex::*;
+use db::pokemon_token::PokemonToken;
 use std::collections::HashMap;
-use db::{self, moves, enums};
+
 
 /// The Player type represents if the Player is a Human or a specific Ai to call different funcions
 /// for e.g. choosing Pokemon
