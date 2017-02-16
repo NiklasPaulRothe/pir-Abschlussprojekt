@@ -61,8 +61,33 @@ impl Movedex {
                      move_tmp.clone().unwrap().get_name() == "fling" ||
                      move_tmp.clone().unwrap().get_name() == "trump-card" ||
                      move_tmp.clone().unwrap().get_name() == "me-first" ||
-                     move_tmp.unwrap().get_category() == enums::MoveCategory::Unique) {
+                     move_tmp.unwrap().get_category() == enums::MoveCategory::Unique) ||
+                   (move_tmp.unwrap().get_category() == enums::MoveCategory::Unique &&
+                    (move_tmp.clone().unwrap().get_name() == "teleport" ||
+                     move_tmp.clone().unwrap().get_name() == "mimic" ||
+                     move_tmp.clone().unwrap().get_name() == "metronome" ||
+                     move_tmp.clone().unwrap().get_name() == "mirror-move" ||
+                     move_tmp.clone().unwrap().get_name() == "nature-power" ||
+                     move_tmp.clone().unwrap().get_name() == "splash" ||
+                     //move_tmp.clone().unwrap().get_name() == "rest" ||
+                     move_tmp.clone().unwrap().get_name() == "conversion" ||
+                     move_tmp.clone().unwrap().get_name() == "spite" ||
+                     move_tmp.clone().unwrap().get_name() == "sleep-talk" ||
+                     move_tmp.clone().unwrap().get_name() == "celebrate" ||
+                     move_tmp.clone().unwrap().get_name() == "powder" ||
+                     move_tmp.clone().unwrap().get_name() == "reflect-type" ||
+                     move_tmp.clone().unwrap().get_name() == "soak" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "" ||
+                     move_tmp.clone().unwrap().get_name() == "")) {
                     new_dex.push(self.move_by_id(move_id).unwrap());
+
                 }
             }
         }
