@@ -6,7 +6,6 @@ use db::{enums, moves};
 use graphic;
 
 
-
 /// The standard arena is based on the default 1v1 fight.
 
 impl<'a> super::Arena<'a> {
@@ -211,9 +210,6 @@ fn call_resolve(arena: &mut super::Arena,
     // Get the names of the current pokemon
     let message_one = arena.get_player_one().get_pokemon_list()[current_one].get_name();
     let message_two = arena.get_player_two().get_pokemon_list()[current_two].get_name();
-    // Checks if the pokemon are dead
-    let dead_one = !arena.get_player_one().get_pokemon_list()[current_one].is_alive();
-    let dead_two = !arena.get_player_two().get_pokemon_list()[current_two].is_alive();
     // Sets the message_switch for following handles
     match player {
         enums::Player::One => {
@@ -223,7 +219,6 @@ fn call_resolve(arena: &mut super::Arena,
             message_switch = message_two.clone();
         }
     }
-
     // Handles confusion and infatuation. If nothing is stops attack, the attack will be resolved
     if confusion(arena, player) {
         match player {
@@ -264,6 +259,7 @@ fn call_resolve(arena: &mut super::Arena,
                     attack.resolve(arena, player, &mut window);
                 }
             }
+
             enums::Player::Two => {
                 if arena.get_player_two().get_next_move().unwrap() == Next::Flinch {
                     window.set_battle_text(message_two.clone() + " flinched.");
@@ -276,13 +272,15 @@ fn call_resolve(arena: &mut super::Arena,
                 }
             }
         }
-        
+
     }
 
+    // Checks if the pokemon are dead
+    let dead_one = !arena.get_player_one().get_pokemon_list()[current_one].is_alive();
+    let dead_two = !arena.get_player_two().get_pokemon_list()[current_two].is_alive();
     // Swaps the pokemon if its dead
     if dead_one {
         window.set_battle_text(message_one.clone() + "is defeated!");
-
         let new = window.get_changed_pokemon(player);
         arena.get_player_one().set_current(new);
     }
