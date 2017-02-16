@@ -256,6 +256,9 @@ fn call_resolve(arena: &mut super::Arena,
             enums::Player::One => {
                 if arena.get_player_one().get_next_move().unwrap() == Next::Flinch {
                     window.set_battle_text(message_one.clone() + "flinched.");
+                    let last = arena.get_player_one().get_next_move().unwrap();
+                    arena.get_player_one().set_last_action((last, 0));
+                    arena.get_player_one().set_next_move(None);
                 } else {
                     window.set_battle_text(message_one.clone() + " uses " + attack.get_name());
                     attack.resolve(arena, player, &mut window);
@@ -264,6 +267,9 @@ fn call_resolve(arena: &mut super::Arena,
             enums::Player::Two => {
                 if arena.get_player_two().get_next_move().unwrap() == Next::Flinch {
                     window.set_battle_text(message_two.clone() + " flinched.");
+                    let last = arena.get_player_two().get_next_move().unwrap();
+                    arena.get_player_two().set_last_action((last, 0));
+                    arena.get_player_two().set_next_move(None);
                 } else {
                     window.set_battle_text(message_two.clone() + " uses " + attack.get_name());
                     attack.resolve(arena, player, &mut window);
