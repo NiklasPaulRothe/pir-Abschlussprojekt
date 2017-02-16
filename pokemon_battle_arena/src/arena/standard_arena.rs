@@ -37,7 +37,7 @@ impl<'a> super::Arena<'a> {
                         Next::Switch(_) => {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            call_resolve(self, technique, enums::Player::Two, &mut window);
+                            call_resolve(self, technique, enums::Player::One, &mut window);
                             self.get_player_one().set_next_move(None);
 
                         }
@@ -54,7 +54,7 @@ impl<'a> super::Arena<'a> {
                         if technique.get_id() == 228 {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            call_resolve(self, technique, enums::Player::One, &mut window);
+                            call_resolve(self, technique, enums::Player::Two, &mut window);
                             self.get_player_two().set_next_move(None);
                         }
                     }
@@ -162,20 +162,20 @@ impl<'a> super::Arena<'a> {
             }
             // The attack with the higher Priority starts
             if one_prio > two_prio {
-                call_resolve(self, one_attack, enums::Player::One, &mut window);
-                call_resolve(self, two_attack, enums::Player::Two, &mut window);
+                call_resolve(self, one_attack, enums::Player::Two, &mut window);
+                call_resolve(self, two_attack, enums::Player::One, &mut window);
             } else if one_prio < two_prio {
-                call_resolve(self, two_attack, enums::Player::Two, &mut window);
-                call_resolve(self, one_attack, enums::Player::One, &mut window);
+                call_resolve(self, two_attack, enums::Player::One, &mut window);
+                call_resolve(self, one_attack, enums::Player::Two, &mut window);
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
                 if one_speed >= two_speed {
-                    call_resolve(self, one_attack, enums::Player::One, &mut window);
-                    call_resolve(self, two_attack, enums::Player::Two, &mut window);
+                    call_resolve(self, one_attack, enums::Player::Two, &mut window);
+                    call_resolve(self, two_attack, enums::Player::One, &mut window);
                 } else {
-                    call_resolve(self, two_attack, enums::Player::Two, &mut window);
-                    call_resolve(self, one_attack, enums::Player::One, &mut window);
+                    call_resolve(self, two_attack, enums::Player::One, &mut window);
+                    call_resolve(self, one_attack, enums::Player::Two, &mut window);
                 }
             }
         }
@@ -198,65 +198,65 @@ fn call_resolve(arena: &mut super::Arena,
     let mut attack_is_allowed = true;
     // Checks if the pokemon is allowed to attack. This is influeced by Sleep, Freeze and Paralysis
     // Checks if the pokemon is paralysed
-    if get_target(player, arena).get_non_volatile().0 == enums::NonVolatile::Paralysis {
+    if get_user(player, arena).get_non_volatile().0 == enums::NonVolatile::Paralysis {
         let mut rng = thread_rng();
         // With a chance of 25% the pokemon will not attack
         if rng.gen_range(0, 4) != 0 {
             attack_is_allowed = false;
-            window.set_battle_text(get_target(player, arena).get_name().clone() + " is paralysed!");
+            window.set_battle_text(get_user(player, arena).get_name().clone() + " is paralysed!");
         }
         // Checks it the pokemon is sleeping
-    } else if get_target(player, arena).get_non_volatile().0 == enums::NonVolatile::Sleep {
+    } else if get_user(player, arena).get_non_volatile().0 == enums::NonVolatile::Sleep {
         // If the pokemon is not sleeping for atleast one round it will not wake up
-        if get_target(player, arena).get_non_volatile().1 == 0 {
-            window.set_battle_text(get_target(player, arena).get_name().clone() + " is sleeping!");
+        if get_user(player, arena).get_non_volatile().1 == 0 {
+            window.set_battle_text(get_user(player, arena).get_name().clone() + " is sleeping!");
             attack_is_allowed = false;
             // Pokemon will wake up after 3 rounds
-        } else if get_target(player, arena).get_non_volatile().1 >= 3 {
-            window.set_battle_text(get_target(player, arena).get_name().clone() + " wakes up.");
-            get_target(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
+        } else if get_user(player, arena).get_non_volatile().1 >= 3 {
+            window.set_battle_text(get_user(player, arena).get_name().clone() + " wakes up.");
+            get_user(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
         } else {
             // Check if pokemon will wake up
             if rand::random::<bool>() {
-                window.set_battle_text(get_target(player, arena).get_name().clone() + " wakes up.");
-                get_target(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
+                window.set_battle_text(get_user(player, arena).get_name().clone() + " wakes up.");
+                get_user(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
             } else {
-                window.set_battle_text(get_target(player, arena).get_name().clone() +
+                window.set_battle_text(get_user(player, arena).get_name().clone() +
                                        " is sleeping!");
                 attack_is_allowed = false;
             }
         }
-    } else if get_target(player, arena).get_non_volatile().0 == enums::NonVolatile::Freeze {
+    } else if get_user(player, arena).get_non_volatile().0 == enums::NonVolatile::Freeze {
         let mut rng = thread_rng();
         // With a chance of 20% the pokemon will not attack
         if rng.gen_range(0, 5) != 0 {
             attack_is_allowed = false;
-            window.set_battle_text(get_target(player, arena).get_name().clone() + " is frozen!");
+            window.set_battle_text(get_user(player, arena).get_name().clone() + " is frozen!");
         } else {
-            window.set_battle_text(get_target(player, arena).get_name().clone() +
+            window.set_battle_text(get_user(player, arena).get_name().clone() +
                                    " is not frozen anymore!");
-            get_target(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
+            get_user(player, arena).set_non_volatile(enums::NonVolatile::Undefined);
         }
     }
 
     if attack_is_allowed {
         // Get the names of the current pokemon
-        let message = get_target(player, arena).get_name().clone();
+        let message = get_user(player, arena).get_name().clone();
         // Handles confusion and infatuation. If nothing is stops attack, the attack will be
         // resolved
         if confusion(arena, player) {
-            let mut pkmn = get_target(player, arena).clone();
+            let mut pkmn = get_user(player, arena).clone();
             let damage = ((((2.0 * pkmn.get_level() as f32 + 10.0) / 250.0) *
                            pkmn.get_current().get_stat(&enums::Stats::Attack) as f32 /
                            pkmn.get_current().get_stat(&enums::Stats::Defense) as f32 *
                            40.0 + 2.0)) as u16;
-            get_target(player, arena).get_current().set_stats(enums::Stats::Hp, damage);
+            get_user(player, arena).get_current().set_stats(enums::Stats::Hp, damage);
             window.set_battle_text(message + " is confused and hitted himself!");
         } else if infatuation(arena, player) {
             window.set_battle_text(message + " has the infatuation effect!");
         } else {
             if get_attacker(player, arena).get_next_move().unwrap() == Next::Flinch {
-                window.set_battle_text(message.clone() + "flinched.");
+                window.set_battle_text(message.clone() + " flinched.");
                 let last = get_attacker(player, arena).get_next_move().unwrap();
                 get_attacker(player, arena).set_last_action((last, 0));
                 get_attacker(player, arena).set_next_move(None);
@@ -268,7 +268,7 @@ fn call_resolve(arena: &mut super::Arena,
     }
     // Handles Poison and Burn aswell as BadPoison(Bad Poison is dealing the same damage as Poison
     // right now)
-    let non_volatile = get_target(player, arena).get_non_volatile().0;
+    let non_volatile = get_user(player, arena).get_non_volatile().0;
     if (non_volatile == enums::NonVolatile::Poison) || (non_volatile == enums::NonVolatile::Burn) ||
        (non_volatile == enums::NonVolatile::BadPoison) {
         window.set_battle_text(get_target(player, arena).get_name().clone() + " got damage by" +
@@ -285,13 +285,13 @@ fn call_resolve(arena: &mut super::Arena,
     let message_two = arena.get_player_two().get_pokemon_list()[current_two].get_name().clone();
     // Swaps the pokemon if its dead
     if dead_one {
-        window.set_battle_text(message_one.clone() + "is defeated!");
-        let new = window.get_changed_pokemon(player);
+        window.set_battle_text(message_one.clone() + " is defeated!");
+        let new = window.get_changed_pokemon(enums::Player::One);
         arena.get_player_one().set_current(new);
     }
     if dead_two {
-        window.set_battle_text(message_two.clone() + "is defeated!");
-        let new = window.get_changed_pokemon(player);
+        window.set_battle_text(message_two.clone() + " is defeated!");
+        let new = window.get_changed_pokemon(enums::Player::Two);
         arena.get_player_two().set_current(new);
     }
 
