@@ -100,7 +100,7 @@ impl App {
     pub fn get_screen(&self) -> Screen {
         self.clone().screen
     }
-
+    #[allow(dead_code)]
     pub fn get_changed_pokemon(&self, player: db::enums::Player) -> usize {
         match player {
             Player::One => self.changed_pkmn_p1,
