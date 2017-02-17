@@ -166,22 +166,22 @@ impl<'a> super::Arena<'a> {
             }
             // The attack with the higher Priority starts
             if one_prio > two_prio {
-                if call_resolve(self, one_attack, enums::Player::Two, &mut window) {
+                if !call_resolve(self, one_attack, enums::Player::Two, &mut window) {
                     call_resolve(self, two_attack, enums::Player::One, &mut window);
                 }
             } else if one_prio < two_prio {
-                if call_resolve(self, two_attack, enums::Player::One, &mut window) {
+                if !call_resolve(self, two_attack, enums::Player::One, &mut window) {
                     call_resolve(self, one_attack, enums::Player::Two, &mut window);
                 }
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
                 if one_speed >= two_speed {
-                    if call_resolve(self, one_attack, enums::Player::Two, &mut window) {
+                    if !call_resolve(self, one_attack, enums::Player::Two, &mut window) {
                         call_resolve(self, two_attack, enums::Player::One, &mut window);
                     }
                 } else {
-                    if call_resolve(self, two_attack, enums::Player::One, &mut window) {
+                    if !call_resolve(self, two_attack, enums::Player::One, &mut window) {
                         call_resolve(self, one_attack, enums::Player::Two, &mut window);
                     }
                 }
@@ -268,7 +268,7 @@ fn call_resolve(arena: &mut super::Arena,
 
     if attack_is_allowed {
         // Get the names of the current pokemon
-        let message = get_target(player, arena).get_name().clone();
+        let message = get_user(player, arena).get_name().clone();
         // Handles confusion and infatuation. If nothing is stops attack, the attack will be
         // resolved
         if confusion(arena, player) {
