@@ -1070,22 +1070,20 @@ impl App {
 
                         // If next move is already full (a move is charging) pokemon cannot du another
                         // one
-                        // ===== unimplemented (due to next_move not being emtyied correctly) =====
-                        // println!("p1 next_move = {:?}", player1.clone().get_next_move());
-                        // println!("p2 next_move = {:?}", player2.clone().get_next_move());
-
-                        // match app.player {
-                        //     Player::One => {
-                        //         if let Some(val) = player1.clone().get_next_move() {
-                        //             app.player = Player::Two;
-                        //         }
-                        //     }
-                        //     Player::Two => {
-                        //         if let Some(val) = player2.clone().get_next_move() {
-                        //             app.player = Player::One;
-                        //         }
-                        //     }
-                        // }
+                        match app.player {
+                            Player::One => {
+                                if let Some(_) = player1.clone().get_next_move() {
+                                    app.player = Player::Two;
+                                    println!("p1 nextm");
+                                }
+                            }
+                            Player::Two => {
+                                if let Some(_) = player2.clone().get_next_move() {
+                                    app.player = Player::One;
+                                    println!("p2 nextm");
+                                }
+                            }
+                        }
                         if let Screen::BattleAttack = app.sub_screen {
                             app.sub_screen = Screen::None;
                         } else {
@@ -1386,8 +1384,6 @@ impl App {
                                     match app.player {
                                         Player::One => {
                                             if selection != player.get_current() {
-                                                app.battle_text = "What will Player 2 do?"
-                                                    .to_string();
                                                 app.changed_pkmn_p1 = selection;
                                                 app.screen = Screen::Battle;
                                                 app.player = Player::Two;
@@ -1397,7 +1393,6 @@ impl App {
                                         }
                                         Player::Two => {
                                             if selection != player.get_current() {
-                                                app.battle_text = "".to_string();
                                                 app.changed_pkmn_p2 = selection;
                                                 app.screen = Screen::Battle;
                                                 app.player = Player::One;
