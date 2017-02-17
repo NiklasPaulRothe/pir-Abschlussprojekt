@@ -141,6 +141,7 @@ impl App {
         self.clone().screen
     }
 
+    // Switches current player
     fn switch_player(&mut self) {
         match self.player {
             Player::One => self.player = Player::Two,
@@ -653,7 +654,8 @@ impl App {
                                     if app.pkmn_moves.len() < 4 && allowed {
                                         app.pkmn_moves.push(techniques[selection].clone())
                                     } else {
-                                        println!("Error: Pokemon's moves have to be different and can only be 4");
+                                        println!("Error: Pokemon's moves have to be different \
+                                                  and can only be 4");
                                     }
                                 }
                                 _ => {}
@@ -762,7 +764,7 @@ impl App {
                             }
                         } else {
                             println!("Error: Pokemon has no moves");
-                        }         
+                        }
                     }
 
                     // Button to remove selected Pokemon from team
@@ -820,7 +822,8 @@ impl App {
                                 if !app.pkmn_team.is_empty() {
                                     arena.get_player_one().set_pokemon_list(app.pkmn_team.clone());
                                     arena.get_player_two().set_pokemon_list(app.pkmn_team.clone());
-                                    arena.get_player_two().set_player_type(player::PlayerType::SimpleAi);
+                                    arena.get_player_two()
+                                        .set_player_type(player::PlayerType::SimpleAi);
 
                                     app.player = Player::One;
                                     app.screen = Screen::Battle;
@@ -853,7 +856,7 @@ impl App {
                                     app.screen = Screen::ChooseTeam;
                                 } else {
                                     println!("Error: Empty team");
-                                }     
+                                }
                             }
                         }
                         // Multiplayer - Player Two
@@ -877,7 +880,7 @@ impl App {
                                     app.screen = Screen::Battle;
                                 } else {
                                     println!("Error: Empty team");
-                                }     
+                                }
                             }
                         }
                     }
@@ -907,7 +910,8 @@ impl App {
                     };
                     // Current Pokemon of player1
                     let current1 = player1.clone()
-                        .get_pokemon_list()[player1.clone().get_current()]
+                            .get_pokemon_list()
+                                       [player1.clone().get_current()]
                         .clone();
                     // ...its name
                     let name1 = current1.clone()
@@ -927,27 +931,27 @@ impl App {
                         .get_non_volatile()
                         .0
                         .to_string();
-                    let text1 = [
-                        name1, 
-                        "\n\nHP: ".to_string(), 
-                        hp1,
-                        " / ".to_string(), 
-                        max_hp1, 
-                        " \n".to_string(), 
-                        status1.to_string()
-                        ].concat();
+                    let text1 = [name1,
+                                 "\n\nHP: ".to_string(),
+                                 hp1,
+                                 " / ".to_string(),
+                                 max_hp1,
+                                 " \n".to_string(),
+                                 status1.to_string()]
+                        .concat();
 
 
                     // Player2:
                     let player2 = arena.get_player_two().clone();
                     // Highlight Pokemon text when it is its turn
-                     let color2 = match app.player {
+                    let color2 = match app.player {
                         Player::Two => conrod::color::YELLOW,
                         _ => conrod::color::WHITE,
                     };
                     // Current Pokemon of player2
                     let current2 = player2.clone()
-                        .get_pokemon_list()[player1.clone().get_current()]
+                            .get_pokemon_list()
+                                       [player1.clone().get_current()]
                         .clone();
                     // ...its name
                     let name2 = current2.clone()
@@ -967,15 +971,14 @@ impl App {
                         .get_non_volatile()
                         .0
                         .to_string();
-                    let text2 = [
-                        name2,
-                        "\n\nHP: ".to_string(), 
-                        hp2, 
-                        " / ".to_string(),
-                        max_hp2, 
-                        " \n".to_string(), 
-                        status2.to_string()
-                        ].concat();
+                    let text2 = [name2,
+                                 "\n\nHP: ".to_string(),
+                                 hp2,
+                                 " / ".to_string(),
+                                 max_hp2,
+                                 " \n".to_string(),
+                                 status2.to_string()]
+                        .concat();
 
 
                     // ===== Canvases =====
@@ -987,7 +990,7 @@ impl App {
                         .w_h(WIDTH as f64 - 350.0, 240.0)
                         .bottom_left_of(ids.canvas)
                         .set(ids.bg_text, ui);
-                    
+
                     // BG Pokemon1
                     widget::Canvas::new()
                         .color(conrod::color::LIGHT_BLUE)
@@ -1022,7 +1025,7 @@ impl App {
                         .font_size(25)
                         .line_spacing(10.0)
                         .set(ids.text_player, ui);
-                    
+
                     // Show Battle Text
                     widget::Text::new(&app.battle_text)
                         .color(app.label_color)
@@ -1051,7 +1054,7 @@ impl App {
                         .font_size(25)
                         .padded_wh_of(ids.bg_sprite2, 20.0)
                         .line_spacing(10.0)
-                        .set(ids.text_pkmn2, ui);  
+                        .set(ids.text_pkmn2, ui);
 
 
                     // ===== Buttons =====
@@ -1068,8 +1071,8 @@ impl App {
                         .was_clicked() {
                         println!("Battle_Fight");
 
-                        // If next move is already full (a move is charging) pokemon cannot du another
-                        // one
+                        // If next move is already full (a move is charging) pokemon cannot do
+                        // another one
                         match app.player {
                             Player::One => {
                                 if let Some(_) = player1.clone().get_next_move() {
@@ -1163,13 +1166,14 @@ impl App {
                                 Player::Two => {
                                     app.done = true;
                                     app.battle_text = "".to_string();
-                                    arena.get_player_two()        
+                                    arena.get_player_two()
                                 }
                             };
 
                             // Get attack
                             let att = player.clone()
-                                .get_pokemon_list()[player.clone().get_current()]
+                                    .get_pokemon_list()
+                                          [player.clone().get_current()]
                                 .clone()
                                 .get_move_one();
 
@@ -1204,11 +1208,12 @@ impl App {
                                 Player::Two => {
                                     app.done = true;
                                     app.battle_text = "".to_string();
-                                    arena.get_player_two()        
+                                    arena.get_player_two()
                                 }
                             };
                             let att = player.clone()
-                                .get_pokemon_list()[player.clone().get_current()]
+                                    .get_pokemon_list()
+                                          [player.clone().get_current()]
                                 .clone()
                                 .get_move_two();
 
@@ -1242,11 +1247,12 @@ impl App {
                                 Player::Two => {
                                     app.done = true;
                                     app.battle_text = "".to_string();
-                                    arena.get_player_two()        
+                                    arena.get_player_two()
                                 }
                             };
                             let att = player.clone()
-                                .get_pokemon_list()[player.clone().get_current()]
+                                    .get_pokemon_list()
+                                          [player.clone().get_current()]
                                 .clone()
                                 .get_move_three();
 
@@ -1280,11 +1286,12 @@ impl App {
                                 Player::Two => {
                                     app.done = true;
                                     app.battle_text = "".to_string();
-                                    arena.get_player_two()        
+                                    arena.get_player_two()
                                 }
                             };
                             let att = player.clone()
-                                .get_pokemon_list()[player.clone().get_current()]
+                                    .get_pokemon_list()
+                                          [player.clone().get_current()]
                                 .clone()
                                 .get_move_four();
 
@@ -1434,9 +1441,10 @@ impl App {
                 if let Screen::End = app.screen {
                     let winner = match app.player {
                         Player::One => "P L A Y E R   O N E",
-                        Player::Two => "P L A Y E R   T W O"
-                    };           
-                    widget::Text::new(&["      W I N N E R\n\n".to_string(), winner.to_string()].concat())
+                        Player::Two => "P L A Y E R   T W O",
+                    };
+                    widget::Text::new(&["      W I N N E R\n\n".to_string(), winner.to_string()]
+                            .concat())
                         .color(app.label_color)
                         .mid_top_with_margin_on(ids.canvas, 100.0)
                         .align_text_left()
