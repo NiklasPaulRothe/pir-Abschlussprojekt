@@ -387,8 +387,8 @@ pub fn change_stats(stages: i8,
             window.set_battle_text(target.get_name() + "s " + enums::stat_to_string(stat) +
                                    " can not be lowered anymore");
         } else {
-            window.set_battle_text(target.get_name() + "s " +
-                                   enums::stat_to_string(stat) + " cannot be raised anymore");
+            window.set_battle_text(target.get_name() + "s " + enums::stat_to_string(stat) +
+                                   " cannot be raised anymore");
         }
     }
     return false;

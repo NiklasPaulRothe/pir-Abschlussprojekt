@@ -99,7 +99,9 @@ impl<'a> super::Arena<'a> {
         if self.get_player_one().get_next_move().is_none() &&
            self.get_player_two().get_next_move().is_some() {
             match self.get_player_two().get_next_move().unwrap() {
-                Next::Move(x) => {call_resolve(self, x, enums::Player::Two, &mut window);},
+                Next::Move(x) => {
+                    call_resolve(self, x, enums::Player::Two, &mut window);
+                }
                 _ => {}
             }
             end_of_fight = true;
@@ -107,7 +109,9 @@ impl<'a> super::Arena<'a> {
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_some() {
             match self.get_player_one().get_next_move().unwrap() {
-                Next::Move(x) => {call_resolve(self, x, enums::Player::One, &mut window);},
+                Next::Move(x) => {
+                    call_resolve(self, x, enums::Player::One, &mut window);
+                }
                 _ => {}
             }
             end_of_fight = true;
@@ -163,19 +167,23 @@ impl<'a> super::Arena<'a> {
             // The attack with the higher Priority starts
             if one_prio > two_prio {
                 if call_resolve(self, one_attack, enums::Player::Two, &mut window) {
-                call_resolve(self, two_attack, enums::Player::One, &mut window); }
+                    call_resolve(self, two_attack, enums::Player::One, &mut window);
+                }
             } else if one_prio < two_prio {
                 if call_resolve(self, two_attack, enums::Player::One, &mut window) {
-                call_resolve(self, one_attack, enums::Player::Two, &mut window); }
+                    call_resolve(self, one_attack, enums::Player::Two, &mut window);
+                }
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
                 if one_speed >= two_speed {
                     if call_resolve(self, one_attack, enums::Player::Two, &mut window) {
-                    call_resolve(self, two_attack, enums::Player::One, &mut window); }
+                        call_resolve(self, two_attack, enums::Player::One, &mut window);
+                    }
                 } else {
                     if call_resolve(self, two_attack, enums::Player::One, &mut window) {
-                    call_resolve(self, one_attack, enums::Player::Two, &mut window); }
+                        call_resolve(self, one_attack, enums::Player::Two, &mut window);
+                    }
                 }
             }
         }
@@ -212,7 +220,8 @@ impl<'a> super::Arena<'a> {
 fn call_resolve(arena: &mut super::Arena,
                 attack: moves::Technique,
                 player: enums::Player,
-                mut window: &mut graphic::gui::App) -> bool {
+                mut window: &mut graphic::gui::App)
+                -> bool {
     let mut attack_is_allowed = true;
     // Checks if the pokemon is allowed to attack. This is influeced by Sleep, Freeze and Paralysis
     // Checks if the pokemon is paralysed
@@ -485,7 +494,8 @@ fn poison_burn_damage(arena: &mut super::Arena, player: enums::Player) {
 /// Checks if the pokemon are dead
 fn check_dead(player: enums::Player,
               arena: &mut super::Arena,
-              mut window: &mut graphic::gui::App) -> bool{
+              mut window: &mut graphic::gui::App)
+              -> bool {
     // Checks if the pokemon are dead
     let dead = !get_target(player, arena).is_alive();
     let message = get_target(player, arena).get_name().clone();
