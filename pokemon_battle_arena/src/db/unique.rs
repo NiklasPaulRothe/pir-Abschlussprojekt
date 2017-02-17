@@ -36,7 +36,7 @@ pub fn unique(attack: &Technique,
         }
         "mimic" => {
             if defender.get_last_move().is_none() {
-                window.set_battle_text("failed attack...");
+                window.set_battle_text("failed attack...".to_string());
             } else {
                 let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
                     .unwrap();
@@ -51,7 +51,7 @@ pub fn unique(attack: &Technique,
         }
         "mirror-move" => {
             if defender.get_last_move().is_none() {
-                window.set_battle_text("failed attack...");
+                window.set_battle_text("failed attack...".to_string());
             } else {
                 let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
                     .unwrap();
@@ -113,35 +113,36 @@ pub fn unique(attack: &Technique,
         "splash" => {
             //ob flag für gravity gesetz ist
             if arena.get_current_effect().0 == enums::Types::Flying {
-                window.set_battle_text("The attack can not be used because" + enums::Types::Flying +
-                                     "is activated.");
+                window.set_battle_text("The attack can not be used because Flyibg is activated."
+                    .to_string());
             } else {
-                window.set_battle_text("Nothing happens...");
+                println!("Nothing happens...");
             }
         }
-        // "rest" => {
-        //     for entry in Movedex::new().get_entries() {
-        //         if entry.get_name() == "rest" {
-        //             ////Fehler muss noch behofen werden
-        //             //let mut user_clone = moves::get_user(flag, arena).clone();
-        //             // resolve::ailment("rest",
-        //             //                  entry.get_type(),
-        //             //                  entry.get_ailment(),
-        //             //                  100,
-        //             //                  user,
-        //             //                  &mut target,
-        //             //                  defender,
-        //             //                  window);
-        //         }
-        //     }
+        "rest" => {
+            window.set_battle_text(target.get_name() + " was not affected by " + name);
+            for entry in Movedex::new().get_entries() {
+                if entry.get_name() == "rest" {
+                    ////Fehler muss noch behofen werden
+                    //let mut user_clone = moves::get_user(flag, arena).clone();
+                    // resolve::ailment("rest",
+                    //                  entry.get_type(),
+                    //                  entry.get_ailment(),
+                    //                  100,
+                    //                  user,
+                    //                  &mut target,
+                    //                  defender,
+                    //                  window);
+                }
+            }
 
-        // }
+        }
         "conversion" => {
             user.set_type(0, attack.get_type());
         }
         "spite" => {
             if defender.get_last_move().is_none() {
-                window.set_battle_text("failed attack...");
+                window.set_battle_text("failed attack...".to_string());
             } else {
                 defender.get_last_move().unwrap().get_power_points();
                 target.decrement_ap();
@@ -175,7 +176,7 @@ pub fn unique(attack: &Technique,
         "powder" => {
             if target.get_types().0 == enums::Types::Grass ||
                target.get_types().1 == enums::Types::Grass {
-                window.set_battle_text(name + " has no effect on  Pokemon type plants");
+                window.set_battle_text(name.to_string() + " has no effect on  Pokemon type plants");
             } else {
                 if defender.get_next_move().is_some() {
                     match defender.get_next_move().unwrap() {
@@ -191,7 +192,7 @@ pub fn unique(attack: &Technique,
                         _ => {}
                     };
                 } else {
-                    window.set_battle_text("failed move...");
+                    window.set_battle_text("failed attack...".to_string());
                 }
             }
         }
