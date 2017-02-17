@@ -15,7 +15,7 @@ use graphic;
 use player::{Player, Next};
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use super::unique;
+//use super::unique;
 
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
