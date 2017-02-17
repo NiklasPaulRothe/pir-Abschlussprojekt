@@ -15,7 +15,7 @@ use graphic;
 use player::{Player, Next};
 use std::cmp::Ordering;
 use std::collections::HashMap;
-//use super::unique;
+use super::unique;
 
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
@@ -57,7 +57,7 @@ impl Technique {
     /// Matches over the category of a move and calls a specific method in resolve.rs for this
     /// category. All calculation is done inside the method, therefore no return is needed.
     pub fn resolve(&self,
-                   arena: &mut Arena,
+                   mut arena: &mut Arena,
                    flag: enums::Player,
                    mut window: &mut graphic::gui::App) {
         // First call the hits method to sort out missing moves.
@@ -444,15 +444,15 @@ impl Technique {
                     }
                 }
                 enums::MoveCategory::Unique => {
-                    // unique::unique(&self.clone(),
-                    //                self.get_name(),
-                    //                user_clone,
-                    //                target_clone,
-                    //                &mut attacker_clone,
-                    //                &mut defender_clone,
-                    //                &mut arena,
-                    //                flag,
-                    //                &mut window);
+                    unique::unique(&self.clone(),
+                                   self.get_name(),
+                                   user_clone,
+                                   target_clone,
+                                   &mut attacker_clone,
+                                   &mut defender_clone,
+                                   &mut arena,
+                                   flag,
+                                   &mut window);
                 }
             };
         } else {
