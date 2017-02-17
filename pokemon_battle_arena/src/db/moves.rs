@@ -15,6 +15,7 @@ use graphic;
 use player::{Player, Next};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+//use super::unique;
 
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
@@ -70,24 +71,21 @@ impl Technique {
 
                 enums::MoveCategory::Damage => {
                     // Set only the last action if move needs to be charged or recharged
-                    if attacker_clone.get_last_action().0 != Next::None {
-                        if self.get_flags().contains(&enums::MoveFlags::Charge) &&
-                           !(attacker_clone.get_last_action().clone() ==
-                             (Next::Move(self.clone()), 0)) {
-                            let attacker = get_attacker(flag, arena);
-                            window.set_battle_text(user_clone.get_name().to_string() +
-                                                   " prepared itself");
-                            attacker.set_last_action(((Next::Move(self.clone()), 0)));
-                            attacker.set_next_move(Some(Next::Move(self.clone())));
-                            return;
-                        } else if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
-                                  attacker_clone.get_last_action().clone() ==
-                                  (Next::Move(self.clone()), 0) {
-                            let attacker = get_attacker(flag, arena);
-                            window.set_battle_text(user_clone.get_name() + " has to recharge");
-                            attacker.set_last_action((Next::Move(self.clone()), 1));
-                            return;
-                        }
+                    if self.get_flags().contains(&enums::MoveFlags::Charge) &&
+                       attacker_clone.get_last_action().clone() != (Next::Move(self.clone()), 0) {
+                        let attacker = get_attacker(flag, arena);
+                        window.set_battle_text(user_clone.get_name().to_string() +
+                                               " prepared itself");
+                        attacker.set_last_action(((Next::Move(self.clone()), 0)));
+                        attacker.set_next_move(Some(Next::Move(self.clone())));
+                        return;
+                    } else if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
+                              attacker_clone.get_last_action().clone() ==
+                              (Next::Move(self.clone()), 0) {
+                        let attacker = get_attacker(flag, arena);
+                        window.set_battle_text(user_clone.get_name() + " has to recharge");
+                        attacker.set_last_action((Next::Move(self.clone()), 1));
+                        return;
                     }
                     let mut rng = thread_rng();
                     // scope to destroy target afterwards, otherwise flinch could not be resolved
@@ -120,7 +118,11 @@ impl Technique {
                         get_defender(flag, arena).set_next_move(Some(Next::Flinch));
                         window.set_battle_text(target_clone.get_name() + " flinched.");
                     }
-
+                    if self.get_flags().contains(&enums::MoveFlags::Recharge) &&
+                       attacker_clone.get_last_action().clone() != (Next::Move(self.clone()), 0) {
+                        let attacker = get_attacker(flag, arena);
+                        attacker.set_next_move(Some(Next::Move(self.clone())));
+                    }
                 }
 
                 enums::MoveCategory::Ailment => {
@@ -441,7 +443,17 @@ impl Technique {
                         println!("It has no effect on {}", target_clone.get_name());
                     }
                 }
-                enums::MoveCategory::Unique => {}
+                enums::MoveCategory::Unique => {
+                    // unique::unique(&self.clone(),
+                    //                self.get_name(),
+                    //                user_clone,
+                    //                target_clone,
+                    //                &mut attacker_clone,
+                    //                &mut defender_clone,
+                    //                &mut arena,
+                    //                flag,
+                    //                &mut window);
+                }
             };
         } else {
             window.set_battle_text(user_clone.get_name() + " misses " + &target_clone.get_name());

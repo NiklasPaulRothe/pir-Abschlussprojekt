@@ -44,7 +44,7 @@ enum Mode {
 ///     bg_color        -   background
 ///     button_color    -   button color
 ///     border_color    -   border colog
-/// 
+///
 ///     ===== Variables =====
 ///     pokedex         -   used Pokedex
 ///     pkmn_team       -   variable to save current team in team selection
@@ -143,7 +143,8 @@ impl App {
 
     // Sets the battle text
     pub fn set_battle_text(&mut self, text: String) {
-        self.battle_text = [self.battle_text.clone()," ".to_string(), text, "\n".to_string()].concat();
+        self.battle_text = [self.battle_text.clone(), " ".to_string(), text, "\n".to_string()]
+            .concat();
     }
 
     // Draws the UI
@@ -860,7 +861,7 @@ impl App {
                 if let Screen::Battle = app.screen {
                     let player1 = arena.get_player_one().clone();
                     let player2 = arena.get_player_two().clone();
-                    
+
                     let player_show = match app.player {
                         Player::One => "Player One",
                         Player::Two => "Player Two",

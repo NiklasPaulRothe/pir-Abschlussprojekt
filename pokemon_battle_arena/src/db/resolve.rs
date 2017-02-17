@@ -383,9 +383,12 @@ pub fn change_stats(stages: i8,
         target.get_current().set_stats(stat, new_stat as u16);
         return true;
     } else {
-        if stage < -6 {
+        if stage <= -6 {
             window.set_battle_text(target.get_name() + "s " + enums::stat_to_string(stat) +
                                    " can not be lowered anymore");
+        } else {
+            window.set_battle_text(target.get_name() + "s " + enums::stat_to_string(stat) +
+                                   " cannot be raised anymore");
         }
     }
     return false;
