@@ -9,6 +9,7 @@ use super::movedex::Movedex;
 //use super::moves;
 use self::rand::{Rng, thread_rng};
 use graphic;
+use player::Next;
 
 extern crate rand;
 
@@ -34,20 +35,28 @@ pub fn unique(attack: &Technique,
             resolve::switch_pokemon(attacker);
         }
         "mimic" => {
-            let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
-                .unwrap();
-            attack.resolve(arena, flag, window);
+            if defender.get_last_move().is_none() {
+                window.set_battle_text("failed attack...");
+            } else {
+                let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
+                    .unwrap();
+                attack.resolve(arena, flag, window);
+            }
         }
-        "focus-energy" => {}
+        //"focus-energy" => {}
         "metronome" => {
-            let random = rng.gen_range(1, 616);
+            let random = rng.gen_range(1, 617);
             let attack = movedex.move_by_id(random).unwrap();
             attack.resolve(arena, flag, window);
         }
         "mirror-move" => {
-            let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
-                .unwrap();
-            attack.resolve(arena, flag, window);
+            if defender.get_last_move().is_none() {
+                window.set_battle_text("failed attack...");
+            } else {
+                let attack = movedex.move_by_id(defender.get_last_move().unwrap().get_id())
+                    .unwrap();
+                attack.resolve(arena, flag, window);
+            }
         }
         "nature-power" => {
             match arena.get_current_effect().0 {
@@ -104,35 +113,39 @@ pub fn unique(attack: &Technique,
         "splash" => {
             //ob flag für gravity gesetz ist
             if arena.get_current_effect().0 == enums::Types::Flying {
-                println!("The attack can not be used because {:?} is activated.",
-                         enums::Types::Flying);
+                window.set_battle_text("The attack can not be used because" + enums::Types::Flying +
+                                     "is activated.");
             } else {
-                println!("Nothing happens...");
+                window.set_battle_text("Nothing happens...");
             }
         }
-        "rest" => {
-            for entry in Movedex::new().get_entries() {
-                if entry.get_name() == "rest" {
-                    ////Fehler muss noch behofen werden
-                    //let mut user_clone = moves::get_user(flag, arena).clone();
-                    // resolve::ailment("rest",
-                    //                  entry.get_type(),
-                    //                  entry.get_ailment(),
-                    //                  100,
-                    //                  user,
-                    //                  &mut target,
-                    //                  defender,
-                    //                  window);
-                }
-            }
+        // "rest" => {
+        //     for entry in Movedex::new().get_entries() {
+        //         if entry.get_name() == "rest" {
+        //             ////Fehler muss noch behofen werden
+        //             //let mut user_clone = moves::get_user(flag, arena).clone();
+        //             // resolve::ailment("rest",
+        //             //                  entry.get_type(),
+        //             //                  entry.get_ailment(),
+        //             //                  100,
+        //             //                  user,
+        //             //                  &mut target,
+        //             //                  defender,
+        //             //                  window);
+        //         }
+        //     }
 
-        }
+        // }
         "conversion" => {
             user.set_type(0, attack.get_type());
         }
         "spite" => {
-            defender.get_last_move().unwrap().get_power_points();
-            target.decrement_ap();
+            if defender.get_last_move().is_none() {
+                window.set_battle_text("failed attack...");
+            } else {
+                defender.get_last_move().unwrap().get_power_points();
+                target.decrement_ap();
+            }
         }
         "sleep-talk" => {
             if user.is_asleep() {
@@ -155,15 +168,31 @@ pub fn unique(attack: &Technique,
             }
         }
         "celebrate" => {
-            println!("{:?}",
-                     user.get_name() + "disappears and then rises out of a birthday" +
-                     "present that falls into the picture from above.");
+            window.set_battle_text(user.get_name().to_string() +
+                                   " sappears and then rises out of a birthday present that \
+                                    falls into the picture from above.");
         }
         "powder" => {
-            //resolv in db enams
             if target.get_types().0 == enums::Types::Grass ||
                target.get_types().1 == enums::Types::Grass {
-                println!("{:?} has no effect on  Pokemon type plants", name);
+                window.set_battle_text(name + " has no effect on  Pokemon type plants");
+            } else {
+                if defender.get_next_move().is_some() {
+                    match defender.get_next_move().unwrap() {
+                        Next::Move(x) => {
+                            if x.get_type() == enums::Types::Fire {
+                                let mut a_stats = target.get_base();
+                                a_stats.set_stats(enums::Stats::Hp,
+                                                  target.get_base().get_stat(&enums::Stats::Hp) -
+                                                  (25 / 100 *
+                                                   target.get_base().get_stat(&enums::Stats::Hp)));
+                            }
+                        }
+                        _ => {}
+                    };
+                } else {
+                    window.set_battle_text("failed move...");
+                }
             }
         }
         "reflect-type" => {
