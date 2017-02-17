@@ -13,6 +13,7 @@ use player::Next;
 
 extern crate rand;
 
+//Calculation of unique attack
 pub fn unique(attack: &Technique,
               name: &str,
               mut user: PokemonToken,
@@ -28,9 +29,7 @@ pub fn unique(attack: &Technique,
     // target.get_moves(dex.move_by_id());
     // match dex.get_entries() {
     match name {
-        "disable" => {
-            println!("disable");
-        }
+
         "teleport" => {
             resolve::switch_pokemon(attacker);
         }
@@ -43,7 +42,6 @@ pub fn unique(attack: &Technique,
                 attack.resolve(arena, flag, window);
             }
         }
-        //"focus-energy" => {}
         "metronome" => {
             let random = rng.gen_range(1, 617);
             let attack = movedex.move_by_id(random).unwrap();
@@ -59,6 +57,7 @@ pub fn unique(attack: &Technique,
             }
         }
         "nature-power" => {
+            //mathing of arena
             match arena.get_current_effect().0 {
                 enums::Types::Normal => {
                     //"tri-attack"
@@ -108,10 +107,7 @@ pub fn unique(attack: &Technique,
                 _ => {}
             }
         }
-        // "transform" => {
-        // },
         "splash" => {
-            //ob flag für gravity gesetz ist
             if arena.get_current_effect().0 == enums::Types::Flying {
                 window.set_battle_text("The attack can not be used because Flyibg is activated."
                     .to_string());
@@ -121,20 +117,20 @@ pub fn unique(attack: &Technique,
         }
         "rest" => {
             window.set_battle_text(target.get_name() + " was not affected by " + name);
-            for entry in Movedex::new().get_entries() {
-                if entry.get_name() == "rest" {
-                    ////Fehler muss noch behofen werden
-                    //let mut user_clone = moves::get_user(flag, arena).clone();
-                    // resolve::ailment("rest",
-                    //                  entry.get_type(),
-                    //                  entry.get_ailment(),
-                    //                  100,
-                    //                  user,
-                    //                  &mut target,
-                    //                  defender,
-                    //                  window);
-                }
-            }
+            //for entry in Movedex::new().get_entries() {
+            //if entry.get_name() == "rest" {
+            ////Fehler muss noch behofen werden
+            //let mut user_clone = moves::get_user(flag, arena).clone();
+            // resolve::ailment("rest",
+            //                  entry.get_type(),
+            //                  entry.get_ailment(),
+            //                  100,
+            //                  user,
+            //                  &mut target,
+            //                  defender,
+            //                  window);
+            //}
+            //}
 
         }
         "conversion" => {
@@ -149,24 +145,28 @@ pub fn unique(attack: &Technique,
             }
         }
         "sleep-talk" => {
-            if user.is_asleep() {
-                let mut id_vec = Vec::new();
-                if attacker.get_attack(&player::AttackSlot::One).get_name() != "sleep-talk" {
-                    id_vec.push(attacker.get_attack(&player::AttackSlot::One).get_id());
+            if attack.get_flags().contains(&enums::MoveFlags::Gravity) {
+                // attack can use only if pokemon sleep
+                if user.is_asleep() {
+                    let mut id_vec = Vec::new();
+                    if attacker.get_attack(&player::AttackSlot::One).get_name() != "sleep-talk" {
+                        id_vec.push(attacker.get_attack(&player::AttackSlot::One).get_id());
+                    }
+                    if attacker.get_attack(&player::AttackSlot::Two).get_name() != "sleep-talk" {
+                        id_vec.push(attacker.get_attack(&player::AttackSlot::Two).get_id());
+                    }
+                    if attacker.get_attack(&player::AttackSlot::Three).get_name() != "sleep-talk" {
+                        id_vec.push(attacker.get_attack(&player::AttackSlot::Three).get_id());
+                    }
+                    if attacker.get_attack(&player::AttackSlot::Four).get_name() != "sleep-talk" {
+                        id_vec.push(attacker.get_attack(&player::AttackSlot::Four).get_id());
+                    }
+                    let random = rng.gen_range(0, id_vec.len());
+                    let attack = movedex.move_by_id(id_vec[random]).unwrap();
+                    attack.resolve(arena, flag, window);
                 }
-                if attacker.get_attack(&player::AttackSlot::Two).get_name() != "sleep-talk" {
-                    id_vec.push(attacker.get_attack(&player::AttackSlot::Two).get_id());
-                }
-                if attacker.get_attack(&player::AttackSlot::Three).get_name() != "sleep-talk" {
-                    id_vec.push(attacker.get_attack(&player::AttackSlot::Three).get_id());
-                }
-                if attacker.get_attack(&player::AttackSlot::Four).get_name() != "sleep-talk" {
-                    id_vec.push(attacker.get_attack(&player::AttackSlot::Four).get_id());
-                }
-                let random = rng.gen_range(0, id_vec.len());
-                let attack = movedex.move_by_id(id_vec[random]).unwrap();
-                attack.resolve(arena, flag, window);
             }
+
         }
         "celebrate" => {
             window.set_battle_text(user.get_name().to_string() +
@@ -204,6 +204,11 @@ pub fn unique(attack: &Technique,
             target.set_type(0, enums::Types::Water);
             target.set_type(1, enums::Types::Water);
         }
+        // }"disable" => {
+        // }
+        //"focus-energy" => {}
+        // "transform" => {
+        // },
         // "conversion-2" => {
         // },
         // "substitute" => {
