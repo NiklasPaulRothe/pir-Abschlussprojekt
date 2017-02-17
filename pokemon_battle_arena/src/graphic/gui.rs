@@ -115,6 +115,11 @@ impl App {
         self.screen = screen
     }
 
+    pub fn set_dead_switch(&mut self, screen: Screen, player: db::enums::Player) {
+        self.screen = screen;
+        self.player = player;
+    }
+
     // Gets the current screen
     pub fn get_screen(&self) -> Screen {
         self.clone().screen
@@ -630,6 +635,7 @@ impl App {
                             label.push("".to_string());
                         }
 
+                        // Set buttons with attacks
                         if widget::Button::new()
                             .border(4.0)
                             .border_color(app.button_color)
@@ -692,7 +698,7 @@ impl App {
                         }
                     }
 
-                    // Button to add selected Pokemon to team
+                    // Button to put current Pokemon into team
                     if widget::Button::new()
                         .border(1.0)
                         .border_color(app.border_color)
@@ -705,20 +711,26 @@ impl App {
                         .was_clicked() {
                         println!("Select");
 
-                        match app.sel_pkmn.clone() {
-                            (Some(mut pkmn), None) => {
-                                pkmn.set_moves(app.pkmn_moves.clone());
-                                app.pkmn_team.push(pkmn.clone());
-                                app.sel_pkmn = (None, None);
+                        if !app.pkmn_moves.is_empty() {
+                            match app.sel_pkmn.clone() {
+                                (Some(mut pkmn), None) => {
+                                    pkmn.set_moves(app.pkmn_moves.clone());
+                                    app.pkmn_team.push(pkmn.clone());
+                                    app.sel_pkmn = (None, None);
+                                }
+                                (Some(mut pkmn), Some(index)) => {
+                                    pkmn.set_moves(app.pkmn_moves.clone());
+                                    app.pkmn_team.remove(index);
+                                    app.pkmn_team.insert(index, pkmn.clone());
+                                    app.sel_pkmn = (None, None);
+                                }
+                                _ => println!("Error: No Pokemon selected"),
                             }
-                            (Some(mut pkmn), Some(index)) => {
-                                pkmn.set_moves(app.pkmn_moves.clone());
-                                app.pkmn_team.remove(index);
-                                app.pkmn_team.insert(index, pkmn.clone());
-                                app.sel_pkmn = (None, None);
-                            }
-                            _ => println!("Error: No Pokemon selected"),
-                        };
+                        } else {
+                            println!("Error: Pokemon has no moves");
+                        }
+
+                            
                     }
 
                     // Button to remove selected Pokemon from team
@@ -742,6 +754,7 @@ impl App {
                     }
 
                     // Back-Button
+                    // version erstellen die zu player one zurück geht
                     if widget::Button::new()
                         .border(1.0)
                         .border_color(app.border_color)
@@ -756,8 +769,9 @@ impl App {
                         app.screen = Screen::Play;
                     }
 
-                    // Show different button depending on what follows
+                    // Show different button depending on current mode and player
                     match (app.mode.clone(), app.player.clone()) {
+                        // Singleplayer
                         (Mode::Singleplayer, _) => {
                             if widget::Button::new()
                                 .border(1.0)
@@ -771,13 +785,18 @@ impl App {
                                 .was_clicked() {
                                 println!("Fight");
 
-                                arena.get_player_one().set_pokemon_list(app.pkmn_team.clone());
-                                arena.get_player_two().set_pokemon_list(app.pkmn_team.clone());
+                                if !app.pkmn_team.is_empty() {
+                                    arena.get_player_one().set_pokemon_list(app.pkmn_team.clone());
+                                    arena.get_player_two().set_pokemon_list(app.pkmn_team.clone());
 
-                                app.player = Player::One;
-                                app.screen = Screen::Battle;
+                                    app.player = Player::One;
+                                    app.screen = Screen::Battle;
+                                } else {
+                                    println!("Error: Empty team");
+                                }
                             }
                         }
+                        // Multiplayer - Player One
                         (Mode::Multiplayer, Player::One) => {
                             if widget::Button::new()
                                 .border(1.0)
@@ -791,15 +810,20 @@ impl App {
                                 .was_clicked() {
                                 println!("Player Two");
 
-                                arena.get_player_one().set_pokemon_list(app.pkmn_team.clone());
+                                if !app.pkmn_team.is_empty() {
+                                    arena.get_player_one().set_pokemon_list(app.pkmn_team.clone());
 
-                                app.pkmn_team = Vec::new();
-                                app.sel_pkmn = (None, None);
-                                app.techs = None;
-                                app.player = Player::Two;
-                                app.screen = Screen::ChooseTeam;
+                                    app.pkmn_team = Vec::new();
+                                    app.sel_pkmn = (None, None);
+                                    app.techs = None;
+                                    app.player = Player::Two;
+                                    app.screen = Screen::ChooseTeam;
+                                } else {
+                                    println!("Error: Empty team");
+                                }     
                             }
                         }
+                        // Multiplayer - Player Two
                         (Mode::Multiplayer, Player::Two) => {
                             if widget::Button::new()
                                 .border(1.0)
@@ -813,10 +837,14 @@ impl App {
                                 .was_clicked() {
                                 println!("Fight");
 
-                                arena.get_player_two().set_pokemon_list(app.pkmn_team.clone());
+                                if !app.pkmn_team.is_empty() {
+                                    arena.get_player_two().set_pokemon_list(app.pkmn_team.clone());
 
-                                app.player = Player::One;
-                                app.screen = Screen::Battle;
+                                    app.player = Player::One;
+                                    app.screen = Screen::Battle;
+                                } else {
+                                    println!("Error: Empty team");
+                                }     
                             }
                         }
                     }
@@ -825,32 +853,28 @@ impl App {
 
 
 
-                // Draws Fight Screen
+
+                // /////////////////////////////////////////////////////////////
+                // //////////               BATTLE SCREEN             //////////
+                // /////////////////////////////////////////////////////////////
                 if let Screen::Battle = app.screen {
-                    println!(".");
                     let player1 = arena.get_player_one().clone();
                     let player2 = arena.get_player_two().clone();
-                    let dead_one = !player1.clone().get_pokemon_list()[player1.clone().get_current()].is_alive();
-                    let dead_two = !player2.clone().get_pokemon_list()[player2.clone().get_current()].is_alive();
-
-                    if dead_one || dead_two {
-                        app.screen = Screen::Switch;
-                        return;
-                    }
-
-                    // Text BG
+                    
                     let player_show = match app.player {
                         Player::One => "Player One",
                         Player::Two => "Player Two",
                     };
-                    widget::Text::new(player_show)
+
+                    widget::Text::new(&["Current Player: ", player_show].concat())
                         .color(app.label_color)
                         .middle_of(ids.canvas)
                         .align_text_left()
                         .font_size(25)
                         .line_spacing(10.0)
                         .set(ids.text_player, ui);
-
+                    
+                    // Battle Text BG
                     widget::Canvas::new()
                         .color(app.button_color)
                         .border_color(app.border_color)
@@ -864,7 +888,7 @@ impl App {
                         .color(app.label_color)
                         .middle_of(ids.bg_text)
                         .align_text_left()
-                        .font_size(25)
+                        .font_size(20)
                         .padded_wh_of(ids.bg_text, 20.0)
                         .line_spacing(10.0)
                         .set(ids.text_battle, ui);
@@ -878,8 +902,8 @@ impl App {
                         .set(ids.bg_sprite, ui);
 
                     let color1 = match app.player {
-                        Player::One => conrod::color::WHITE,
-                        _ => conrod::color::CHARCOAL,
+                        Player::One => conrod::color::YELLOW,
+                        _ => conrod::color::WHITE,
                     };
 
                     let pkmn1 = player1.clone()
@@ -897,6 +921,7 @@ impl App {
                         .0
                         .to_string();
 
+                    // Name Pkmn1
                     widget::Text::new(&name1)
                         .color(color1)
                         .middle_of(ids.bg_sprite)
@@ -906,6 +931,7 @@ impl App {
                         .line_spacing(10.0)
                         .set(ids.text_test1, ui);
 
+                    // HP & Status Pkmn1
                     widget::Text::new(&[hp1, "HP\n\n".to_string(), status1.to_string()].concat())
                         .color(color1)
                         .down_from(ids.text_test1, -200.0)
@@ -925,8 +951,8 @@ impl App {
                         .set(ids.bg_sprite2, ui);
 
                     let color2 = match app.player {
-                        Player::Two => conrod::color::WHITE,
-                        _ => conrod::color::CHARCOAL,
+                        Player::Two => conrod::color::YELLOW,
+                        _ => conrod::color::WHITE,
                     };
 
                     let pkmn2 = player2.clone()
@@ -944,6 +970,7 @@ impl App {
                         .0
                         .to_string();
 
+                    // Name Pkmn2
                     widget::Text::new(&name2)
                         .color(color2)
                         .middle_of(ids.bg_sprite2)
@@ -953,6 +980,7 @@ impl App {
                         .line_spacing(10.0)
                         .set(ids.text_test2, ui);
 
+                    // HP & Status Pkmn2
                     widget::Text::new(&[hp2, "HP\n\n".to_string(), status2.to_string()].concat())
                         .color(color2)
                         .down_from(ids.text_test2, -200.0)
@@ -984,14 +1012,15 @@ impl App {
                         println!("Battle_Fight");
                         match app.player {
                             Player::One => {
-                                println!("{:?}", player1.clone().get_next_move());
                                 if let Some(_) = player1.clone().get_next_move() {
                                     app.player = Player::Two;
+                                    println!("player one voll");
                                 }
                             }
                             Player::Two => {
                                 if let Some(_) = player2.clone().get_next_move() {
                                     app.player = Player::One;
+                                    println!("player two voll");
                                 }
                             }
                         }
@@ -1016,7 +1045,9 @@ impl App {
                         app.screen = Screen::Switch;
                     }
 
-                    // ===== Choose attack =====
+                    // /////////////////////////////////////////////////////////////
+                    // //////////               CHOOSE ATTACK             //////////
+                    // /////////////////////////////////////////////////////////////
                     if let Screen::BattleAttack = app.sub_screen {
                         let label1 = match app.player.clone() {
                             Player::One => {
@@ -1360,7 +1391,17 @@ impl App {
                         app.set_battle_text("\nWhat will Player 1 do?".to_string());
                         app.done = false;
                     }
+
+                    // Show end screen when fight is over (one teams' pokemon are all dead)
+                    if arena.get_player_one().clone().get_alive_count() == 0 
+                       || arena.get_player_two().clone().get_alive_count() == 0 {
+                        app.screen = Screen::Title;
+                    }
                 }
+
+
+
+
 
                 if let Screen::Switch = app.screen {
                     let player_show = match app.player {
@@ -1464,6 +1505,7 @@ impl App {
                     }
                 }
 
+                // einfach immer setten -> da immer gleich sein
                 match app.player.clone() {
                     Player::One => {
                         let player = arena.get_player_one();

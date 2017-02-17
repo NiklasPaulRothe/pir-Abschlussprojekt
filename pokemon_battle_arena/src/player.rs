@@ -152,7 +152,7 @@ impl Player {
     pub fn get_alive_count(&mut self) -> usize {
         let mut alive = 0;
         for i in 0..self.pokemon_list.len() {
-            if self.pokemon_list[i].get_current().get_stat(&enums::Stats::Hp) == 0 {
+            if self.pokemon_list[i].get_current().get_stat(&enums::Stats::Hp) != 0 {
                 alive += 1;
             }
         }
