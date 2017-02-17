@@ -15,6 +15,7 @@ use graphic;
 use player::{Player, Next};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use super::unique;
 
 
 /// Struct that is a representation of a move a pokemon can learn. Contains everything that is
@@ -442,7 +443,17 @@ impl Technique {
                         println!("It has no effect on {}", target_clone.get_name());
                     }
                 }
-                enums::MoveCategory::Unique => {}
+                enums::MoveCategory::Unique => {
+                    // unique::unique(&self.clone(),
+                    //                self.get_name(),
+                    //                user_clone,
+                    //                target_clone,
+                    //                &mut attacker_clone,
+                    //                &mut defender_clone,
+                    //                &mut arena,
+                    //                flag,
+                    //                &mut window);
+                }
             };
         } else {
             window.set_battle_text(user_clone.get_name() + " misses " + &target_clone.get_name());

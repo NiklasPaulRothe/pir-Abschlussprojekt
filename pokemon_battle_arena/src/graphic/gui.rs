@@ -44,7 +44,7 @@ enum Mode {
 ///     bg_color        -   background
 ///     button_color    -   button color
 ///     border_color    -   border colog
-/// 
+///
 ///     ===== Variables =====
 ///     pokedex         -   used Pokedex
 ///     pkmn_team       -   variable to save current team in team selection
@@ -138,7 +138,8 @@ impl App {
 
     // Sets the battle text
     pub fn set_battle_text(&mut self, text: String) {
-        self.battle_text = [self.battle_text.clone()," ".to_string(), text, "\n".to_string()].concat();
+        self.battle_text = [self.battle_text.clone(), " ".to_string(), text, "\n".to_string()]
+            .concat();
     }
 
     // Draws the UI
@@ -830,8 +831,12 @@ impl App {
                     println!(".");
                     let player1 = arena.get_player_one().clone();
                     let player2 = arena.get_player_two().clone();
-                    let dead_one = !player1.clone().get_pokemon_list()[player1.clone().get_current()].is_alive();
-                    let dead_two = !player2.clone().get_pokemon_list()[player2.clone().get_current()].is_alive();
+                    let dead_one = !player1.clone().get_pokemon_list()[player1.clone()
+                            .get_current()]
+                        .is_alive();
+                    let dead_two = !player2.clone().get_pokemon_list()[player2.clone()
+                            .get_current()]
+                        .is_alive();
 
                     if dead_one || dead_two {
                         app.screen = Screen::Switch;
