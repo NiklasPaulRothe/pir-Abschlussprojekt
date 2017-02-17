@@ -138,7 +138,7 @@ impl App {
 
     // Sets the battle text
     pub fn set_battle_text(&mut self, text: String) {
-        self.battle_text = [self.battle_text.clone(), text, "\n".to_string()].concat();
+        self.battle_text = [self.battle_text.clone()," ".to_string(), text, "\n".to_string()].concat();
     }
 
     // Draws the UI
@@ -346,9 +346,9 @@ impl App {
                 // //////////            CHOOSE TEAM SCREEN           //////////
                 // /////////////////////////////////////////////////////////////
                 if let Screen::ChooseTeam = app.screen {
-                    // ==============================
-                    // =====       POKEDEX      =====
-                    // ==============================
+                    // =========================================================
+                    // ==========           POKEDEX                   ==========
+                    // =========================================================
                     let pokedex_entries = app.pokedex.get_entries();
                     let num_items = pokedex_entries.len();
                     let (mut events, scrollbar) = widget::ListSelect::single(num_items, 64.0)
@@ -406,9 +406,11 @@ impl App {
                         }
                     }
 
-                    // ==============================
-                    // =====     PLAYER TEAM    =====
-                    // ==============================
+
+
+                    // =========================================================
+                    // ==========              PLAYER TEAM            ==========
+                    // =========================================================
                     let (mut events, _) = widget::ListSelect::single(6, 650.0 / 6.0)
                         .w_h(200.0, 650.0)
                         .mid_right_with_margin_on(ids.canvas, 25.0)
@@ -491,9 +493,11 @@ impl App {
                         }
                     }
 
-                    // ===================================
-                    // = Description of selected Pokemon =
-                    // ===================================
+
+
+                    // =========================================================
+                    // ==========             DESCRIPTION             ==========
+                    // =========================================================
                     let description = match app.sel_pkmn.0 {
                         None => "".to_string(),
                         Some(ref pkmn) => {
@@ -537,10 +541,11 @@ impl App {
                         .line_spacing(2.5)
                         .set(ids.text_sel_pkmn, ui);
 
-                    // ==================================
-                    // = Sprite of the selected Pokemon =
-                    // ==================================
 
+
+                    // =========================================================
+                    // ==========                SPRITE               ==========
+                    // =========================================================
                     // Background for Sprite
                     widget::Canvas::new()
                         .color(conrod::color::LIGHT_GREY)
@@ -549,9 +554,11 @@ impl App {
                         .top_left_with_margins_on(ids.canvas, 35.0, WIDTH as f64 / 5.0)
                         .set(ids.bg_sprite, ui);
 
-                    // ====================
-                    // = Attack Selection =
-                    // ====================
+
+
+                    // =========================================================
+                    // ==========               ATTACKS               ==========
+                    // =========================================================
 
                     // Background for attack selection
                     widget::Canvas::new()
@@ -561,14 +568,13 @@ impl App {
                         .mid_bottom_with_margin_on(ids.canvas, 100.0)
                         .set(ids.bg_att_sel, ui);
 
-                    // Only show stuff when there is a Pokemon selected
+                    // Only show when there is a Pokemon selected
                     if let Some(_) = app.sel_pkmn.clone().0 {
                         let techniques = app.techs.clone().unwrap();
                         let num_items = techniques.len();
-                        let item_h = 64.0;
 
                         // List with all possible attacks for the selected Pokemon
-                        let (mut events, scrollbar) = widget::ListSelect::single(num_items, item_h)
+                        let (mut events, scrollbar) = widget::ListSelect::single(num_items, 64.0)
                             .scrollbar_next_to()
                             .w_h(200.0, 320.0)
                             .mid_left_with_margin_on(ids.bg_att_sel, 0.0)
@@ -615,33 +621,20 @@ impl App {
                             }
                         }
 
-                        // Add buttons for attacks
-                        let label1 = if app.pkmn_moves.len() > 0 {
-                            app.pkmn_moves[0].get_name().to_string()
-                        } else {
-                            "".to_string()
-                        };
-                        let label2 = if app.pkmn_moves.len() > 1 {
-                            app.pkmn_moves[1].get_name().to_string()
-                        } else {
-                            "".to_string()
-                        };
-                        let label3 = if app.pkmn_moves.len() > 2 {
-                            app.pkmn_moves[2].get_name().to_string()
-                        } else {
-                            "".to_string()
-                        };
-                        let label4 = if app.pkmn_moves.len() > 3 {
-                            app.pkmn_moves[3].get_name().to_string()
-                        } else {
-                            "".to_string()
-                        };
+                        // Get all attack names
+                        let mut label = Vec::with_capacity(4);
+                        for attack in app.pkmn_moves.clone() {
+                            label.push(attack.get_name().to_string());
+                        }
+                        while label.len() < 4 {
+                            label.push("".to_string());
+                        }
 
                         if widget::Button::new()
                             .border(4.0)
                             .border_color(app.button_color)
                             .color(app.bg_color)
-                            .label(&label1)
+                            .label(&label[0])
                             .label_color(app.label_color)
                             .left_from(ids.button_att2, 0.0)
                             .w_h(285.0, 160.0)
@@ -652,13 +645,11 @@ impl App {
                                 app.pkmn_moves.remove(0);
                             }
                         }
-
-
                         if widget::Button::new()
                             .border(4.0)
                             .border_color(app.button_color)
                             .color(app.bg_color)
-                            .label(&label2)
+                            .label(&label[1])
                             .label_color(app.label_color)
                             .top_right_with_margin_on(ids.bg_att_sel, 0.0)
                             .w_h(285.0, 160.0)
@@ -669,12 +660,11 @@ impl App {
                                 app.pkmn_moves.remove(1);
                             }
                         }
-
                         if widget::Button::new()
                             .border(4.0)
                             .border_color(app.button_color)
                             .color(app.bg_color)
-                            .label(&label3)
+                            .label(&label[2])
                             .label_color(app.label_color)
                             .down_from(ids.button_att1, 0.0)
                             .w_h(285.0, 160.0)
@@ -685,12 +675,11 @@ impl App {
                                 app.pkmn_moves.remove(2);
                             }
                         }
-
                         if widget::Button::new()
                             .border(4.0)
                             .border_color(app.button_color)
                             .color(app.bg_color)
-                            .label(&label4)
+                            .label(&label[3])
                             .label_color(app.label_color)
                             .right_from(ids.button_att3, 0.0)
                             .w_h(285.0, 160.0)
@@ -833,10 +822,21 @@ impl App {
                     }
                 }
 
+
+
+
                 // Draws Fight Screen
                 if let Screen::Battle = app.screen {
+                    println!(".");
                     let player1 = arena.get_player_one().clone();
                     let player2 = arena.get_player_two().clone();
+                    let dead_one = !player1.clone().get_pokemon_list()[player1.clone().get_current()].is_alive();
+                    let dead_two = !player2.clone().get_pokemon_list()[player2.clone().get_current()].is_alive();
+
+                    if dead_one || dead_two {
+                        app.screen = Screen::Switch;
+                        return;
+                    }
 
                     // Text BG
                     let player_show = match app.player {
@@ -1380,7 +1380,7 @@ impl App {
                         .mid_left_with_margin_on(ids.canvas, 25.0)
                         .set(ids.slist_team, ui);
 
-                    let mut player = match app.player {
+                    let player = match app.player {
                         Player::One => arena.get_player_one(),
                         Player::Two => arena.get_player_two(),
                     };
@@ -1461,6 +1461,21 @@ impl App {
                         .was_clicked() {
                         println!("Back");
                         app.screen = Screen::Battle;
+                    }
+                }
+
+                match app.player.clone() {
+                    Player::One => {
+                        let player = arena.get_player_one();
+                        if player.get_current() != app.changed_pkmn_p1 {
+                            player.set_current(app.changed_pkmn_p1);
+                        }
+                    }
+                    Player::Two => {
+                        let player = arena.get_player_two();
+                        if player.get_current() != app.changed_pkmn_p2 {
+                            player.set_current(app.changed_pkmn_p2);
+                        }
                     }
                 }
             });
