@@ -37,7 +37,7 @@ impl<'a> super::Arena<'a> {
                         Next::Switch(_) => {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            call_resolve(self, technique, enums::Player::Two, &mut window);
+                            call_resolve(self, technique, enums::Player::One, &mut window);
                             self.get_player_one().set_next_move(None);
 
                         }
@@ -54,7 +54,7 @@ impl<'a> super::Arena<'a> {
                         if technique.get_id() == 228 {
                             // Resolving pursuit, updating last action and last move
                             // and setting the next move to None
-                            call_resolve(self, technique, enums::Player::One, &mut window);
+                            call_resolve(self, technique, enums::Player::Two, &mut window);
                             self.get_player_two().set_next_move(None);
                         }
                     }
@@ -99,7 +99,7 @@ impl<'a> super::Arena<'a> {
         if self.get_player_one().get_next_move().is_none() &&
            self.get_player_two().get_next_move().is_some() {
             match self.get_player_two().get_next_move().unwrap() {
-                Next::Move(x) => call_resolve(self, x, enums::Player::Two, &mut window),
+                Next::Move(x) => {call_resolve(self, x, enums::Player::Two, &mut window);},
                 _ => {}
             }
             end_of_fight = true;
@@ -107,7 +107,7 @@ impl<'a> super::Arena<'a> {
         } else if self.get_player_two().get_next_move().is_none() &&
                   self.get_player_one().get_next_move().is_some() {
             match self.get_player_one().get_next_move().unwrap() {
-                Next::Move(x) => call_resolve(self, x, enums::Player::One, &mut window),
+                Next::Move(x) => {call_resolve(self, x, enums::Player::One, &mut window);},
                 _ => {}
             }
             end_of_fight = true;
@@ -162,39 +162,57 @@ impl<'a> super::Arena<'a> {
             }
             // The attack with the higher Priority starts
             if one_prio > two_prio {
-                call_resolve(self, one_attack, enums::Player::One, &mut window);
-                call_resolve(self, two_attack, enums::Player::Two, &mut window);
+                if call_resolve(self, one_attack, enums::Player::Two, &mut window) {
+                call_resolve(self, two_attack, enums::Player::One, &mut window); }
             } else if one_prio < two_prio {
-                call_resolve(self, two_attack, enums::Player::Two, &mut window);
-                call_resolve(self, one_attack, enums::Player::One, &mut window);
+                if call_resolve(self, two_attack, enums::Player::One, &mut window) {
+                call_resolve(self, one_attack, enums::Player::Two, &mut window); }
             } else {
                 // If the attack priority is the same the pokemon with the higher attackspeed starts
                 // If the attack speed is the same, the pokemon of player one will strike first
                 if one_speed >= two_speed {
-                    call_resolve(self, one_attack, enums::Player::One, &mut window);
-                    call_resolve(self, two_attack, enums::Player::Two, &mut window);
+                    if call_resolve(self, one_attack, enums::Player::Two, &mut window) {
+                    call_resolve(self, two_attack, enums::Player::One, &mut window); }
                 } else {
-                    call_resolve(self, two_attack, enums::Player::Two, &mut window);
-                    call_resolve(self, one_attack, enums::Player::One, &mut window);
+                    if call_resolve(self, two_attack, enums::Player::One, &mut window) {
+                    call_resolve(self, one_attack, enums::Player::Two, &mut window); }
                 }
             }
         }
-        // Increases Counter for NonVolatile status
-        let mut current = self.get_player_one().get_current();
-        self.get_player_one().get_pokemon_list()[current].increment_non_volatile();
-        current = self.get_player_two().get_current();
-        self.get_player_two().get_pokemon_list()[current].increment_non_volatile();
-        // End of Turn moves like validate the weather and effects, handle poison etc.
-        end_of_turn_flags(self, enums::Player::One, window);
-        end_of_turn_flags(self, enums::Player::Two, window);
-        self.validate_effects_and_weather();
+
+        // Handles Poison and Burn aswell as BadPoison(Bad Poison is dealing the same damage as
+        // Poison right now)
+        // Player One
+        let mut non_volatile = get_target(enums::Player::One, self).get_non_volatile().0;
+        if (non_volatile == enums::NonVolatile::Poison) ||
+           (non_volatile == enums::NonVolatile::Burn) ||
+           (non_volatile == enums::NonVolatile::BadPoison) {
+            window.set_battle_text(get_target(enums::Player::One, self).get_name().clone() +
+                                   " got damage by " +
+                                   non_volatile.to_string().as_str());
+            poison_burn_damage(self, enums::Player::One);
+        }
+        // Player Two
+        non_volatile = get_target(enums::Player::Two, self).get_non_volatile().0;
+        if (non_volatile == enums::NonVolatile::Poison) ||
+           (non_volatile == enums::NonVolatile::Burn) ||
+           (non_volatile == enums::NonVolatile::BadPoison) {
+            window.set_battle_text(get_target(enums::Player::Two, self).get_name().clone() +
+                                   " got damage by " +
+                                   non_volatile.to_string().as_str());
+            poison_burn_damage(self, enums::Player::Two);
+        }
+
+        // Checks if one of the two player died
+        check_dead(enums::Player::One, self, window);
+        check_dead(enums::Player::Two, self, window);
     }
 }
 /// Resolving if the resolve method must be called and after that if the pokemon is dead
 fn call_resolve(arena: &mut super::Arena,
                 attack: moves::Technique,
                 player: enums::Player,
-                mut window: &mut graphic::gui::App) {
+                mut window: &mut graphic::gui::App) -> bool {
     let mut attack_is_allowed = true;
     // Checks if the pokemon is allowed to attack. This is influeced by Sleep, Freeze and Paralysis
     // Checks if the pokemon is paralysed
@@ -256,7 +274,7 @@ fn call_resolve(arena: &mut super::Arena,
             window.set_battle_text(message + " has the infatuation effect!");
         } else {
             if get_attacker(player, arena).get_next_move().unwrap() == Next::Flinch {
-                window.set_battle_text(message.clone() + "flinched.");
+                window.set_battle_text(message.clone() + " flinched.");
                 let last = get_attacker(player, arena).get_next_move().unwrap();
                 get_attacker(player, arena).set_last_action((last, 0));
                 get_attacker(player, arena).set_next_move(None);
@@ -266,39 +284,30 @@ fn call_resolve(arena: &mut super::Arena,
             }
         }
     }
-    // Handles Poison and Burn aswell as BadPoison(Bad Poison is dealing the same damage as Poison
-    // right now)
-    let non_volatile = get_target(player, arena).get_non_volatile().0;
-    if (non_volatile == enums::NonVolatile::Poison) || (non_volatile == enums::NonVolatile::Burn) ||
-       (non_volatile == enums::NonVolatile::BadPoison) {
-        window.set_battle_text(get_target(player, arena).get_name().clone() + " got damage by" +
-                               non_volatile.to_string());
-        poison_burn_damage(arena, player);
-    }
-
-    // Checks if the pokemon are dead
-    let current_one = arena.get_player_one().get_current();
-    let dead_one = !arena.get_player_one().get_pokemon_list()[current_one].is_alive();
-    let message_one = arena.get_player_one().get_pokemon_list()[current_one].get_name().clone();
-    let current_two = arena.get_player_two().get_current();
-    let dead_two = !arena.get_player_two().get_pokemon_list()[current_two].is_alive();
-    let message_two = arena.get_player_two().get_pokemon_list()[current_two].get_name().clone();
-    // Swaps the pokemon if its dead
-    if dead_one {
-        window.set_battle_text(message_one.clone() + "is defeated!");
-        let new = window.get_changed_pokemon(player);
-        arena.get_player_one().set_current(new);
-    }
-    if dead_two {
-        window.set_battle_text(message_two.clone() + "is defeated!");
-        let new = window.get_changed_pokemon(player);
-        arena.get_player_two().set_current(new);
+    // Checks if one of the two player died
+    match player {
+        enums::Player::One => {
+            if check_dead(enums::Player::One, arena, window) {
+                check_dead(enums::Player::Two, arena, window);
+                return true;
+            }
+            false
+        }
+        enums::Player::Two => {
+            if check_dead(enums::Player::Two, arena, window) {
+                check_dead(enums::Player::One, arena, window);
+                return true;
+            }
+            false
+        }
     }
 
 }
 
 /// Handles the end of turn flags
-fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &graphic::gui::App) {
+fn end_of_turn_flags(arena: &mut super::Arena,
+                     player: enums::Player,
+                     mut window: &mut graphic::gui::App) {
     let map: HashMap<enums::EndOfTurn, u8> =
         get_target(player, arena).get_end_of_turn_flags().clone();
 
@@ -338,8 +347,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                         .set_stats(enums::Stats::Hp, hp);
                 }
                 if !get_target(player, arena).is_alive() {
-                    let new = window.get_changed_pokemon(enums::Player::One);
-                    arena.get_player_one().set_current(new);
+                    window.set_screen(graphic::gui::Screen::Switch);
                 }
             }
             // After four rounds the pokemon will die
@@ -353,8 +361,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     get_target(player, arena)
                         .get_current()
                         .set_stats(enums::Stats::Hp, 0);
-                    let new = window.get_changed_pokemon(enums::Player::One);
-                    get_attacker(player, arena).set_current(new);
+                    window.set_screen(graphic::gui::Screen::Switch);
                 }
             }
             // Pokemon will fall asleep in the next round
@@ -411,8 +418,7 @@ fn end_of_turn_flags(arena: &mut super::Arena, player: enums::Player, window: &g
                     .set_stats(enums::Stats::Hp, hp - damage);
                 // if pokemon dead force a switch
                 if !get_target(player, arena).is_alive() {
-                    let new = window.get_changed_pokemon(enums::Player::One);
-                    get_attacker(player, arena).set_current(new);
+                    window.set_screen(graphic::gui::Screen::Switch);
                 }
 
             }
@@ -463,23 +469,31 @@ fn infatuation(arena: &mut super::Arena, player: enums::Player) -> bool {
 }
 /// Deals the burn and poison damage.
 fn poison_burn_damage(arena: &mut super::Arena, player: enums::Player) {
-    let mut hp = get_target(player, arena)
+    let base_hp = get_target(player, arena)
         .get_base()
         .get_stat(&enums::Stats::Hp);
     // Get the amount for heal
-    hp = hp - (hp / 8);
-    if get_target(player, arena)
-        .get_base()
-        .get_stat(&enums::Stats::Hp) >= hp {
-        get_target(player, arena)
-            .get_current()
-            .set_stats(enums::Stats::Hp, hp);
+    let damage = base_hp / 8;
+    let current_hp = get_target(player, arena).get_current().get_stat(&enums::Stats::Hp);
+    if !(damage > current_hp) {
+        get_target(player, arena).get_current().set_stats(enums::Stats::Hp, current_hp - damage);
     } else {
-        hp = get_target(player, arena)
-            .get_base()
-            .get_stat(&enums::Stats::Hp);
-        get_target(player, arena)
-            .get_current()
-            .set_stats(enums::Stats::Hp, hp);
+        get_target(player, arena).get_current().set_stats(enums::Stats::Hp, 0);
     }
+}
+
+/// Checks if the pokemon are dead
+fn check_dead(player: enums::Player,
+              arena: &mut super::Arena,
+              mut window: &mut graphic::gui::App) -> bool{
+    // Checks if the pokemon are dead
+    let dead = !get_target(player, arena).is_alive();
+    let message = get_target(player, arena).get_name().clone();
+    // Swaps the pokemon if its dead
+    if dead {
+        window.set_battle_text(message.clone() + " is defeated!");
+        window.set_screen(graphic::gui::Screen::Switch);
+        return true;
+    }
+    false
 }
